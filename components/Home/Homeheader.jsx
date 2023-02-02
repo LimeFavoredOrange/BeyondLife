@@ -8,7 +8,6 @@ import { selectGreeting } from '../../redux/slices/homeSlice';
 
 const Header = () => {
   const greeting = useSelector(selectGreeting);
-  console.log(greeting);
   return (
     <View>
       <View className="items-start px-3">

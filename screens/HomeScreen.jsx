@@ -11,8 +11,8 @@ import HomeHeader from '../components/Home/Homeheader';
 import HomeDashboard from '../components/Home/Homedashboard';
 
 // Account Tab
-import AccountHeader from '../components/Account/AccountHeader';
-import AccountDashboard from '../components/Account/AccountDashboard';
+import AccountHeader from '../components/Account/AutomaticWillHeader';
+import AccountDashboard from '../components/Account/AutomaticWillDashboard';
 
 const HomeScreen = () => {
   const selectedTab = useSelector(selectSelectedTab);
@@ -24,9 +24,9 @@ const HomeScreen = () => {
           <HomeDashboard />
         </>
       )}
-      {selectedTab === 'Add' && (
+      {selectedTab === 'Document' && (
         <>
-          <AccountHeader title={'Account Automation'} />
+          <AccountHeader title={'Automatic Will'} />
           <AccountDashboard />
         </>
       )}
@@ -36,5 +36,3 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
-
-const styles = StyleSheet.create({});

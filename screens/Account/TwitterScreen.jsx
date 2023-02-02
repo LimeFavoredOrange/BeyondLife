@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet, SafeAreaView, FlatList, Image, Modal, TouchableOpacity } from 'react-native';
 import React from 'react';
-import AccountHeader from '../../components/Account/AccountHeader';
+import AccountHeader from '../../components/Account/AutomaticWillHeader';
 import axios from 'axios';
-import { Button, SearchBar, CheckBox, Divider } from '@rneui/themed';
+import { Button, SearchBar, CheckBox, Icon } from '@rneui/themed';
 
 const TwitterScreen = () => {
   const [tweets, setTweets] = React.useState([]);
@@ -20,7 +20,7 @@ const TwitterScreen = () => {
   const [searching, setSearching] = React.useState('');
 
   const getTweets = async () => {
-    const response = await axios.get('http://localhost:8080/getTweets');
+    const response = await axios.get('https://tor2023.onrender.com/getTweets');
     // const likes = (await axios.get('http://localhost:8080/likes')).data.likedTweets.data;
     setTweets(response.data.tweets.data);
     setTargets(response.data.tweets.data);
@@ -43,7 +43,7 @@ const TwitterScreen = () => {
   };
 
   const deleteTweet = async (id) => {
-    const response = await axios.post(`http://localhost:8080/delete/${id}`);
+    const response = await axios.post(`https://tor2023.onrender.com/delete/${id}`);
     if (response.status === 200) {
       setTargets((current) => current.filter((item) => item.id !== id));
     }
@@ -108,7 +108,9 @@ const TwitterScreen = () => {
           setShowOptions(true);
         }}
       />
+
       <SearchBar placeholder="Type Here..." platform="ios" onChangeText={(e) => setSearching(e)} value={searching} />
+
       <FlatList
         data={targets}
         renderItem={({ item }) => {
