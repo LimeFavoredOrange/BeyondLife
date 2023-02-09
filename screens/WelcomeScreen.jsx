@@ -1,37 +1,113 @@
-import { Text, View, Image, StatusBar } from 'react-native';
+import { Text, View, Image } from 'react-native';
 import React from 'react';
 import * as Animatable from 'react-native-animatable';
 import { Button } from '@rneui/themed';
-import { useNavigation } from '@react-navigation/native';
+import Loading from '../components/Loading';
+
+import Login from '../components/Welcome/Login';
+import Register from '../components/Welcome/Register';
 
 const WelcomeScreen = () => {
-  const navigation = useNavigation();
+  const [animating, setAnimating] = React.useState('zoomIn');
+  const [currentHeight, setCurrentHeight] = React.useState('66%');
+  const [currentMode, setCurrentMode] = React.useState('Welcome');
+  const [showLoading, setShowLoading] = React.useState(false);
+
+  const loginHeight = '46%';
+  const registerHeight = '36%';
+
+  // Login animation
+  const loginAnimation = {
+    from: {
+      height: currentHeight,
+    },
+    to: {
+      height: loginHeight,
+    },
+  };
+
+  // Register animation
+  const registerAnimation = {
+    from: {
+      height: currentHeight,
+    },
+    to: {
+      height: registerHeight,
+    },
+  };
+
   return (
     <View className="w-screen h-screen items-center" style={{ backgroundColor: '#1c7549' }}>
-      <Animatable.View animation="zoomIn" style={{ height: '66%' }} className=" justify-center items-center">
+      <Loading showLoading={showLoading} />
+      <Animatable.View
+        duration={500}
+        animation={animating}
+        style={{ height: '66%' }}
+        className=" justify-center items-center"
+      >
         <Image source={require('../assets/welcome.png')} style={{ width: 280, height: 280 }} resizeMode="contain" />
       </Animatable.View>
 
       <Animatable.View
-        animation="fadeInUpBig"
+        easing="linear"
+        animation={'fadeInUpBig'}
+        duration={600}
         delay={200}
         style={{ flex: 1 }}
         className="w-screen bg-white rounded-3xl"
       >
-        <Text className="text-2xl mt-2 font-bold text-center">Digital will.app</Text>
+        {currentMode === 'Welcome' && <Text className="text-2xl mt-3 font-bold text-center">Digital will.app</Text>}
         <View className="flex-1 justify-center items-center">
-          <View className="gap-2">
-            <Button
-              color="#036635"
-              buttonStyle={{ width: 300, borderRadius: 15 }}
-              onPress={() => navigation.navigate('Home')}
-            >
-              <Text className="font-bold text-white text-xl">Login</Text>
-            </Button>
-            <Button color="#4630EB" buttonStyle={{ width: 300, borderRadius: 15 }}>
-              <Text className="font-bold text-white text-xl">Register today</Text>
-            </Button>
-          </View>
+          {currentMode === 'Welcome' && (
+            <View className=" gap-2">
+              <Button
+                color="#036635"
+                buttonStyle={{ width: 300, borderRadius: 15 }}
+                onPress={() => {
+                  setAnimating(loginAnimation);
+                  setCurrentHeight(loginHeight);
+                  setCurrentMode('Login');
+                }}
+              >
+                <Text className="font-bold text-white text-xl">Login</Text>
+              </Button>
+
+              <Button
+                color="#4630EB"
+                buttonStyle={{ width: 300, borderRadius: 15 }}
+                onPress={() => {
+                  setAnimating(registerAnimation);
+                  setCurrentHeight(registerHeight);
+                  setCurrentMode('Register');
+                }}
+              >
+                <Text className="font-bold text-white text-xl">Register today</Text>
+              </Button>
+            </View>
+          )}
+
+          {currentMode === 'Login' && (
+            <Login
+              setShowLoading={setShowLoading}
+              registerAnimation={registerAnimation}
+              setCurrentHeight={setCurrentHeight}
+              setCurrentMode={setCurrentMode}
+              setAnimating={setAnimating}
+              registerHeight={registerHeight}
+            />
+          )}
+
+          {currentMode === 'Register' && (
+            <Register
+              setShowLoading={setShowLoading}
+              loginAnimation={loginAnimation}
+              registerAnimation={registerAnimation}
+              setCurrentHeight={setCurrentHeight}
+              setCurrentMode={setCurrentMode}
+              setAnimating={setAnimating}
+              loginHeight={loginHeight}
+            />
+          )}
         </View>
       </Animatable.View>
     </View>

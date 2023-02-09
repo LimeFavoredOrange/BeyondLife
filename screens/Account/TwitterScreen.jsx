@@ -1,36 +1,77 @@
 import { View, Text, StyleSheet, SafeAreaView, FlatList, Image, Modal, TouchableOpacity } from 'react-native';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+
 import React from 'react';
 import AccountHeader from '../../components/Account/AutomaticWillHeader';
 import axios from 'axios';
-import { Button, SearchBar, CheckBox, Icon } from '@rneui/themed';
+import { Button, SearchBar, Badge, Tab, TabView } from '@rneui/themed';
+
+import Filter from '../../components/Account/Filter';
+import AutoSetting from '../../components/Account/AutoSetting';
+
+import Loading from '../../components/Loading';
 
 const TwitterScreen = () => {
+  const mlURL = 'https://89fc-203-91-225-221.au.ngrok.io';
   const [tweets, setTweets] = React.useState([]);
   const [targets, setTargets] = React.useState([]);
+  const [imageData, setImageData] = React.useState([]);
+  const [offensiveData, setOffensiveData] = React.useState([]);
+  const [showLoading, setShowLoading] = React.useState(false);
   let current_data = tweets;
 
   const [medias, setMedias] = React.useState([]);
   const [likes, setLikes] = React.useState([]);
 
-  const [option, setOption] = React.useState('Default');
-  const [offensive, setOffensive] = React.useState('noDetect');
   const [tab, setTab] = React.useState('Tweets&replies');
   const [showOptions, setShowOptions] = React.useState(false);
 
+  const [selectImage, setSelectImage] = React.useState(0);
+  const [selectOffensive, setSelectOffensive] = React.useState(0);
+  const [enable, setEnable] = React.useState(0);
+
   const [searching, setSearching] = React.useState('');
 
+  const [showSetting, setShowSetting] = React.useState(false);
+
   const getTweets = async () => {
-    const response = await axios.get('https://tor2023.onrender.com/getTweets');
+    setShowLoading(true);
+    const response = await axios.get('https://tor2023-203l.onrender.com/twitter/getTweets');
     // const likes = (await axios.get('http://localhost:8080/likes')).data.likedTweets.data;
-    setTweets(response.data.tweets.data);
-    setTargets(response.data.tweets.data);
+    getUserSetting();
+    const tweetsData = response.data.tweets.data;
+    for (const tweet in tweetsData) {
+      const checkOffensive = await detectOffensive(removeLink(tweetsData[tweet].text));
+      if (checkOffensive === 'Toxicity: True') {
+        tweetsData[tweet].offensive = true;
+      } else {
+        tweetsData[tweet].offensive = false;
+      }
+    }
+    setShowLoading(false);
+    setTweets(tweetsData);
+    setTargets(tweetsData);
+    setImageData(tweetsData.filter((item) => item.attachments).map((item) => item.id));
+    setOffensiveData(tweetsData.filter((item) => item.offensive).map((item) => item.id));
     setMedias(response.data.tweets.includes.media);
-    setLikes(likes);
+    // setLikes(likes);
   };
 
   React.useEffect(() => {
     getTweets();
   }, []);
+
+  const detectOffensive = async (text) => {
+    try {
+      const response = await axios.get(`${mlURL}/detectToxicity`, { params: { text } });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   const removeLink = (text) => {
     const regex = /https?:\/\/[\w/:%#\$&\?\(\)~\.=\+\-]+/g;
@@ -43,22 +84,26 @@ const TwitterScreen = () => {
   };
 
   const deleteTweet = async (id) => {
-    const response = await axios.post(`https://tor2023.onrender.com/delete/${id}`);
+    const response = await axios.post(`https://tor2023-203l.onrender.com/twitter/delete/${id}`);
     if (response.status === 200) {
       setTargets((current) => current.filter((item) => item.id !== id));
     }
   };
 
+  const checkAutomaticAction = (target) => {
+    if (selectImage === 1 && target.attachments) {
+      return true;
+    }
+    if (selectOffensive === 1 && target.offensive) {
+      return true;
+    }
+    return false;
+  };
+
   React.useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      // console.log(searching);
-      // console.log(targets);
       const tar = tweets.filter((item) => item.text.toUpperCase().includes(searching.toUpperCase()));
       setTargets(tar);
-      // console.log(applyFunction(option, offensive, tab));
-      // setTargets((current) => current.filter((item) => item.text.toUpperCase().includes(searching.toUpperCase())));
-      // setTargets(applyFunction(option, offensive, tab));
-      // handleSearch();
     }, 300);
     return () => clearTimeout(delayDebounceFn);
   }, [searching]);
@@ -67,25 +112,13 @@ const TwitterScreen = () => {
     let tar = current_data.filter((item) => item.text.toUpperCase().includes(searching.toUpperCase()));
 
     if (option === 'containMedia') {
-      tar = tar
-        .filter((item) => item.text.toUpperCase().includes(searching.toUpperCase()))
-        .filter((item) => item.attachments);
+      tar = tar.filter((item) => item.attachments);
     } else if (option === 'noMedia') {
-      tar = tar
-        .filter((item) => item.text.toUpperCase().includes(searching.toUpperCase()))
-        .filter((item) => !item.attachments);
+      tar = tar.filter((item) => !item.attachments);
     }
 
     if (offensive === 'offensive') {
-      const offensiveList = [];
-      for (const item of tar) {
-        // console.log(item);
-        const response = await checkOffensive(item.text);
-        if (response === 'Toxicity: True') {
-          offensiveList.push(item);
-        }
-      }
-      tar = offensiveList;
+      tar = tar.filter((item) => item.offensive);
     }
 
     if (tab === 'Replies') {
@@ -94,19 +127,59 @@ const TwitterScreen = () => {
     return tar;
   };
 
-  const handleSearch = async () => {
-    const tar = await applyFunction(option, offensive, tab, current_data);
-    setTargets(tar);
+  const getUserSetting = async () => {
+    try {
+      const res = await axios.get('https://tor2023-203l.onrender.com/twitter/autoSetting?userId=1');
+      const { deleteimage, deleteoffensive } = res.data;
+      console.log(deleteimage, deleteoffensive);
+      if (deleteimage === true) {
+        setSelectImage(1);
+      } else {
+        setSelectImage(0);
+      }
+
+      if (deleteoffensive === true) {
+        setSelectOffensive(1);
+      } else {
+        setSelectOffensive(0);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <Loading showLoading={showLoading} />
       <AccountHeader
+        setShowLoading={setShowLoading}
         title={'Twitter'}
-        icon={{ name: 'options', type: 'ionicon' }}
-        iconFunction={() => {
-          setShowOptions(true);
-        }}
+        icon={[
+          { name: 'options', type: 'ionicon' },
+          { name: 'refresh-auto', type: 'material-community' },
+          { name: 'clouddownload', type: 'antdesign' },
+        ]}
+        iconFunction={[
+          () => {
+            setShowOptions(true);
+          },
+          () => {
+            setShowSetting(true);
+          },
+          async () => {
+            const downloadedFile = await FileSystem.downloadAsync(
+              'https://tor2023-203l.onrender.com/twitter/backup',
+              FileSystem.documentDirectory + 'tweetsData.txt'
+            );
+            const imageFileExts = ['jpg', 'png', 'gif', 'heic', 'webp', 'bmp'];
+            const isIos = Platform.OS === 'ios';
+
+            if (isIos && imageFileExts.every((x) => !downloadedFile.uri.endsWith(x))) {
+              const UTI = 'twitter.item';
+              await Sharing.shareAsync(downloadedFile.uri, { UTI });
+            }
+          },
+        ]}
       />
 
       <SearchBar placeholder="Type Here..." platform="ios" onChangeText={(e) => setSearching(e)} value={searching} />
@@ -116,15 +189,21 @@ const TwitterScreen = () => {
         renderItem={({ item }) => {
           return (
             <View className="flex-row border-b">
-              <View style={{ height: 200, width: '80%' }} className="bg-gray-100 p-2">
-                <Text>id: {item.id}</Text>
-                <Text>author_id: {item.author_id}</Text>
-                <Text>created_at: {item.created_at}</Text>
-                {item.attachments === undefined && <Text>text: {item.text}</Text>}
+              <View style={{ height: 200, width: '80%' }} className="bg-gray-100 p-2 ">
+                <Text className="mb-2">id: {item.id}</Text>
+                <Text className="mb-2">author_id: {item.author_id}</Text>
+                <Text className="mb-2">created_at: {item.created_at}</Text>
+                {checkAutomaticAction(item) && (
+                  <Text>
+                    <Badge className="mb-2" value="will be automatically delete" status="primary" />
+                  </Text>
+                )}
+                {item.attachments === undefined && <Text className="mb-2">text: {item.text}</Text>}
                 {item.attachments && (
                   <>
-                    <Text>text: {removeLink(item.text)}</Text>
+                    <Text className="mb-2">text: {removeLink(item.text)}</Text>
                     <Image
+                      className="mb-2"
                       height={300}
                       width={300}
                       source={{ uri: `${getImage(item.attachments.media_keys[0])}`, width: 100, height: 100 }}
@@ -132,7 +211,7 @@ const TwitterScreen = () => {
                   </>
                 )}
               </View>
-              <View className="justify-center items-center">
+              <View className="justify-center items-center bg-gray-100 ">
                 <Button color="#FF2E2E" buttonStyle={{ borderRadius: 15 }} onPress={() => deleteTweet(item.id)}>
                   <Text className="font-bold text-white">Delete</Text>
                 </Button>
@@ -142,55 +221,31 @@ const TwitterScreen = () => {
         }}
       />
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showOptions}
-        onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
-          setShowOptions(!showOptions);
-        }}
-      >
-        <View className="flex-1 justify-center items-center mt-6">
-          <View className="bg-white rounded-xl shadow-lg items-center relative" style={{ width: 300, height: 350 }}>
-            <View className="flex-row justify-center">
-              <CheckBox
-                checked={option === 'Default'}
-                onPress={() => setOption('Default')}
-                checkedIcon="dot-circle-o"
-                uncheckedIcon="circle-o"
-                title={'Default'}
-              />
+      <Filter
+        applyFunction={applyFunction}
+        setTargets={setTargets}
+        setShowOptions={setShowOptions}
+        showOptions={showOptions}
+        tab={tab}
+        setTab={setTab}
+        current_data={current_data}
+      />
 
-              <CheckBox
-                checked={option === 'containMedia'}
-                onPress={() => setOption('containMedia')}
-                checkedIcon="dot-circle-o"
-                uncheckedIcon="circle-o"
-                title={'Contain media'}
-              />
-            </View>
-            <CheckBox
-              checked={option === 'noMedia'}
-              onPress={() => setOption('noMedia')}
-              checkedIcon="dot-circle-o"
-              uncheckedIcon="circle-o"
-              title={'noMedia'}
-            />
-
-            <TouchableOpacity
-              className="p-2 rounded-xl absolute bottom-2"
-              style={{ backgroundColor: '#036635', width: '50%' }}
-              onPress={async () => {
-                setShowOptions(!showOptions);
-                setTargets(await applyFunction(option, offensive, tab, current_data));
-              }}
-            >
-              <Text className="text-white text-center">Set options</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <AutoSetting
+        showSetting={showSetting}
+        setShowSetting={setShowSetting}
+        setTargets={setTargets}
+        tab={tab}
+        current_data={current_data}
+        setSelectImage={setSelectImage}
+        setSelectOffensive={setSelectOffensive}
+        setEnable={setEnable}
+        enable={enable}
+        selectImage={selectImage}
+        selectOffensive={selectOffensive}
+        imageData={imageData}
+        offensiveData={offensiveData}
+      />
     </SafeAreaView>
   );
 };

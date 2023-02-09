@@ -3,16 +3,23 @@ import React from 'react';
 import { Icon } from '@rneui/themed';
 import { Divider } from '@rneui/themed';
 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectGreeting } from '../../redux/slices/homeSlice';
+import { setIsLogin, setToken } from '../../redux/slices/auth';
 
 const Header = () => {
+  const dispatch = useDispatch();
   const greeting = useSelector(selectGreeting);
   return (
     <View>
       <View className="items-start px-3">
         <View className="flex-row justify-between items-center">
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              dispatch(setIsLogin(false));
+              dispatch(setToken(''));
+            }}
+          >
             <Icon name="user-alt" type="font-awesome-5" />
           </TouchableOpacity>
           <View className="flex-1"></View>
