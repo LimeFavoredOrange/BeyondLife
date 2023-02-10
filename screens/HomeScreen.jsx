@@ -57,6 +57,7 @@ const HomeScreen = () => {
                 const response = await axios.post('https://tor2023-203l.onrender.com/twitter/restore', {
                   data: fileContent,
                 });
+                console.log(response.data.data);
 
                 navigation.navigate('View Backup', { data: response.data.data });
               } catch (err) {

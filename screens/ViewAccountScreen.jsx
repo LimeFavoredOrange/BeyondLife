@@ -32,12 +32,24 @@ const ViewAccountScreen = ({ route }) => {
 
   return (
     <SafeAreaView>
-      <Text>Platform: {account?.platform}</Text>
-      <Text>Tag: {account?.tag}</Text>
-      <Text>Username: {account?.username}</Text>
-      <Text>Password: {account?.password}</Text>
-      <Text>Usefor: {account?.usefor}</Text>
-      <Text>Note: {account?.note}</Text>
+      <View className="border-b p-1">
+        <Text>Platform: {account?.platform}</Text>
+      </View>
+      <View className="border-b p-1">
+        <Text>Tag: {account?.tag}</Text>
+      </View>
+      <View className="border-b p-1">
+        <Text>Username: {account?.username}</Text>
+      </View>
+      <View className="border-b p-1">
+        <Text>Password: {account?.password}</Text>
+      </View>
+      <View className="border-b p-1">
+        <Text>Usefor: {account?.usefor}</Text>
+      </View>
+      <View className="border-b p-1">
+        <Text>Note: {account?.note}</Text>
+      </View>
     </SafeAreaView>
   );
 };

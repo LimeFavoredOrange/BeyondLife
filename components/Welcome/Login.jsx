@@ -29,6 +29,7 @@ const Login = ({
       dispatch(setIsLogin(true));
       dispatch(setToken(response.data.data.token));
     } catch (error) {
+      setShowLoading(false);
       console.log(error);
     }
   };
