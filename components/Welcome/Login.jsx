@@ -66,6 +66,7 @@ const Login = ({
           placeholder="Password"
           leftIcon={<Icon name="onepassword" type="material-community" size={24} color={'#036635'} />}
           onChangeText={(text) => setPassword(text)}
+          secureTextEntry={true}
         />
         <Button
           color="#036635"

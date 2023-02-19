@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, SafeAreaView, FlatList, Image, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, SafeAreaView, FlatList, Image, Modal, TouchableOpacity } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 

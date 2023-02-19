@@ -41,7 +41,12 @@ const ViewBackupScreen = ({ route }) => {
                       className="mb-2"
                       height={300}
                       width={300}
-                      source={{ uri: `${getImage(item.attachments.media_keys[0])}`, width: 100, height: 100 }}
+                      source={{
+                        uri: `${getImage(item.attachments.media_keys[0])}`,
+                        width: 100,
+                        height: 100,
+                        resizeMode: 'contain',
+                      }}
                     />
                   </>
                 )}

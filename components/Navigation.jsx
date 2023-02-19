@@ -16,6 +16,7 @@ import ViewAccountScreen from '../screens/ViewAccountScreen';
 
 // Account screen
 import TwitterScreen from '../screens/Account/TwitterScreen';
+import GoogleDriveScreen from '../screens/Account/GoogleDriveScreen';
 import ViewBackupScreen from '../screens/ViewBackupScreen';
 
 const Navigation = () => {
@@ -31,6 +32,7 @@ const Navigation = () => {
     <Stack.Navigator>
       <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Twitter" component={TwitterScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Google Drive" component={GoogleDriveScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Add Account" component={AddAccountScreen} />
       <Stack.Screen name="View Account" component={ViewAccountScreen} options={{ headerShown: false }} />
       <Stack.Screen name="View Backup" component={ViewBackupScreen} />

@@ -6,8 +6,8 @@ const Loading = ({ showLoading }) => {
     <View
       className="justify-center items-center h-screen w-screen bg-gray-100"
       style={{
-        display: `${showLoading ? '' : 'none'}`,
-        zIndex: '1000',
+        display: showLoading ? '' : 'none',
+        zIndex: 1000,
         position: 'absolute',
         backgroundColor: 'rgba(0, 0, 0, 0.3)',
       }}

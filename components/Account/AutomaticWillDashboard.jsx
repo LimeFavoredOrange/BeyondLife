@@ -20,6 +20,13 @@ const AccountDashboard = () => {
       type: 'antdesign',
       color: '#3B5998',
     },
+    {
+      id: 'Google Drive',
+      name: 'google-drive',
+      title: 'Google Drive',
+      type: 'entypo',
+      color: '#4285F4',
+    },
   ];
 
   return (
