@@ -1,8 +1,10 @@
 import { View, Text, TouchableOpacity, FlatList, Image, ScrollView } from 'react-native';
 import React from 'react';
 import { Icon } from '@rneui/themed';
+import { useNavigation } from '@react-navigation/native';
 
 const Dashboard = () => {
+  const navigation = useNavigation();
   const setup = [
     {
       id: 'Action number',
@@ -47,6 +49,7 @@ const Dashboard = () => {
               <TouchableOpacity
                 style={{ backgroundColor: `${item.backgroundColor}`, width: 200, height: 120 }}
                 className="p-5 bg-gray-200 m-2 rounded-xl"
+                onPress={() => navigation.navigate('Executor')}
               >
                 <View>
                   <Text className="text-lg font-semibold">{item.title}</Text>

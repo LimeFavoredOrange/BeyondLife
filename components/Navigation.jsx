@@ -9,6 +9,7 @@ const Stack = createNativeStackNavigator();
 // Screens
 import WelcomeScreen from '../screens/WelcomeScreen';
 import HomeScreen from '../screens/HomeScreen';
+import ExecutorScreen from '../screens/ExecutorScreen';
 
 // Key screen
 import AddAccountScreen from '../screens/AddAccountScreen';
@@ -31,6 +32,7 @@ const Navigation = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Executor" component={ExecutorScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Twitter" component={TwitterScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Google Drive" component={GoogleDriveScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Add Account" component={AddAccountScreen} />

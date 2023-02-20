@@ -17,8 +17,24 @@ const AddAccountScreen = () => {
   const [useFor, setUseFor] = React.useState('');
   const [note, setNote] = React.useState('');
 
+  const [executors, setExecutors] = React.useState([]);
+
   const token = useSelector(selectToken);
   const navigation = useNavigation();
+
+  const getExecutors = async () => {
+    const response = await axios.get('https://tor2023-203l.onrender.com/executor/all', {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    setExecutors(response.data.data);
+  };
+
+  React.useEffect(() => {
+    getExecutors();
+  }, []);
 
   const tags = [
     { color: 'red', name: 'Work' },
@@ -65,6 +81,58 @@ const AddAccountScreen = () => {
         }
         onChangeText={(text) => setPassword(text)}
       />
+
+      <View
+        style={{
+          width: vw(85),
+          borderRadius: 15,
+          borderWidth: 1.5,
+          borderColor: 'gray',
+          height: 100,
+          marginBottom: 20,
+        }}
+      >
+        <View
+          className="flex-row justify-center items-center"
+          style={{ backgroundColor: '#036635', borderTopLeftRadius: 13, borderTopRightRadius: 13, padding: 5 }}
+        >
+          <Text className="text-xl text-gray-100">Executors</Text>
+        </View>
+        <SelectDropdown
+          data={executors}
+          onSelect={(selectedItem, index) => {
+            setTag(selectedItem.name);
+          }}
+          defaultButtonText={'Link executor'}
+          buttonTextAfterSelection={(selectedItem, index) => {
+            return selectedItem.name;
+          }}
+          rowTextForSelection={(item, index) => {
+            return item.name;
+          }}
+          renderCustomizedRowChild={(item, index) => {
+            return (
+              <View className="flex-row justify-center items-center">
+                <View className="flex-1">
+                  <Text className="font-semibold">{item.name}</Text>
+                </View>
+              </View>
+            );
+          }}
+          renderDropdownIcon={(isOpened) => {
+            return <FontAwesome name={isOpened ? 'chevron-up' : 'chevron-down'} color={'black'} size={18} />;
+          }}
+          dropdownIconPosition={'right'}
+          buttonStyle={{
+            flex: 1,
+            backgroundColor: '#F3F4F6',
+            width: '100%',
+            height: 40,
+            borderBottomLeftRadius: 13,
+            borderBottomRightRadius: 13,
+          }}
+        />
+      </View>
 
       <View
         style={{

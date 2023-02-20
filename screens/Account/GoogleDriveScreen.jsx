@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, SafeAreaView, FlatList } from 'react-native';
+import { View, Text, SafeAreaView, FlatList, Image, Linking } from 'react-native';
 import axios from 'axios';
 import Loading from '../../components/Loading';
 import { Button } from '@rneui/base';
@@ -37,9 +37,16 @@ const GoogleDriveScreen = () => {
           return (
             <View className="flex-row border-b">
               <View style={{ height: 200, width: '80%' }} className="bg-gray-100 p-2 ">
-                <Text className="mb-2">id: {item.id}</Text>
-                <Text className="mb-2">name: {item.name}</Text>
+                <Image source={{ uri: `${item.iconLink}`, width: 30, height: 30 }} style={{ resizeMode: 'contain' }} />
+                <Text className="mb-2">Filename: {item.name}</Text>
                 <Text className="mb-2">MIME Type: {item.mimeType}</Text>
+                <Button
+                  color="#036635"
+                  buttonStyle={{ borderRadius: 15, width: '50%' }}
+                  onPress={() => Linking.openURL(item.webViewLink)}
+                >
+                  <Text className="font-bold text-white">View & Download</Text>
+                </Button>
               </View>
               <View className="justify-center items-center bg-gray-100 ">
                 <Button color="#FF2E2E" buttonStyle={{ borderRadius: 15 }} onPress={() => deleteFile(item.id)}>
