@@ -5,7 +5,7 @@ import * as Sharing from 'expo-sharing';
 import React from 'react';
 import AccountHeader from '../../components/Account/AutomaticWillHeader';
 import axios from 'axios';
-import { Button, SearchBar, Badge, Tab, TabView } from '@rneui/themed';
+import { Button, SearchBar, Badge } from '@rneui/themed';
 
 import Filter from '../../components/Account/Filter';
 import AutoSetting from '../../components/Account/AutoSetting';
@@ -13,7 +13,7 @@ import AutoSetting from '../../components/Account/AutoSetting';
 import Loading from '../../components/Loading';
 
 const TwitterScreen = () => {
-  const mlURL = 'https://89fc-203-91-225-221.au.ngrok.io';
+  const mlURL = 'https://5331-110-150-115-26.au.ngrok.io';
   const [tweets, setTweets] = React.useState([]);
   const [targets, setTargets] = React.useState([]);
   const [imageData, setImageData] = React.useState([]);
@@ -38,7 +38,6 @@ const TwitterScreen = () => {
   const getTweets = async () => {
     setShowLoading(true);
     const response = await axios.get('https://tor2023-203l.onrender.com/twitter/getTweets');
-    // const likes = (await axios.get('http://localhost:8080/likes')).data.likedTweets.data;
     getUserSetting();
     const tweetsData = response.data.tweets.data;
     for (const tweet in tweetsData) {
@@ -55,7 +54,6 @@ const TwitterScreen = () => {
     setImageData(tweetsData.filter((item) => item.attachments).map((item) => item.id));
     setOffensiveData(tweetsData.filter((item) => item.offensive).map((item) => item.id));
     setMedias(response.data.tweets.includes.media);
-    // setLikes(likes);
   };
 
   React.useEffect(() => {
