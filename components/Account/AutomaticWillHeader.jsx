@@ -25,33 +25,17 @@ const AccountHeader = ({ title, icon, iconFunction, isTab, tabIcon, tabIconFunct
           <>
             <View className="flex-1" />
             <View className="flex-row gap-2">
-              <TouchableOpacity>
-                {iconFunction ? (
-                  <Icon onPress={() => iconFunction[0]()} name={icon[0].name} type={icon[0].type} />
-                ) : (
-                  <Icon name={icon[0].name} type={icon[0].type} />
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity>
-                {iconFunction ? (
-                  <Icon onPress={() => iconFunction[1]()} name={icon[1].name} type={icon[1].type} />
-                ) : (
-                  <Icon name={icon[1].name} type={icon[1].type} />
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity>
-                {iconFunction ? (
-                  <Icon
-                    onPress={() => {
-                      iconFunction[2]();
-                    }}
-                    name={icon[2].name}
-                    type={icon[2].type}
-                  />
-                ) : (
-                  <Icon name={icon[2].name} type={icon[2].type} />
-                )}
-              </TouchableOpacity>
+              {icon.map((item, index) => {
+                return (
+                  <TouchableOpacity key={index}>
+                    {iconFunction ? (
+                      <Icon onPress={() => iconFunction[index]()} name={item.name} type={item.type} />
+                    ) : (
+                      <Icon name={item.name} type={item.type} />
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </>
         )}

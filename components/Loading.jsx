@@ -2,7 +2,6 @@ import { View, Text, ActivityIndicator } from 'react-native';
 import React from 'react';
 
 const Loading = ({ showLoading }) => {
-  console.log(showLoading);
   return (
     <View
       className="justify-center items-center h-screen w-screen bg-gray-100"

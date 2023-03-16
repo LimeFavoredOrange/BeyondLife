@@ -17,6 +17,7 @@
     "@rneui/themed": "^4.0.0-rc.7",
     "axios": "^1.2.6",
     "expo": "~47.0.12",
+    "expo-document-picker": "~11.0.1",
     "expo-file-system": "~15.1.1",
     "expo-sharing": "~11.0.1",
     "expo-status-bar": "~1.4.2",
@@ -31,7 +32,7 @@
     "react-native-select-dropdown": "^3.2.1",
     "react-redux": "^8.0.5",
     "tailwindcss": "^3.2.4",
-    "expo-document-picker": "~11.0.1"
+    "@react-native-community/datetimepicker": "6.5.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

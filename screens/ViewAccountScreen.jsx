@@ -48,6 +48,9 @@ const ViewAccountScreen = ({ route }) => {
         <Text>Usefor: {account?.usefor}</Text>
       </View>
       <View className="border-b p-1">
+        <Text>Executor: {account?.name}</Text>
+      </View>
+      <View className="border-b p-1">
         <Text>Note: {account?.note}</Text>
       </View>
     </SafeAreaView>

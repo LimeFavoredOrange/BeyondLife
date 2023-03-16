@@ -4,6 +4,7 @@ import React, { memo } from 'react';
 
 const FileItem = ({ item, deleteFile }) => {
   const isOffensive = item.offensive;
+  const date = new Date(item.createdTime).toLocaleDateString('en-AU');
   return (
     <View className="flex-row border-b">
       <View style={{ height: 200, width: '80%' }} className="bg-gray-100 p-2 ">
@@ -13,6 +14,7 @@ const FileItem = ({ item, deleteFile }) => {
         />
         <Text className="mb-2">Filename: {item.name}</Text>
         <Text className="mb-2">MIME Type: {item.mimeType}</Text>
+        <Text className="mb-2">Created at: {date}</Text>
         {isOffensive && (
           <Text>
             <Badge className="mb-2" value="contain offensive word(s)" status="primary" />

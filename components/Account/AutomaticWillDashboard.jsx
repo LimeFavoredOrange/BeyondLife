@@ -27,6 +27,13 @@ const AccountDashboard = () => {
       type: 'entypo',
       color: '#4285F4',
     },
+    {
+      id: 'Gmail',
+      name: 'gmail',
+      title: 'Gmail',
+      type: 'material-community',
+      color: '#036635',
+    },
   ];
 
   return (
