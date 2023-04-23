@@ -1,5 +1,5 @@
-import React, { memo } from 'react';
-import { View, Text, SafeAreaView, FlatList, Image, Linking, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { Text, SafeAreaView, FlatList, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import Loading from '../../components/Loading';
@@ -21,6 +21,7 @@ const GoogleDriveScreen = () => {
   const [showSetting, setShowSetting] = React.useState(false);
   const [showDate, setShowDate] = React.useState(false);
 
+  // Function to search file in Google Drive
   const applySearch = async (keyword) => {
     if (keyword === '') {
       getData();
@@ -33,6 +34,7 @@ const GoogleDriveScreen = () => {
     setShowLoading(false);
   };
 
+  // Function to detect offensive content in google drive files
   const detectOffensive = async () => {
     const fileIds = [];
     const currentData = data;
@@ -133,6 +135,7 @@ const GoogleDriveScreen = () => {
     getData();
   }, []);
 
+  // Function to get data from Google Drive
   const getData = async () => {
     setShowLoading(true);
     let response;
@@ -145,6 +148,7 @@ const GoogleDriveScreen = () => {
     setShowLoading(false);
   };
 
+  // Function to delete file from Google Drive
   const deleteFile = async (id) => {
     const response = await axios.delete(`https://tor2023-203l.onrender.com/googleDrive/${id}`);
     if (response.status === 200) {

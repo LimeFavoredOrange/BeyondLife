@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, FlatList, Image, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, SafeAreaView, FlatList, Image } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
@@ -22,7 +22,6 @@ const TwitterScreen = () => {
   let current_data = tweets;
 
   const [medias, setMedias] = React.useState([]);
-  const [likes, setLikes] = React.useState([]);
 
   const [tab, setTab] = React.useState('Tweets&replies');
   const [showOptions, setShowOptions] = React.useState(false);
@@ -35,11 +34,14 @@ const TwitterScreen = () => {
 
   const [showSetting, setShowSetting] = React.useState(false);
 
+  // Function to get all tweets
   const getTweets = async () => {
     setShowLoading(true);
     const response = await axios.get('https://tor2023-203l.onrender.com/twitter/getTweets');
     getUserSetting();
     const tweetsData = response.data.tweets.data;
+
+    // Check if tweet is offensive
     for (const tweet in tweetsData) {
       const checkOffensive = await detectOffensive(removeLink(tweetsData[tweet].text));
       if (checkOffensive === 'Toxicity: True') {
@@ -48,18 +50,19 @@ const TwitterScreen = () => {
         tweetsData[tweet].offensive = false;
       }
     }
-    setShowLoading(false);
     setTweets(tweetsData);
     setTargets(tweetsData);
     setImageData(tweetsData.filter((item) => item.attachments).map((item) => item.id));
     setOffensiveData(tweetsData.filter((item) => item.offensive).map((item) => item.id));
     setMedias(response.data.tweets.includes.media);
+    setShowLoading(false);
   };
 
   React.useEffect(() => {
     getTweets();
   }, []);
 
+  // Function to check the input text is offensive or not
   const detectOffensive = async (text) => {
     try {
       const response = await axios.get(`${mlURL}/detectToxicity`, { params: { text } });
@@ -81,6 +84,7 @@ const TwitterScreen = () => {
     return media?.url;
   };
 
+  // Function to delete tweet
   const deleteTweet = async (id) => {
     const response = await axios.post(`https://tor2023-203l.onrender.com/twitter/delete/${id}`);
     if (response.status === 200) {
@@ -106,6 +110,7 @@ const TwitterScreen = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [searching]);
 
+  // Function to apply filter
   const applyFunction = async (option, offensive, tab, current_data) => {
     let tar = current_data.filter((item) => item.text.toUpperCase().includes(searching.toUpperCase()));
 
@@ -125,6 +130,7 @@ const TwitterScreen = () => {
     return tar;
   };
 
+  // Function to get the current user setting
   const getUserSetting = async () => {
     try {
       const res = await axios.get('https://tor2023-203l.onrender.com/twitter/autoSetting?userId=1');
@@ -165,6 +171,7 @@ const TwitterScreen = () => {
             setShowSetting(true);
           },
           async () => {
+            // Download the backup file
             const downloadedFile = await FileSystem.downloadAsync(
               'https://tor2023-203l.onrender.com/twitter/backup',
               FileSystem.documentDirectory + 'tweetsData.txt'
@@ -196,7 +203,10 @@ const TwitterScreen = () => {
                     <Badge className="mb-2" value="will be automatically delete" status="primary" />
                   </Text>
                 )}
+                {/* If the tweet doesn't contain image */}
                 {item.attachments === undefined && <Text className="mb-2">text: {item.text}</Text>}
+
+                {/* If the tweet contain image */}
                 {item.attachments && (
                   <>
                     <Text className="mb-2">text: {removeLink(item.text)}</Text>
@@ -219,6 +229,7 @@ const TwitterScreen = () => {
         }}
       />
 
+      {/* Filter popup */}
       <Filter
         applyFunction={applyFunction}
         setTargets={setTargets}
@@ -229,6 +240,7 @@ const TwitterScreen = () => {
         current_data={current_data}
       />
 
+      {/* Setting popup */}
       <AutoSetting
         showSetting={showSetting}
         setShowSetting={setShowSetting}

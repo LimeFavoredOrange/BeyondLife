@@ -1,6 +1,7 @@
 import { View, Text, FlatList, Image, SafeAreaView } from 'react-native';
 import React from 'react';
 
+// Screen to view backup data from backup file
 const ViewBackupScreen = ({ route }) => {
   const [data, setData] = React.useState([]);
   const [medias, setMedias] = React.useState([]);
@@ -11,8 +12,7 @@ const ViewBackupScreen = ({ route }) => {
     setData(data.data);
     setMedias(data.includes.media);
   }, []);
-
-  const getImage = (key) => {
+  Image = (key) => {
     const media = medias.find((item) => item.media_key === key);
     return media?.url;
   };

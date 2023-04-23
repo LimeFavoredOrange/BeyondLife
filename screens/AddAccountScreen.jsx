@@ -55,6 +55,7 @@ const AddAccountScreen = () => {
         alignItems: 'center',
       }}
     >
+      {/* Platform input */}
       <Input
         containerStyle={{ width: vw(90) }}
         inputContainerStyle={{ borderBottomWidth: 1.5, borderWidth: 1.5, borderRadius: 15, padding: 5 }}
@@ -64,6 +65,8 @@ const AddAccountScreen = () => {
         }
         onChangeText={(text) => setPlatform(text)}
       />
+
+      {/* Username input */}
       <Input
         containerStyle={{ width: vw(90) }}
         inputContainerStyle={{ borderBottomWidth: 1.5, borderWidth: 1.5, borderRadius: 15, padding: 5 }}
@@ -71,6 +74,8 @@ const AddAccountScreen = () => {
         leftIcon={<Icon style={{ marginRight: 5 }} name="idcard" type="antdesign" size={24} color={'#036635'} />}
         onChangeText={(text) => setUsername(text)}
       />
+
+      {/* Password input */}
       <Input
         containerStyle={{ width: vw(90) }}
         inputContainerStyle={{ borderBottomWidth: 1.5, borderWidth: 1.5, borderRadius: 15, padding: 5 }}
@@ -98,6 +103,8 @@ const AddAccountScreen = () => {
         >
           <Text className="text-xl text-gray-100">Executors</Text>
         </View>
+
+        {/* Executor input */}
         <SelectDropdown
           data={executors}
           onSelect={(selectedItem, index) => {

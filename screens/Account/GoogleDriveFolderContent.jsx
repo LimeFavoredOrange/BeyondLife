@@ -11,6 +11,7 @@ const GoogleDriveFolderContent = ({ route }) => {
   const [data, setData] = React.useState([]);
   const [showLoading, setShowLoading] = React.useState(false);
 
+  // Function to get the folder content in Google Drive.
   const getData = async () => {
     setShowLoading(true);
     const response = await axios.get(`https://tor2023-203l.onrender.com/googleDrive/folders/${folderId}`);
@@ -19,6 +20,7 @@ const GoogleDriveFolderContent = ({ route }) => {
     setShowLoading(false);
   };
 
+  // Function to delete specific file in the folder
   const deleteFile = async (id) => {
     const response = await axios.delete(`https://tor2023-203l.onrender.com/googleDrive/folders/${id}`);
     if (response.status === 200) {

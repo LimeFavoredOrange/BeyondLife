@@ -59,7 +59,8 @@ const WelcomeScreen = () => {
         {currentMode === 'Welcome' && <Text className="text-2xl mt-3 font-bold text-center">Digital will.app</Text>}
         <View className="flex-1 justify-center items-center">
           {currentMode === 'Welcome' && (
-            <View className="gap-2 flex-1 justify-center ">
+            <View className="gap-2 flex-1 justify-center">
+              {/* Login button */}
               <View>
                 <Button
                   color="#036635"
@@ -75,6 +76,7 @@ const WelcomeScreen = () => {
                 </Button>
               </View>
 
+              {/* Register button */}
               <View>
                 <Button
                   color="#4630EB"
@@ -91,6 +93,7 @@ const WelcomeScreen = () => {
             </View>
           )}
 
+          {/* Login screen */}
           {currentMode === 'Login' && (
             <Login
               setShowLoading={setShowLoading}
@@ -102,6 +105,7 @@ const WelcomeScreen = () => {
             />
           )}
 
+          {/* Register screen */}
           {currentMode === 'Register' && (
             <Register
               setShowLoading={setShowLoading}

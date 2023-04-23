@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { selectToken } from '../redux/slices/auth';
 import axios from 'axios';
 
+// Screen to view account detail
 const ViewAccountScreen = ({ route }) => {
   const { accountid } = route.params;
   const token = useSelector(selectToken);
@@ -19,7 +20,6 @@ const ViewAccountScreen = ({ route }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response.data.data);
       setAccount(response.data.data);
     } catch (error) {
       console.log(error);
