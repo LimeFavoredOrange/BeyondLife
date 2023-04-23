@@ -6,6 +6,7 @@ import AccountHeader from '../../../components/Account/AutomaticWillHeader';
 import { useNavigation } from '@react-navigation/native';
 
 const GmailNav = () => {
+  // Options for Gmail
   const options = [
     { id: 1, title: 'Delete emails', linkTo: 'GmailDelete' },
     { id: 2, title: 'Forward emails', linkTo: 'GmailForward' },
