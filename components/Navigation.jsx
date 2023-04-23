@@ -20,7 +20,10 @@ import TwitterScreen from '../screens/Account/TwitterScreen';
 import GoogleDriveScreen from '../screens/Account/GoogleDriveScreen';
 import GoogleDriveFolderScreen from '../screens/Account/GoogleDriveFolderScreen';
 import GoogleDriveFolderContent from '../screens/Account/GoogleDriveFolderContent';
-import GmailScreen from '../screens/Account/GmailScreen';
+import GmailNav from '../screens/Account/Gmail/GmailNav';
+import GmailDelete from '../screens/Account/Gmail/GmailDelete';
+import GmailForward from '../screens/Account/Gmail/GmailForward';
+import GmailDownload from '../screens/Account/Gmail/GmailDownload';
 import ViewBackupScreen from '../screens/ViewBackupScreen';
 
 const Navigation = () => {
@@ -44,7 +47,10 @@ const Navigation = () => {
         component={GoogleDriveFolderContent}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="Gmail" component={GmailScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Gmail" component={GmailNav} options={{ headerShown: false }} />
+      <Stack.Screen name="GmailDelete" component={GmailDelete} options={{ headerShown: false }} />
+      <Stack.Screen name="GmailForward" component={GmailForward} options={{ headerShown: false }} />
+      <Stack.Screen name="GmailDownload" component={GmailDownload} options={{ headerShown: false }} />
       <Stack.Screen name="Add Account" component={AddAccountScreen} />
       <Stack.Screen name="View Account" component={ViewAccountScreen} options={{ headerShown: false }} />
       <Stack.Screen name="View Backup" component={ViewBackupScreen} />

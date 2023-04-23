@@ -17,6 +17,9 @@ import HomeDashboard from '../components/Home/Homedashboard';
 // Key Tab
 import AccountManagerDashboard from '../components/Account/AccountManagerDashboard';
 
+// Link Tab
+import LinkAccount from '../components/Link/LinkAccount';
+
 // Account Tab
 import AccountHeader from '../components/Account/AutomaticWillHeader';
 import AccountDashboard from '../components/Account/AutomaticWillDashboard';
@@ -31,6 +34,13 @@ const HomeScreen = () => {
         <>
           <HomeHeader />
           <HomeDashboard />
+        </>
+      )}
+
+      {selectedTab === 'Link' && (
+        <>
+          <AccountHeader title={'Link accounts'} />
+          <LinkAccount />
         </>
       )}
       {selectedTab === 'Key' && (

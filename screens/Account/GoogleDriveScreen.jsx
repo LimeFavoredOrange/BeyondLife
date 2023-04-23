@@ -64,7 +64,12 @@ const GoogleDriveScreen = () => {
         const response = await axios.get('https://tor2023-203l.onrender.com/googleDrive/getContent/Doc', {
           params: { fileId: currentData[item].id },
         });
-        const result = await checkOffensive(response.data.content);
+        let result = null;
+        try {
+          result = await checkOffensive(response.data.content);
+        } catch (error) {
+          console.log('here');
+        }
         if (result === 'Toxicity: True') {
           currentData[item].offensive = true;
           fileIds.push(currentData[item].id);
@@ -124,9 +129,18 @@ const GoogleDriveScreen = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [searching]);
 
+  React.useEffect(() => {
+    getData();
+  }, []);
+
   const getData = async () => {
     setShowLoading(true);
-    const response = await axios.get('http://localhost:8080/googleDrive/files');
+    let response;
+    try {
+      response = await axios.get('https://tor2023-203l.onrender.com/googleDrive/files');
+    } catch (error) {
+      console.log('something wrong with useEffect');
+    }
     setData(response.data.files);
     setShowLoading(false);
   };
@@ -137,10 +151,6 @@ const GoogleDriveScreen = () => {
       setData((current) => current.filter((item) => item.id !== id));
     }
   };
-
-  React.useEffect(() => {
-    getData();
-  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

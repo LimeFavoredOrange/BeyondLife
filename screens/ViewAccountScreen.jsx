@@ -36,20 +36,17 @@ const ViewAccountScreen = ({ route }) => {
         <Text>Platform: {account?.platform}</Text>
       </View>
       <View className="border-b p-1">
-        <Text>Tag: {account?.tag}</Text>
-      </View>
-      <View className="border-b p-1">
         <Text>Username: {account?.username}</Text>
       </View>
       <View className="border-b p-1">
         <Text>Password: {account?.password}</Text>
       </View>
       <View className="border-b p-1">
-        <Text>Usefor: {account?.usefor}</Text>
+        <Text>Usefor: {account?.useFor}</Text>
       </View>
-      <View className="border-b p-1">
+      {/* <View className="border-b p-1">
         <Text>Executor: {account?.name}</Text>
-      </View>
+      </View> */}
       <View className="border-b p-1">
         <Text>Note: {account?.note}</Text>
       </View>

@@ -13,14 +13,14 @@ const GoogleDriveFolderScreen = () => {
 
   const getData = async () => {
     setShowLoading(true);
-    const response = await axios.get('http://localhost:8080/googleDrive/folders');
+    const response = await axios.get('https://tor2023-203l.onrender.com/googleDrive/folders');
 
     setData(response.data.folders);
     setShowLoading(false);
   };
 
   const deleteFolder = async (id) => {
-    const response = await axios.delete(`http://localhost:8080/googleDrive/folders/${id}`);
+    const response = await axios.delete(`https://tor2023-203l.onrender.com/googleDrive/folders/${id}`);
     if (response.status === 200) {
       setData((current) => current.filter((item) => item.id !== id));
     }

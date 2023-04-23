@@ -1,6 +1,5 @@
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
 import React from 'react';
-import { Icon } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
 
 const AccountDashboard = () => {
@@ -8,31 +7,23 @@ const AccountDashboard = () => {
   const platforms = [
     {
       id: 'Twitter',
-      name: 'twitter',
-      type: 'antdesign',
       title: 'Twitter',
-      color: '#00ACEE',
+      logo: 'https://assets.stickpng.com/images/580b57fcd9996e24bc43c53e.png',
     },
     {
       id: 'Facebook',
-      name: 'facebook-square',
       title: 'Facebook',
-      type: 'antdesign',
-      color: '#3B5998',
+      logo: 'https://www.facebook.com/images/fb_icon_325x325.png',
     },
     {
       id: 'Google Drive',
-      name: 'google-drive',
       title: 'Google Drive',
-      type: 'entypo',
-      color: '#4285F4',
+      logo: 'https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png',
     },
     {
       id: 'Gmail',
-      name: 'gmail',
       title: 'Gmail',
-      type: 'material-community',
-      color: '#036635',
+      logo: 'https://www.gstatic.com/images/branding/product/1x/gmail_2020q4_48dp.png',
     },
   ];
 
@@ -48,7 +39,7 @@ const AccountDashboard = () => {
               navigation.navigate(item.id);
             }}
           >
-            <Icon name={item.name} type={item.type} color={item.color} size={30} />
+            <Image source={{ uri: item.logo, width: 30, height: 30 }} style={{ resizeMode: 'contain' }} />
             <Text className="text-lg font-semibold">{item.title}</Text>
           </TouchableOpacity>
         );

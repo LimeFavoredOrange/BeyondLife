@@ -10,11 +10,13 @@ const Dashboard = () => {
       id: 'Action number',
       title: '#Actions',
       backgroundColor: '#68a386',
+      num: 3,
     },
     {
       id: 'Executor number',
       title: '#Executors',
       backgroundColor: '#68a386',
+      num: 2,
     },
   ];
 
@@ -53,7 +55,7 @@ const Dashboard = () => {
               >
                 <View>
                   <Text className="text-lg font-semibold">{item.title}</Text>
-                  <Text className="text-2xl font-bold">0</Text>
+                  <Text className="text-2xl font-bold">{item.num}</Text>
                 </View>
               </TouchableOpacity>
             );
