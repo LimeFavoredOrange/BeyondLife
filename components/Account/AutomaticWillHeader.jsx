@@ -2,7 +2,8 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { Divider, Icon } from '@rneui/themed';
 
-const AccountHeader = ({ title, icon, iconFunction, isTab, tabIcon, tabIconFunction, setShowLoading }) => {
+// Header for the account screen.
+const AccountHeader = ({ title, icon, iconFunction, isTab, tabIcon, tabIconFunction }) => {
   return (
     <View>
       <View className="justify-start px-3 flex-row items-center">

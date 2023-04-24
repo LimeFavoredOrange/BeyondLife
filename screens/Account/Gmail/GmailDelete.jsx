@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, SafeAreaView, FlatList, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, SafeAreaView, FlatList, TextInput, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 
@@ -32,6 +32,7 @@ const GmailDelete = () => {
 
       <View className="justify-center items-center mt-6 px-2 w-full">
         <View className="w-screen px-3">
+          {/* Delete the emails that contain the keywords */}
           <Text className="text-lg font-semibold ">Delete the emails that contain the following keywords:</Text>
           <TextInput
             style={{
@@ -74,6 +75,7 @@ const GmailDelete = () => {
         </View>
 
         <View className="w-screen px-3">
+          {/* Delete the emails that sent from the following address */}
           <Text className="text-lg font-semibold ">Delete the emails that sent from the following address:</Text>
           <TextInput
             style={{
@@ -116,6 +118,7 @@ const GmailDelete = () => {
         </View>
 
         <View className="p-3 items-center justify-center mb-6 w-screen px-3">
+          {/* Delete based on the date */}
           <Text className="text-lg font-semibold ">Delete the emails that before the following date:</Text>
           <DateTimePicker value={date} mode={'date'} is24Hour={true} onChange={selectDate} />
         </View>

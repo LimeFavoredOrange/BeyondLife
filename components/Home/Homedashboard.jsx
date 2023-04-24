@@ -3,6 +3,7 @@ import React from 'react';
 import { Icon } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
 
+// Dashboard screen component
 const Dashboard = () => {
   const navigation = useNavigation();
   const setup = [

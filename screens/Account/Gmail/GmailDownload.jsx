@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, SafeAreaView, FlatList, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, SafeAreaView, FlatList, TextInput, TouchableOpacity } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { useNavigation } from '@react-navigation/native';
@@ -11,6 +11,7 @@ import { Icon } from '@rneui/base';
 
 import AccountHeader from '../../../components/Account/AutomaticWillHeader';
 
+// Download gmail backup
 const GmailDownload = () => {
   const [keyword, setKeyword] = React.useState('');
   const [keywordList, setKeywordList] = React.useState([]);
@@ -33,6 +34,7 @@ const GmailDownload = () => {
 
       <View className="justify-center items-center mt-6 px-2 w-full">
         <View className="w-screen px-3">
+          {/* Keywords input */}
           <Text className="text-lg font-semibold ">Download the emails that contain the following keywords:</Text>
           <TextInput
             style={{
@@ -75,6 +77,7 @@ const GmailDownload = () => {
         </View>
 
         <View className="w-screen px-3">
+          {/* Download email backup based on the email address */}
           <Text className="text-lg font-semibold ">Download the emails that sent from the following address:</Text>
           <TextInput
             style={{
@@ -117,6 +120,7 @@ const GmailDownload = () => {
         </View>
 
         <View className="p-3 items-center justify-center mb-6 w-screen px-3">
+          {/* Download email backup based on the sending date */}
           <Text className="text-lg font-semibold ">Download the emails that before the following date:</Text>
           <DateTimePicker value={date} mode={'date'} is24Hour={true} onChange={selectDate} />
         </View>
@@ -127,7 +131,7 @@ const GmailDownload = () => {
           onPress={async () => {
             setShowLoading(true);
             const dateParam = date.toString().replace(/ /g, '_');
-            console.log(dateParam);
+            // Download backup
             const downloadedFile = await FileSystem.downloadAsync(
               `https://tor2023-203l.onrender.com/gmail/download?keywords=${keywordList}&senders=${addressList}&before=${dateParam}`,
               FileSystem.documentDirectory + `emails-${Date.now()}.txt`
@@ -136,6 +140,7 @@ const GmailDownload = () => {
             const imageFileExts = ['jpg', 'png', 'gif', 'heic', 'webp', 'bmp'];
             const isIos = Platform.OS === 'ios';
 
+            // Save the backup file in local storage.
             if (isIos && imageFileExts.every((x) => !downloadedFile.uri.endsWith(x))) {
               const UTI = 'gmail.item';
               await Sharing.shareAsync(downloadedFile.uri, { UTI });

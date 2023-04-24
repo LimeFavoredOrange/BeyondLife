@@ -2,6 +2,7 @@ import { View, Text } from 'react-native';
 import { CheckBox } from '@rneui/themed';
 import React from 'react';
 
+// Option to filter tweet content.
 const ContentOption = ({ tab, setTab }) => {
   return (
     <View className="justify-center  w-full ">

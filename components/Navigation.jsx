@@ -27,6 +27,7 @@ import GmailDownload from '../screens/Account/Gmail/GmailDownload';
 import ViewBackupScreen from '../screens/ViewBackupScreen';
 
 const Navigation = () => {
+  // Haven't login yet.
   if (useSelector(selectIsLogin) === false) {
     return (
       <Stack.Navigator>
@@ -35,6 +36,7 @@ const Navigation = () => {
     );
   }
 
+  // Nav stack that after login in.
   return (
     <Stack.Navigator>
       <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />

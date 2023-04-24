@@ -2,9 +2,11 @@ import { View } from 'react-native';
 import React from 'react';
 import { CheckBox } from '@rneui/themed';
 
+// Checkbox option to detect offensive content.
 const OffensiveOption = ({ offensive, setOffensive }) => {
   return (
     <View className="justify-center  w-full ">
+      {/* Option: disable detection */}
       <CheckBox
         checked={offensive === 'noDetect'}
         onPress={() => setOffensive('noDetect')}
@@ -13,6 +15,7 @@ const OffensiveOption = ({ offensive, setOffensive }) => {
         title={'No detect offensive'}
       />
 
+      {/* Option: Enable detection */}
       <CheckBox
         checked={offensive === 'offensive'}
         onPress={() => setOffensive('offensive')}

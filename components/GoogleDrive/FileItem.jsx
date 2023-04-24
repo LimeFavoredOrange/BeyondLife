@@ -2,6 +2,7 @@ import { View, Text, Image, Linking } from 'react-native';
 import { Button, Badge } from '@rneui/base';
 import React, { memo } from 'react';
 
+// Component to display file element in the flatlist.
 const FileItem = ({ item, deleteFile }) => {
   const isOffensive = item.offensive;
   const date = new Date(item.createdTime).toLocaleDateString('en-AU');

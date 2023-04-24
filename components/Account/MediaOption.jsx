@@ -2,10 +2,12 @@ import { View, Text } from 'react-native';
 import React from 'react';
 import { CheckBox } from '@rneui/themed';
 
+// Checkbox option to apply filter.
 const MediaOption = ({ option, setOption }) => {
   return (
     <View className="border-b-2">
       <View className="flex-row justify-center">
+        {/* Default option */}
         <CheckBox
           checked={option === 'Default'}
           onPress={() => setOption('Default')}
@@ -14,6 +16,7 @@ const MediaOption = ({ option, setOption }) => {
           title={'Default'}
         />
 
+        {/* Contain media option */}
         <CheckBox
           checked={option === 'containMedia'}
           onPress={() => setOption('containMedia')}
@@ -22,6 +25,8 @@ const MediaOption = ({ option, setOption }) => {
           title={'Contain media'}
         />
       </View>
+
+      {/* Does not contain media */}
       <CheckBox
         checked={option === 'noMedia'}
         onPress={() => setOption('noMedia')}

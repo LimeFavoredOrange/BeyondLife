@@ -4,6 +4,7 @@ import { vh, vw } from 'react-native-expo-viewport-units';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 
+// Component to display folder element in the flat list
 const FolderItem = ({ item, deleteFolder }) => {
   const navigation = useNavigation();
   const date = new Date(item.createdTime).toLocaleDateString('en-AU');

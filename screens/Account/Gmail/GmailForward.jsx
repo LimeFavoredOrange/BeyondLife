@@ -10,6 +10,7 @@ import { Icon } from '@rneui/base';
 
 import AccountHeader from '../../../components/Account/AutomaticWillHeader';
 
+// Forward the gmail screen
 const GmailForward = () => {
   const [keyword, setKeyword] = React.useState('');
   const [keywordList, setKeywordList] = React.useState([]);
@@ -33,6 +34,7 @@ const GmailForward = () => {
 
       <View className=" items-center mt-6 px-2 w-full flex-1">
         <View className="w-screen px-3">
+          {/* Keywords input */}
           <Text className="text-lg font-semibold ">Forward the emails that contain the following keywords:</Text>
           <TextInput
             style={{
@@ -74,6 +76,7 @@ const GmailForward = () => {
           />
         </View>
 
+        {/* Forward email based on the email address */}
         <View className="w-screen px-3">
           <Text className="text-lg font-semibold ">Forward the emails that sent from the following address:</Text>
           <TextInput
@@ -117,6 +120,7 @@ const GmailForward = () => {
           />
         </View>
 
+        {/* Forward the email based on the date */}
         <View className="items-center justify-center mb-6 w-screen px-3">
           <Text className="text-lg font-semibold ">Forward the emails that before the following date:</Text>
           <DateTimePicker value={date} mode={'date'} is24Hour={true} onChange={selectDate} />
@@ -143,6 +147,7 @@ const GmailForward = () => {
           style={{ width: '50%' }}
           onPress={async () => {
             setShowLoading(true);
+            // Send the request to the backend
             await axios.put('https://tor2023-203l.onrender.com/gmail/forward', {
               keywords: keywordList,
               senders: addressList,

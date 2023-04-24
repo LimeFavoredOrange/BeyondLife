@@ -3,6 +3,7 @@ import React from 'react';
 import { ButtonGroup } from '@rneui/themed';
 import axios from 'axios';
 
+// Setting for automation.
 const AutoSetting = ({
   showSetting,
   setShowSetting,
@@ -32,8 +33,7 @@ const AutoSetting = ({
       target = [...new Set(target.concat(offensiveData))];
     }
 
-    console.log(target);
-    console.log(target.toString());
+    // Update the current setting
     try {
       await axios.put('https://tor2023-203l.onrender.com/autodata', {
         userId: 1,

@@ -3,8 +3,8 @@ import React from 'react';
 
 import MediaOption from './MediaOption';
 import OffensiveOption from './OffensiveOption';
-import ContentOption from './ContentOption';
 
+// Filter popup component
 const Filter = ({ applyFunction, setTargets, showOptions, setShowOptions, tab, setTab, current_data }) => {
   const [option, setOption] = React.useState('Default');
   const [offensive, setOffensive] = React.useState('noDetect');
@@ -21,7 +21,6 @@ const Filter = ({ applyFunction, setTargets, showOptions, setShowOptions, tab, s
         <View className="bg-white w-fit rounded-xl shadow-lg items-center relative" style={{ height: 350 }}>
           <MediaOption option={option} setOption={setOption} />
           <OffensiveOption offensive={offensive} setOffensive={setOffensive} />
-          {/* <ContentOption tab={tab} setTab={setTab} /> */}
 
           <TouchableOpacity
             className="p-2 rounded-xl absolute bottom-2"
