@@ -67,9 +67,9 @@ const Setting = ({ showSetting, setShowSetting, setShowLoading }) => {
             style={{ backgroundColor: '#FF2E2E', width: '50%' }}
             onPress={async () => {
               setShowLoading(true);
-              const response = await axios.put('https://tor2023-203l.onrender.com/googleDrive/files/delete', {
-                keywords: keywordList,
-              });
+              // const response = await axios.put('https://tor2023-203l.onrender.com/googleDrive/files/delete', {
+              //   keywords: keywordList,
+              // });
               setShowLoading(false);
               setShowSetting(!showSetting);
             }}

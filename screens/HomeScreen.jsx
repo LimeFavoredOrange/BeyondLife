@@ -6,6 +6,7 @@ import { selectSelectedTab } from '../redux/slices/homeSlice';
 import { useNavigation } from '@react-navigation/native';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ExpoFileSystem from 'expo-file-system';
+import twitterRestore from '../Data/Twitter/twitterRestore';
 
 console.log(DocumentPicker);
 // Import components
@@ -63,11 +64,14 @@ const HomeScreen = () => {
             tabIconFunction={async () => {
               try {
                 const file = await DocumentPicker.getDocumentAsync({});
-                const fileContent = await ExpoFileSystem.readAsStringAsync(file.uri);
-                const response = await axios.post('https://tor2023-203l.onrender.com/twitter/restore', {
-                  data: fileContent,
-                });
-                navigation.navigate('View Backup', { data: response.data.data });
+                // const fileContent = await ExpoFileSystem.readAsStringAsync(file.uri);
+                // Check the file name is twitterBackup.txt
+                if (file.name !== 'twitterBackup.txt') {
+                  alert('Please upload the correct file');
+                  return;
+                }
+                // navigation.navigate('View Backup', { data: JSON.stringify(twitterRestore) });
+                navigation.navigate('View Backup');
               } catch (err) {
                 console.log(err);
               }

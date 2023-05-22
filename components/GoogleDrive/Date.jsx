@@ -36,9 +36,9 @@ const Date1 = ({ showDate, setShowDate, setShowLoading }) => {
             style={{ backgroundColor: '#FF2E2E', width: '50%' }}
             onPress={async () => {
               setShowLoading(true);
-              const response = await axios.put('http://localhost:8080/googleDrive//files/delete/before', {
-                date: date,
-              });
+              // const response = await axios.put('http://localhost:8080/googleDrive/files/delete/before', {
+              //   date: date,
+              // });
               setShowLoading(false);
               setShowDate(!showDate);
             }}

@@ -25,6 +25,10 @@ const GmailDelete = () => {
 
   const navigation = useNavigation();
 
+  React.useEffect(() => {
+    alert('Delete function is not available for this static demo');
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <AccountHeader title={'Delete emails'} />
@@ -128,11 +132,11 @@ const GmailDelete = () => {
           style={{ backgroundColor: '#FF2E2E', width: '50%' }}
           onPress={async () => {
             setShowLoading(true);
-            await axios.put('https://tor2023-203l.onrender.com/gmail/delete', {
-              keywords: keywordList,
-              senders: addressList,
-              before: date,
-            });
+            // await axios.put('https://tor2023-203l.onrender.com/gmail/delete', {
+            //   keywords: keywordList,
+            //   senders: addressList,
+            //   before: date,
+            // });
             setShowLoading(false);
             navigation.goBack();
           }}

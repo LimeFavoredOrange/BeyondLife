@@ -2,6 +2,7 @@ import React from 'react';
 import { SafeAreaView, FlatList } from 'react-native';
 import axios from 'axios';
 import Loading from '../../components/Loading';
+import folderData from '../../Data/GoogleDrive/driveFolder';
 
 import FolderItem from '../../components/GoogleDrive/FolderItem';
 
@@ -13,17 +14,17 @@ const GoogleDriveFolderScreen = () => {
 
   const getData = async () => {
     setShowLoading(true);
-    const response = await axios.get('https://tor2023-203l.onrender.com/googleDrive/folders');
-
-    setData(response.data.folders);
+    // const response = await axios.get('https://tor2023-203l.onrender.com/googleDrive/folders');
+    setData(folderData.folders);
     setShowLoading(false);
   };
 
   const deleteFolder = async (id) => {
-    const response = await axios.delete(`https://tor2023-203l.onrender.com/googleDrive/folders/${id}`);
-    if (response.status === 200) {
-      setData((current) => current.filter((item) => item.id !== id));
-    }
+    // const response = await axios.delete(`https://tor2023-203l.onrender.com/googleDrive/folders/${id}`);
+    // if (response.status === 200) {
+    //   setData((current) => current.filter((item) => item.id !== id));
+    // }
+    setData((current) => current.filter((item) => item.id !== id));
   };
 
   React.useEffect(() => {

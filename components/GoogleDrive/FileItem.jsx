@@ -3,7 +3,7 @@ import { Button, Badge } from '@rneui/base';
 import React, { memo } from 'react';
 
 // Component to display file element in the flatlist.
-const FileItem = ({ item, deleteFile }) => {
+const FileItem = ({ item, deleteFile, showOffensive }) => {
   const isOffensive = item.offensive;
   const date = new Date(item.createdTime).toLocaleDateString('en-AU');
   return (
@@ -16,7 +16,7 @@ const FileItem = ({ item, deleteFile }) => {
         <Text className="mb-2">Filename: {item.name}</Text>
         <Text className="mb-2">MIME Type: {item.mimeType}</Text>
         <Text className="mb-2">Created at: {date}</Text>
-        {isOffensive && (
+        {showOffensive && isOffensive && (
           <Text>
             <Badge className="mb-2" value="contain offensive word(s)" status="primary" />
           </Text>

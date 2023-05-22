@@ -11,11 +11,13 @@ import Filter from '../../components/Account/Filter';
 import AutoSetting from '../../components/Account/AutoSetting';
 
 import Loading from '../../components/Loading';
+import { userData } from '../../Data/Twitter/twitterData';
+import twitterBackup from '../../Data/Twitter/twitterBackup';
 
 const TwitterScreen = () => {
-  const mlURL = 'https://5331-110-150-115-26.au.ngrok.io';
-  const [tweets, setTweets] = React.useState([]);
-  const [targets, setTargets] = React.useState([]);
+  // const mlURL = 'https://5331-110-150-115-26.au.ngrok.io';
+  const [tweets, setTweets] = React.useState(userData.tweets.data);
+  const [targets, setTargets] = React.useState(userData.tweets.data);
   const [imageData, setImageData] = React.useState([]);
   const [offensiveData, setOffensiveData] = React.useState([]);
   const [showLoading, setShowLoading] = React.useState(false);
@@ -37,24 +39,27 @@ const TwitterScreen = () => {
   // Function to get all tweets
   const getTweets = async () => {
     setShowLoading(true);
-    const response = await axios.get('https://tor2023-203l.onrender.com/twitter/getTweets');
-    getUserSetting();
-    const tweetsData = response.data.tweets.data;
+    // const response = await axios.get('https://tor2023-203l.onrender.com/twitter/getTweets');
+    // const response = await axios.get('https://1e86-110-150-54-105.ngrok-free.app/twitter/getTweets');
+    const response = userData;
+    // getUserSetting();
+    const tweetsData = response.tweets.data;
 
     // Check if tweet is offensive
-    for (const tweet in tweetsData) {
-      const checkOffensive = await detectOffensive(removeLink(tweetsData[tweet].text));
-      if (checkOffensive === 'Toxicity: True') {
-        tweetsData[tweet].offensive = true;
-      } else {
-        tweetsData[tweet].offensive = false;
-      }
-    }
+    // for (const tweet in tweetsData) {
+    //   const checkOffensive = await detectOffensive(removeLink(tweetsData[tweet].text));
+    //   if (checkOffensive === 'Toxicity: True') {
+    //     tweetsData[tweet].offensive = true;
+    //   } else {
+    //     tweetsData[tweet].offensive = false;
+    //   }
+    // }
+
     setTweets(tweetsData);
     setTargets(tweetsData);
     setImageData(tweetsData.filter((item) => item.attachments).map((item) => item.id));
     setOffensiveData(tweetsData.filter((item) => item.offensive).map((item) => item.id));
-    setMedias(response.data.tweets.includes.media);
+    setMedias(response.tweets.includes.media);
     setShowLoading(false);
   };
 
@@ -63,16 +68,16 @@ const TwitterScreen = () => {
   }, []);
 
   // Function to check the input text is offensive or not
-  const detectOffensive = async (text) => {
-    try {
-      const response = await axios.get(`${mlURL}/detectToxicity`, { params: { text } });
-      if (response.status === 200) {
-        return response.data;
-      }
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
+  // const detectOffensive = async (text) => {
+  //   try {
+  //     const response = await axios.get(`${mlURL}/detectToxicity`, { params: { text } });
+  //     if (response.status === 200) {
+  //       return response.data;
+  //     }
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // };
 
   const removeLink = (text) => {
     const regex = /https?:\/\/[\w/:%#\$&\?\(\)~\.=\+\-]+/g;
@@ -86,10 +91,11 @@ const TwitterScreen = () => {
 
   // Function to delete tweet
   const deleteTweet = async (id) => {
-    const response = await axios.post(`https://tor2023-203l.onrender.com/twitter/delete/${id}`);
-    if (response.status === 200) {
-      setTargets((current) => current.filter((item) => item.id !== id));
-    }
+    // const response = await axios.post(`https://1e86-110-150-54-105.ngrok-free.app/twitter/delete/${id}`);
+    // if (response.status === 200) {
+    //   setTargets((current) => current.filter((item) => item.id !== id));
+    // }
+    setTargets((current) => current.filter((item) => item.id !== id));
   };
 
   const checkAutomaticAction = (target) => {
@@ -131,26 +137,26 @@ const TwitterScreen = () => {
   };
 
   // Function to get the current user setting
-  const getUserSetting = async () => {
-    try {
-      const res = await axios.get('https://tor2023-203l.onrender.com/twitter/autoSetting?userId=1');
-      const { deleteimage, deleteoffensive } = res.data;
-      console.log(deleteimage, deleteoffensive);
-      if (deleteimage === true) {
-        setSelectImage(1);
-      } else {
-        setSelectImage(0);
-      }
+  // const getUserSetting = async () => {
+  //   try {
+  //     const res = await axios.get('https://tor2023-203l.onrender.com/twitter/autoSetting?userId=1');
+  //     const { deleteimage, deleteoffensive } = res.data;
+  //     console.log(deleteimage, deleteoffensive);
+  //     if (deleteimage === true) {
+  //       setSelectImage(1);
+  //     } else {
+  //       setSelectImage(0);
+  //     }
 
-      if (deleteoffensive === true) {
-        setSelectOffensive(1);
-      } else {
-        setSelectOffensive(0);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //     if (deleteoffensive === true) {
+  //       setSelectOffensive(1);
+  //     } else {
+  //       setSelectOffensive(0);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -171,30 +177,38 @@ const TwitterScreen = () => {
             setShowSetting(true);
           },
           async () => {
-            // Download the backup file
-            const downloadedFile = await FileSystem.downloadAsync(
-              'https://tor2023-203l.onrender.com/twitter/backup',
-              FileSystem.documentDirectory + 'tweetsData.txt'
-            );
+            // Send the local backup file to the user (twitterBackup.txt)
+            // ../../Data/twitterData/tweetsData.txt
+            const fileUri = FileSystem.documentDirectory + 'twitterBackup.txt';
+            await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(twitterBackup));
+            const downloadedFile = await FileSystem.getInfoAsync(fileUri);
+
             const imageFileExts = ['jpg', 'png', 'gif', 'heic', 'webp', 'bmp'];
             const isIos = Platform.OS === 'ios';
 
             if (isIos && imageFileExts.every((x) => !downloadedFile.uri.endsWith(x))) {
               const UTI = 'twitter.item';
               await Sharing.shareAsync(downloadedFile.uri, { UTI });
+            } else {
+              await Sharing.shareAsync(downloadedFile.uri);
             }
           },
         ]}
       />
 
-      <SearchBar placeholder="Type Here..." platform="ios" onChangeText={(e) => setSearching(e)} value={searching} />
+      <SearchBar
+        placeholder="Search tweets......"
+        platform="ios"
+        onChangeText={(e) => setSearching(e)}
+        value={searching}
+      />
 
       <FlatList
         data={targets}
         renderItem={({ item }) => {
           return (
             <View className="flex-row border-b">
-              <View style={{ height: 200, width: '80%' }} className="bg-gray-100 p-2 ">
+              <View style={{ height: 230, width: '80%' }} className="bg-gray-100 p-2 ">
                 <Text className="mb-2">id: {item.id}</Text>
                 <Text className="mb-2">author_id: {item.author_id}</Text>
                 <Text className="mb-2">created_at: {item.created_at}</Text>
@@ -211,10 +225,9 @@ const TwitterScreen = () => {
                   <>
                     <Text className="mb-2">text: {removeLink(item.text)}</Text>
                     <Image
-                      className="mb-2"
                       height={300}
                       width={300}
-                      source={{ uri: `${getImage(item.attachments.media_keys[0])}`, width: 100, height: 100 }}
+                      source={{ uri: `${getImage(item.attachments.media_keys[0])}`, width: 200, height: 110 }}
                     />
                   </>
                 )}

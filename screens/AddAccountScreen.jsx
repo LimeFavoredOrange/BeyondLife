@@ -5,9 +5,32 @@ import { vw } from 'react-native-expo-viewport-units';
 import SelectDropdown from 'react-native-select-dropdown';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
-import { useSelector } from 'react-redux';
+
+import { useSelector, useDispatch } from 'react-redux';
 import { selectToken } from '../redux/slices/auth';
 import { useNavigation } from '@react-navigation/native';
+
+import { setAccounts, selectAccounts, setAccountsDetail, selectAccountsDetail } from '../redux/slices/accounts';
+
+function getRandomChars(strings) {
+  const targetLength = strings[0].length;
+
+  const mergedString = strings.join('');
+
+  let randomChars = '';
+  for (let i = 0; i < targetLength; i++) {
+    const randomIndex = Math.floor(Math.random() * mergedString.length);
+    randomChars += mergedString.charAt(randomIndex);
+  }
+
+  return randomChars;
+}
+
+const randomStrings = [
+  '$2a$12$dRHMN5tjyeur/W7znk/b5ejg6JClu93AH73nTdl9AWQKofCNQbRZC',
+  '$2a$12$ZTe6TzmkzpWQE23p5LdqbeK8a.KnXAmthEAQ5mfcv460Xll1TZvCS',
+  '$2a$12$MIduspaVwx11Y7o1JR3GtuPk0QFM2aWD6zn0n95qFQ8CO9aDqkeuu',
+];
 
 const AddAccountScreen = () => {
   const [platform, setPlatform] = React.useState('');
@@ -15,26 +38,29 @@ const AddAccountScreen = () => {
   const [password, setPassword] = React.useState('');
   const [tag, setTag] = React.useState('');
   const [useFor, setUseFor] = React.useState('');
-  const [note, setNote] = React.useState('');
+  const [notes, setNotes] = React.useState('');
 
-  const [executors, setExecutors] = React.useState([]);
+  const [executors, setExecutors] = React.useState([{ name: 'John' }, { name: 'Peter' }]);
 
   const token = useSelector(selectToken);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const accounts = useSelector(selectAccounts);
+  const accountsDetail = useSelector(selectAccountsDetail);
 
-  const getExecutors = async () => {
-    const response = await axios.get('https://tor2023-203l.onrender.com/executor/all', {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    setExecutors(response.data.data);
-  };
+  // const getExecutors = async () => {
+  //   const response = await axios.get('https://tor2023-203l.onrender.com/executor/all', {
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //   });
+  //   setExecutors(response.data.data);
+  // };
 
-  React.useEffect(() => {
-    getExecutors();
-  }, []);
+  // React.useEffect(() => {
+  //   getExecutors();
+  // }, []);
 
   const tags = [
     { color: 'red', name: 'Work' },
@@ -253,8 +279,8 @@ const AddAccountScreen = () => {
           editable
           multiline
           numberOfLines={4}
-          onChangeText={(text) => setNote(text)}
-          value={note}
+          onChangeText={(text) => setNotes(text)}
+          value={notes}
           style={{ padding: 8 }}
         />
       </View>
@@ -265,28 +291,51 @@ const AddAccountScreen = () => {
         onPress={async () => {
           console.log(useFor);
           try {
-            console.log(token);
-            const response = await axios.post(
-              'https://tor2023-203l.onrender.com/account/create',
-              {
-                platform,
-                username,
-                password,
-                useFor,
-                tag,
-                note,
-              },
-              {
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
+            // console.log(token);
+            // const response = await axios.post(
+            //   'https://tor2023-203l.onrender.com/account/create',
+            //   {
+            //     platform,
+            //     username,
+            //     password,
+            //     useFor,
+            //     tag,
+            //     note,
+            //   },
+            //   {
+            //     headers: {
+            //       'Content-Type': 'application/json',
+            //       Authorization: `Bearer ${token}`,
+            //     },
+            //   }
+            // );
 
-            if (response.data.status === 'success') {
-              navigation.navigate('Home');
+            // if (response.data.status === 'success') {
+            //   navigation.navigate('Home');
+            // }
+
+            // get the latest account id
+            let accountid = 0;
+            for (let index = 0; index < accounts.length; index++) {
+              if (accounts[index].accountid > accountid) {
+                accountid = accounts[index].accountid;
+              }
             }
+            accountid = parseInt(accountid) + 1;
+            dispatch(setAccounts([...accounts, { platform, tag, accountid }]));
+            const temp = JSON.parse(JSON.stringify(accountsDetail));
+            temp[accountid] = {
+              platform,
+              username,
+              password: getRandomChars(randomStrings),
+              useFor,
+              tag,
+              notes,
+              accountid,
+            };
+            console.log(temp);
+            dispatch(setAccountsDetail(temp));
+            navigation.navigate('Home');
           } catch (error) {
             console.log(error);
           }

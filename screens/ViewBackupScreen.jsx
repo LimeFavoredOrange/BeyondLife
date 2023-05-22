@@ -1,18 +1,24 @@
 import { View, Text, FlatList, Image, SafeAreaView } from 'react-native';
 import React from 'react';
+import twitterRestore from '../Data/Twitter/twitterRestore';
 
 // Screen to view backup data from backup file
 const ViewBackupScreen = ({ route }) => {
-  const [data, setData] = React.useState([]);
-  const [medias, setMedias] = React.useState([]);
-  console.log(data);
+  const [data, setData] = React.useState(twitterRestore.data.data);
+  const [medias, setMedias] = React.useState(twitterRestore.data.includes.media);
+  console.log(medias);
+  // console.log(data);
 
-  React.useEffect(() => {
-    const { data } = route.params;
-    setData(data.data);
-    setMedias(data.includes.media);
-  }, []);
-  Image = (key) => {
+  // React.useEffect(() => {
+  //   const { data } = route.params;
+  //   const target = JSON.parse(data);
+  //   setData(target.data);
+  //   console.log(target.data);
+  //   setMedias(target.data.includes.media);
+  //   console.log(target.data.includes.media);
+  // }, []);
+
+  const getImage = (key) => {
     const media = medias.find((item) => item.media_key === key);
     return media?.url;
   };
@@ -24,6 +30,10 @@ const ViewBackupScreen = ({ route }) => {
 
   return (
     <SafeAreaView>
+      {/* <View>
+        <Text>View Backup</Text>
+        <Text>`${data[0].id}`</Text>
+      </View> */}
       <FlatList
         data={data}
         renderItem={({ item }) => {

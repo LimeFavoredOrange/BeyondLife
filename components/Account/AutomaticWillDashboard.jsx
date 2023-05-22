@@ -11,11 +11,6 @@ const AccountDashboard = () => {
       logo: 'https://assets.stickpng.com/images/580b57fcd9996e24bc43c53e.png',
     },
     {
-      id: 'Facebook',
-      title: 'Facebook',
-      logo: 'https://www.facebook.com/images/fb_icon_325x325.png',
-    },
-    {
       id: 'Google Drive',
       title: 'Google Drive',
       logo: 'https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png',

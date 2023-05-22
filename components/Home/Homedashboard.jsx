@@ -74,15 +74,21 @@ const Dashboard = () => {
           horizontal
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => {
-            const imagePath = `../../assets/${item.image}`;
             return (
               <TouchableOpacity className="p-2 bg-gray-200 m-2">
                 <View>
                   <Text className="mt-2 text-lg font-semibold">{item.title}</Text>
-                  <Image
-                    source={require('../../assets/actions.png')}
-                    style={{ width: 100, height: 100, resizeMode: 'contain' }}
-                  />
+                  {item.id === 'actions' ? (
+                    <Image
+                      source={require(`../../assets/actions.png`)}
+                      style={{ width: 100, height: 100, resizeMode: 'contain' }}
+                    />
+                  ) : (
+                    <Image
+                      source={require(`../../assets/executors.png`)}
+                      style={{ width: 100, height: 100, resizeMode: 'contain' }}
+                    />
+                  )}
                 </View>
               </TouchableOpacity>
             );

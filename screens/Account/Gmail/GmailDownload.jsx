@@ -27,6 +27,10 @@ const GmailDownload = () => {
 
   const navigation = useNavigation();
 
+  React.useEffect(() => {
+    alert('Download function is not available for this static demo');
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <AccountHeader title={'Download emails'} />

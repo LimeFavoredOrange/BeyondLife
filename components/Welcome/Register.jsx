@@ -12,10 +12,10 @@ const Register = ({ setAnimating, setCurrentMode, setCurrentHeight, loginAnimati
   const handleRegister = async () => {
     if (password === confirmPassword) {
       setShowLoading(true);
-      const response = await axios.post('https://tor2023-203l.onrender.com/auth/register', {
-        email,
-        password,
-      });
+      // const response = await axios.post('https://tor2023-203l.onrender.com/auth/register', {
+      //   email,
+      //   password,
+      // });
       setShowLoading(false);
       setAnimating(loginAnimation);
       setCurrentHeight(loginHeight);
@@ -65,7 +65,6 @@ const Register = ({ setAnimating, setCurrentMode, setCurrentHeight, loginAnimati
           color="#036635"
           buttonStyle={{ width: 300, borderRadius: 15, marginBottom: 15 }}
           onPress={() => {
-            console.log('here');
             handleRegister();
           }}
         >

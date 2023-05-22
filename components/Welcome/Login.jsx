@@ -21,13 +21,13 @@ const Login = ({
   const handleLogin = async () => {
     try {
       setShowLoading(true);
-      const response = await axios.post('https://tor2023-203l.onrender.com/auth/login', {
-        email,
-        password,
-      });
+      // const response = await axios.post('https://tor2023-203l.onrender.com/auth/login', {
+      //   email,
+      //   password,
+      // });
       setShowLoading(false);
       dispatch(setIsLogin(true));
-      dispatch(setToken(response.data.data.token));
+      // dispatch(setToken(response.data.data.token));
     } catch (error) {
       setShowLoading(false);
       console.log(error);
@@ -87,7 +87,7 @@ const Login = ({
             setCurrentMode('Register');
           }}
         >
-          <Text className="font-bold text-white text-xl">no account yet</Text>
+          <Text className="font-bold text-white text-xl">No account yet</Text>
         </Button>
       </ScrollView>
     </View>

@@ -5,9 +5,10 @@ import { useSelector } from 'react-redux';
 import { selectToken } from '../../redux/slices/auth';
 import { Badge } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
+import { selectAccounts } from '../../redux/slices/accounts';
 
 const AccountManagerDashboard = () => {
-  const [accounts, setAccounts] = React.useState([]);
+  const accounts = useSelector(selectAccounts);
   const token = useSelector(selectToken);
   const navigation = useNavigation();
 
@@ -19,24 +20,24 @@ const AccountManagerDashboard = () => {
     Other: 'purple',
   };
 
-  const getAccounts = async () => {
-    try {
-      const response = await axios.get('https://tor2023-203l.onrender.com/account/get', {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log(response.data.data);
-      setAccounts(response.data.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const getAccounts = async () => {
+  //   try {
+  //     const response = await axios.get('https://tor2023-203l.onrender.com/account/get', {
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     console.log(response.data.data);
+  //     setAccounts(response.data.data);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
-  React.useEffect(() => {
-    getAccounts();
-  }, []);
+  // React.useEffect(() => {
+  //   getAccounts();
+  // }, []);
 
   return (
     <FlatList
