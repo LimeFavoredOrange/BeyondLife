@@ -13,6 +13,7 @@ import AutoSetting from '../../components/Account/AutoSetting';
 import Loading from '../../components/Loading';
 import { userData } from '../../Data/Twitter/twitterData';
 import twitterBackup from '../../Data/Twitter/twitterBackup';
+import { useNavigation } from '@react-navigation/native';
 
 const TwitterScreen = () => {
   // const mlURL = 'https://5331-110-150-115-26.au.ngrok.io';
@@ -35,6 +36,8 @@ const TwitterScreen = () => {
   const [searching, setSearching] = React.useState('');
 
   const [showSetting, setShowSetting] = React.useState(false);
+
+  const navigation = useNavigation();
 
   // Function to get all tweets
   const getTweets = async () => {
@@ -168,6 +171,8 @@ const TwitterScreen = () => {
           { name: 'options', type: 'ionicon' },
           { name: 'refresh-auto', type: 'material-community' },
           { name: 'clouddownload', type: 'antdesign' },
+          { name: 'upload-cloud', type: 'feather' },
+          { name: 'unlock', type: 'feather' },
         ]}
         iconFunction={[
           () => {
@@ -192,6 +197,14 @@ const TwitterScreen = () => {
             } else {
               await Sharing.shareAsync(downloadedFile.uri);
             }
+          },
+          () => {
+            // Navigate to the twitter setting screen
+            navigation.navigate('Twitter Setting');
+          },
+          () => {
+            // Navigate to the twitter decryption screen
+            navigation.navigate('Twitter Decryption');
           },
         ]}
       />

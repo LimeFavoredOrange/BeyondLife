@@ -4,7 +4,7 @@ import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { useNavigation } from '@react-navigation/native';
 
-import DateTimePicker from '@react-native-community/datetimepicker';
+// import DateTimePicker from '@react-native-community/datetimepicker';
 import Loading from '../../../components/Loading';
 
 import { Icon } from '@rneui/base';
@@ -126,7 +126,7 @@ const GmailDownload = () => {
         <View className="p-3 items-center justify-center mb-6 w-screen px-3">
           {/* Download email backup based on the sending date */}
           <Text className="text-lg font-semibold ">Download the emails that before the following date:</Text>
-          <DateTimePicker value={date} mode={'date'} is24Hour={true} onChange={selectDate} />
+          {/* <DateTimePicker value={date} mode={'date'} is24Hour={true} onChange={selectDate} /> */}
         </View>
 
         <TouchableOpacity

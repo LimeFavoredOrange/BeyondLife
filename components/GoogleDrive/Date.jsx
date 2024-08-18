@@ -1,6 +1,6 @@
 import { View, Text, Modal, TouchableOpacity } from 'react-native';
 import { vw, vh } from 'react-native-expo-viewport-units';
-import DateTimePicker from '@react-native-community/datetimepicker';
+// import DateTimePicker from '@react-native-community/datetimepicker';
 import axios from 'axios';
 import React from 'react';
 
@@ -28,7 +28,7 @@ const Date1 = ({ showDate, setShowDate, setShowLoading }) => {
             <Text className="text-lg font-semibold ">Delete the file that before the following date:</Text>
           </View>
 
-          <DateTimePicker value={date} mode={'date'} is24Hour={true} onChange={selectDate} />
+          {/* <DateTimePicker value={date} mode={'date'} is24Hour={true} onChange={selectDate} /> */}
 
           <View className="flex-1"></View>
           <TouchableOpacity

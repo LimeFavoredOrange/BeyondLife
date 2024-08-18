@@ -3,7 +3,7 @@ import { View, Text, SafeAreaView, FlatList, TextInput, TouchableOpacity, Scroll
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 
-import DateTimePicker from '@react-native-community/datetimepicker';
+// import DateTimePicker from '@react-native-community/datetimepicker';
 import Loading from '../../../components/Loading';
 
 import { Icon } from '@rneui/base';
@@ -127,7 +127,7 @@ const GmailForward = () => {
         {/* Forward the email based on the date */}
         <View className="items-center justify-center mb-6 w-screen px-3">
           <Text className="text-lg font-semibold ">Forward the emails that before the following date:</Text>
-          <DateTimePicker value={date} mode={'date'} is24Hour={true} onChange={selectDate} />
+          {/* <DateTimePicker value={date} mode={'date'} is24Hour={true} onChange={selectDate} /> */}
         </View>
 
         <View className="w-screen px-3">

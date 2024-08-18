@@ -8,7 +8,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as ExpoFileSystem from 'expo-file-system';
 import twitterRestore from '../Data/Twitter/twitterRestore';
 
-console.log(DocumentPicker);
+// console.log(DocumentPicker);
 // Import components
 
 // Home Tab

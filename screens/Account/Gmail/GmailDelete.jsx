@@ -3,7 +3,7 @@ import { View, Text, SafeAreaView, FlatList, TextInput, TouchableOpacity } from 
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 
-import DateTimePicker from '@react-native-community/datetimepicker';
+// import DateTimePicker from '@react-native-community/datetimepicker';
 import Loading from '../../../components/Loading';
 
 import { Icon } from '@rneui/base';
@@ -124,7 +124,7 @@ const GmailDelete = () => {
         <View className="p-3 items-center justify-center mb-6 w-screen px-3">
           {/* Delete based on the date */}
           <Text className="text-lg font-semibold ">Delete the emails that before the following date:</Text>
-          <DateTimePicker value={date} mode={'date'} is24Hour={true} onChange={selectDate} />
+          {/* <DateTimePicker value={date} mode={'date'} is24Hour={true} onChange={selectDate} /> */}
         </View>
 
         <TouchableOpacity

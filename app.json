@@ -3,9 +3,18 @@
     "name": "digitalWill",
     "slug": "digitalWill",
     "version": "1.0.0",
+    "plugins": [
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ]
+    ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "permissions": ["CAMERA", "CAMERA_ROLL", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"],
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -14,9 +23,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },

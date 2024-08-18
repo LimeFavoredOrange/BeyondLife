@@ -17,6 +17,10 @@ import ViewAccountScreen from '../screens/ViewAccountScreen';
 
 // Account screen
 import TwitterScreen from '../screens/Account/TwitterScreen';
+import TwitterSettingScreen from '../screens/Account/TwitterSettingScreen';
+import HeirSettingScreen from '../screens/Account/HeirSettingScreen';
+import TwitterDecryptionScreen from '../screens/Account/TwitterDecryptionScreen';
+
 import GoogleDriveScreen from '../screens/Account/GoogleDriveScreen';
 import GoogleDriveFolderScreen from '../screens/Account/GoogleDriveFolderScreen';
 import GoogleDriveFolderContent from '../screens/Account/GoogleDriveFolderContent';
@@ -42,6 +46,9 @@ const Navigation = () => {
       <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Executor" component={ExecutorScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Twitter" component={TwitterScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Twitter Setting" component={TwitterSettingScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Heir Setting" component={HeirSettingScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Twitter Decryption" component={TwitterDecryptionScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Google Drive" component={GoogleDriveScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Google Drive Folder" component={GoogleDriveFolderScreen} options={{ headerShown: false }} />
       <Stack.Screen
