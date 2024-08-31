@@ -6,7 +6,7 @@ The code in this repo is a static version to protect account privacy and backend
 
 ![](./readme_src/screenshots.png)
 
-Link for the demo video 🎥: [Link](https://youtu.be/yqgjz6WW4gU)
+**Link for the demo video** 🎥: [Link](https://youtu.be/yqgjz6WW4gU)
 
 ## Access via pre-packaged Expo Link (recommended)
 You can run the app on your local devices by scanning the QR code below, but you need to install the app "Expo Go" on your device first, which is free to download on the App Store and the Google Play Store.
