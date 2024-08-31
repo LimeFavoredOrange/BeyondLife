@@ -56,7 +56,7 @@ const WelcomeScreen = () => {
         style={{ flex: 1, borderTopLeftRadius: 30, borderTopRightRadius: 30 }}
         className="w-screen bg-white "
       >
-        {currentMode === 'Welcome' && <Text className="text-2xl mt-3 font-bold text-center">Digital will.app</Text>}
+        {currentMode === 'Welcome' && <Text className="text-2xl mt-3 font-bold text-center">Digital Will App</Text>}
         <View className="flex-1 justify-center items-center">
           {currentMode === 'Welcome' && (
             <View className="gap-2 flex-1 justify-center">

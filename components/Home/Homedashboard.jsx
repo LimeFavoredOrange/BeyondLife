@@ -103,7 +103,7 @@ const Dashboard = () => {
         </View>
         <View>
           <View className="justify-center items-center " style={{ height: 120, backgroundColor: '#036635' }}>
-            <Text className="text-white text-2xl font-bold">Digital will solution</Text>
+            <Text className="text-white text-2xl font-bold">Digital will System</Text>
           </View>
         </View>
       </View>

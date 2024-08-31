@@ -14,9 +14,9 @@ const Tabs = () => {
       <View className="flex-row pt-3">
         <TouchableOpacity className="flex-1" onPress={() => dispatch(setSelectedTab('Home'))}>
           {selectedTab === 'Home' ? (
-            <Icon size={30} name="ios-home" type="ionicon" color={'#036635'} />
+            <Icon size={30} name="home" type="ionicon" color={'#036635'} />
           ) : (
-            <Icon size={30} name="ios-home-outline" type="ionicon" color={'gray'} />
+            <Icon size={30} name="home-outline" type="ionicon" color={'gray'} />
           )}
         </TouchableOpacity>
 
@@ -30,9 +30,9 @@ const Tabs = () => {
 
         <TouchableOpacity className="flex-1" onPress={() => dispatch(setSelectedTab('Key'))}>
           {selectedTab === 'Key' ? (
-            <Icon size={30} name="ios-key" type="ionicon" color={'#036635'} />
+            <Icon size={30} name="key" type="ionicon" color={'#036635'} />
           ) : (
-            <Icon size={30} name="ios-key-outline" type="ionicon" color={'gray'} />
+            <Icon size={30} name="key-outline" type="ionicon" color={'gray'} />
           )}
         </TouchableOpacity>
 
