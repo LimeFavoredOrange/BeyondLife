@@ -9,7 +9,7 @@ The code in this repo is a static version to protect account privacy and backend
 
 ## Access via pre-packaged Expo Link (recommended)
 You can run the app on your local devices by scanning the QR code below, but you need to install the app "Expo Go" on your device first, which is free to download on the App Store and the Google Play Store.
-- Expo GO:[Link](https://expo.dev/go)
+- Expo GO: [Link](https://expo.dev/go)
 
 
 ## Local Installation
@@ -28,8 +28,8 @@ i
 a
 ```
 Note: 
-- If you want to run it on an iOS simulator, you need to install `XCode` first, please refer to this [link]([https://expo.dev/go](https://docs.expo.dev/workflow/ios-simulator/)) for more info.
-- If you want to run it on an Android simulator, you need to install 'Android Studio' first, please refer to this [link]([https://expo.dev/go](https://docs.expo.dev/workflow/android-studio-emulator/)) for more info.
+- If you want to run it on an iOS simulator, you need to install `XCode` first, please refer to this [link](https://docs.expo.dev/workflow/ios-simulator/) for more info.
+- If you want to run it on an Android simulator, you need to install `Android Studio` first, please refer to this [link](https://docs.expo.dev/workflow/android-studio-emulator/) for more info.
 
 
 
