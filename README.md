@@ -1,42 +1,35 @@
-## Introduction
 
-A prototype mobile app for digital will solution. It is designed to allow users to set up an electronic will, and the application will automatically execute the user's electronic will through the backend. Provide a new way for people who need such services to manage their own pre-mortem information.
+# Digital Will App
 
-## Expo Link
+This repository contains the source code for the **Digital Will App**, a React Native Expo project that provides a secure and user-friendly platform for creating and managing digital legacy.
+The code in this repo is a static version to protect account privacy and backend server information. However, the data files included are real and were saved from actual server interactions. In a real-world scenario, this app would interact with a backend server. You can run it locally or access it using the pre-packaged Expo link. Please refer to the following sections for more details.
 
-https://expo.dev/@xinzhang9091/digitalWill?serviceType=classic&distribution=expo-go
 
-## Technology Stack
 
-- Frontend:
 
-  - React Native
-  - React Navigation
-  - React Native Elements
-  - Animatable
-  - Redux
-  - Axios
-  - Tailwind css
+## Access via pre-packaged Expo Link (recommended)
+You can run the app on your local devices by scanning the QR code below, but you need to install the app "Expo Go" on your device first, which is free to download on the App Store and the Google Play Store.
+- Expo GO:[Link](https://expo.dev/go)
 
-- Backend:
-  - Express
-  - Bcrypt
-  - Ethereum
 
 ## Local Installation
-
 ```bash
+# Assume you clone this repo and cd into the directory
+
+# Install the packages
 npm install
-```
 
-## Local running
-
-```bash
 npm start
 
-# For IOS device, assume there is a ios simulator running.
+# For an IOS device, assume there is an iOS simulator running.
 i
 
-# For Android device, assume there is an android simulator running.
+# For Android devices, assume there is an Android simulator running.
 a
 ```
+Note: 
+- If you want to run it on an iOS simulator, you need to install `XCode` first, please refer to this [link]([https://expo.dev/go](https://docs.expo.dev/workflow/ios-simulator/)) for more info.
+- If you want to run it on an Android simulator, you need to install 'Android Studio' first, please refer to this [link]([https://expo.dev/go](https://docs.expo.dev/workflow/android-studio-emulator/)) for more info.
+
+
+
