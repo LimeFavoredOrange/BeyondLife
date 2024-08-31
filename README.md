@@ -4,8 +4,10 @@
 This repository contains the source code for the **Digital Will App**, a React Native Expo project that provides a secure and user-friendly platform for creating and managing digital legacy.
 The code in this repo is a static version to protect account privacy and backend server information. However, the data files included are real and were saved from actual server interactions. In a real-world scenario, this app would interact with a backend server. You can run it locally or access it using the pre-packaged Expo link. Please refer to the following sections for more details.
 
+<img src="./readme_src/screenshots.png" alt="Digital Will App screenshots" width="300px">
 
-Link for the demo video 🎥: 
+
+Link for the demo video 🎥: [Link](https://youtu.be/yqgjz6WW4gU)
 
 ## Access via pre-packaged Expo Link (recommended)
 You can run the app on your local devices by scanning the QR code below, but you need to install the app "Expo Go" on your device first, which is free to download on the App Store and the Google Play Store.
