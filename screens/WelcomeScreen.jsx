@@ -66,7 +66,6 @@ const WelcomeScreen = () => {
                   color="#036635"
                   buttonStyle={{ width: 300, borderRadius: 15 }}
                   onPress={() => {
-                    console.log('here');
                     setAnimating(loginAnimation);
                     setCurrentHeight(loginHeight);
                     setCurrentMode('Login');

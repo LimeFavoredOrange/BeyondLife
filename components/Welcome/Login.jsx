@@ -5,6 +5,9 @@ import { View } from 'react-native-animatable';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { setIsLogin, setToken } from '../../redux/slices/auth';
+import showToast from '../../utils/showToast';
+
+import axiosInstance from '../../api';
 
 const Login = ({
   setAnimating,
@@ -15,22 +18,25 @@ const Login = ({
   setShowLoading,
 }) => {
   const dispatch = useDispatch();
+
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
   const handleLogin = async () => {
     try {
       setShowLoading(true);
-      // const response = await axios.post('https://tor2023-203l.onrender.com/auth/login', {
-      //   email,
-      //   password,
-      // });
+      const response = await axiosInstance.post('auth/login', {
+        email,
+        password,
+      });
       setShowLoading(false);
       dispatch(setIsLogin(true));
-      // dispatch(setToken(response.data.data.token));
+      dispatch(setToken(response.data.access_token));
+      showToast('Login successful ✅', 'success');
     } catch (error) {
       setShowLoading(false);
       console.log(error);
+      showToast('Login failed ❌', 'error');
     }
   };
 
@@ -39,6 +45,7 @@ const Login = ({
       <Text className="mt-5 font-bold " style={{ fontSize: 38 }}>
         Login
       </Text>
+
       <ScrollView
         alwaysBounceVertical={false}
         showsVerticalScrollIndicator={false}
@@ -60,6 +67,7 @@ const Login = ({
           leftIcon={<Icon name="email" type="material-community" size={24} color={'#036635'} />}
           onChangeText={(text) => setEmail(text)}
         />
+
         <Input
           containerStyle={{ width: 300 }}
           inputContainerStyle={{ borderBottomWidth: 1, borderWidth: 1, borderRadius: 15, padding: 5 }}
@@ -68,6 +76,7 @@ const Login = ({
           onChangeText={(text) => setPassword(text)}
           secureTextEntry={true}
         />
+
         <Button
           color="#036635"
           buttonStyle={{ width: 300, borderRadius: 15, marginBottom: 15 }}
