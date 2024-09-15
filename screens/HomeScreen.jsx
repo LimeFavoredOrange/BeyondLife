@@ -5,13 +5,6 @@ import { useSelector } from 'react-redux';
 import { selectSelectedTab } from '../redux/slices/homeSlice';
 import { useNavigation } from '@react-navigation/native';
 import * as DocumentPicker from 'expo-document-picker';
-import {
-  selectLinkToFacebook,
-  selectLinkToTwitter,
-  selectLinkToInstagram,
-  selectLinkToGmail,
-  selectLinkToGoogleDrive,
-} from '../redux/slices/homeSlice';
 import * as ExpoFileSystem from 'expo-file-system';
 import twitterRestore from '../Data/Twitter/twitterRestore';
 
