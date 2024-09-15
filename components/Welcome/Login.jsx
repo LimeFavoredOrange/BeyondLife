@@ -4,6 +4,17 @@ import { Input, Icon, Button } from '@rneui/themed';
 import { View } from 'react-native-animatable';
 import { useDispatch } from 'react-redux';
 import { setIsLogin, setToken } from '../../redux/slices/auth';
+import {
+  setAccountNumber,
+  setHeirNumber,
+  setNoteNumber,
+  setWillsNumber,
+  setLinkToFacebook,
+  setLinkToTwitter,
+  setLinkToInstagram,
+  setLinkToGmail,
+  setLinkToGoogleDrive,
+} from '../../redux/slices/homeSlice';
 import showToast from '../../utils/showToast';
 
 import axiosInstance from '../../api';
@@ -28,6 +39,27 @@ const Login = ({
         email,
         password,
       });
+      console.log(response.data);
+      const {
+        account_number,
+        heir_number,
+        note_number,
+        wills_number,
+        link_to_facebook,
+        link_to_twitter,
+        link_to_instagram,
+        link_to_gmail,
+        link_to_google_drive,
+      } = response.data;
+      dispatch(setAccountNumber(account_number));
+      dispatch(setHeirNumber(heir_number));
+      dispatch(setNoteNumber(note_number));
+      dispatch(setWillsNumber(wills_number));
+      dispatch(setLinkToFacebook(link_to_facebook));
+      dispatch(setLinkToTwitter(link_to_twitter));
+      dispatch(setLinkToInstagram(link_to_instagram));
+      dispatch(setLinkToGmail(link_to_gmail));
+      dispatch(setLinkToGoogleDrive(link_to_google_drive));
       setShowLoading(false);
       dispatch(setIsLogin(true));
       dispatch(setToken(response.data.access_token));

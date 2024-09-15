@@ -2,50 +2,63 @@ import React, { useState } from 'react';
 import { FlatList, Text, TouchableOpacity, Image, View, ActivityIndicator, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Button } from '@rneui/base';
+import facebookLogo from '../../assets/logos/facebook.png';
+import xLogo from '../../assets/logos/x.jpg';
+import instagramLogo from '../../assets/logos/Instagram.png';
+import GmailLogo from '../../assets/logos/gmail.png';
+import GoogleDriveLogo from '../../assets/logos/google_drive.png';
+
+import {
+  selectLinkToFacebook,
+  selectLinkToTwitter,
+  selectLinkToInstagram,
+  selectLinkToGmail,
+  selectLinkToGoogleDrive,
+} from '../../redux/slices/homeSlice';
+
+import { useSelector } from 'react-redux';
 
 const AccountManagerDashboard = () => {
   const navigation = useNavigation();
-  const [imageLoaded, setImageLoaded] = useState({});
   const [scrollEnabled, setScrollEnabled] = useState(false);
   const windowHeight = Dimensions.get('window').height;
 
-  const handleImageLoad = (accountId) => {
-    setImageLoaded((prevState) => ({
-      ...prevState,
-      [accountId]: true,
-    }));
-  };
+  const link_to_facebook = useSelector(selectLinkToFacebook);
+  const link_to_twitter = useSelector(selectLinkToTwitter);
+  const link_to_instagram = useSelector(selectLinkToInstagram);
+  const link_to_gmail = useSelector(selectLinkToGmail);
+  const link_to_google_drive = useSelector(selectLinkToGoogleDrive);
 
   const accounts = [
     {
       accountId: '1',
       platform: 'Facebook',
-      logo: 'https://www.facebook.com/images/fb_icon_325x325.png',
-      linked: false,
+      logo: facebookLogo,
+      linked: link_to_facebook == 'None' ? false : true,
     },
     {
       accountId: '2',
-      platform: 'Twitter',
-      logo: 'https://assets.stickpng.com/images/580b57fcd9996e24bc43c53e.png',
-      linked: false,
+      platform: 'X',
+      logo: xLogo,
+      linked: link_to_twitter == 'None' ? false : true,
     },
     {
       accountId: '3',
       platform: 'Instagram',
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/2048px-Instagram_icon.png',
-      linked: false,
+      logo: instagramLogo,
+      linked: link_to_instagram == 'None' ? false : true,
     },
     {
       accountId: '4',
       platform: 'Gmail',
-      logo: 'https://www.gstatic.com/images/branding/product/1x/gmail_2020q4_48dp.png',
-      linked: false,
+      logo: GmailLogo,
+      linked: link_to_gmail == 'None' ? false : true,
     },
     {
       accountId: '5',
       platform: 'Google Drive',
-      logo: 'https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png',
-      linked: false,
+      logo: GoogleDriveLogo,
+      linked: link_to_google_drive == 'None' ? false : true,
     },
   ];
 
@@ -60,14 +73,7 @@ const AccountManagerDashboard = () => {
       }}
       renderItem={({ item }) => (
         <TouchableOpacity className="flex-row items-center bg-gray-100 border-b px-2 space-x-2" style={{ height: 50 }}>
-          {!imageLoaded[item.accountId] && (
-            <ActivityIndicator size="small" color="#000" style={{ width: 30, height: 30 }} />
-          )}
-          <Image
-            source={{ uri: item.logo }}
-            style={{ width: 30, height: 30, resizeMode: 'contain' }}
-            onLoad={() => handleImageLoad(item.accountId)}
-          />
+          <Image source={item.logo} style={{ width: 30, height: 30, resizeMode: 'contain' }} />
           <Text className="text-lg font-semibold mx-3">{item.platform}</Text>
           <View className="flex-1" />
           <Button
