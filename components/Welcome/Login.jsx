@@ -2,7 +2,6 @@ import { Text, ScrollView } from 'react-native';
 import React from 'react';
 import { Input, Icon, Button } from '@rneui/themed';
 import { View } from 'react-native-animatable';
-import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { setIsLogin, setToken } from '../../redux/slices/auth';
 import showToast from '../../utils/showToast';

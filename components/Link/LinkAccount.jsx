@@ -1,10 +1,20 @@
-import { FlatList, Text, TouchableOpacity, Image, View } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
+import { FlatList, Text, TouchableOpacity, Image, View, ActivityIndicator, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Button } from '@rneui/base';
 
 const AccountManagerDashboard = () => {
   const navigation = useNavigation();
+  const [imageLoaded, setImageLoaded] = useState({});
+  const [scrollEnabled, setScrollEnabled] = useState(false);
+  const windowHeight = Dimensions.get('window').height;
+
+  const handleImageLoad = (accountId) => {
+    setImageLoaded((prevState) => ({
+      ...prevState,
+      [accountId]: true,
+    }));
+  };
 
   const accounts = [
     {
@@ -17,7 +27,7 @@ const AccountManagerDashboard = () => {
       accountId: '2',
       platform: 'Twitter',
       logo: 'https://assets.stickpng.com/images/580b57fcd9996e24bc43c53e.png',
-      linked: true,
+      linked: false,
     },
     {
       accountId: '3',
@@ -29,13 +39,13 @@ const AccountManagerDashboard = () => {
       accountId: '4',
       platform: 'Gmail',
       logo: 'https://www.gstatic.com/images/branding/product/1x/gmail_2020q4_48dp.png',
-      linked: true,
+      linked: false,
     },
     {
       accountId: '5',
       platform: 'Google Drive',
       logo: 'https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png',
-      linked: true,
+      linked: false,
     },
   ];
 
@@ -43,25 +53,32 @@ const AccountManagerDashboard = () => {
     <FlatList
       data={accounts}
       keyExtractor={(item) => item.accountId}
-      renderItem={({ item }) => {
-        return (
-          <TouchableOpacity
-            className="flex-row items-center bg-gray-100 border-b px-2 space-x-2"
-            style={{ height: 50 }}
-          >
-            <Image source={{ uri: item.logo, width: 30, height: 30 }} style={{ resizeMode: 'contain' }} />
-            <Text className="text-lg font-semibold mx-3">{item.platform}</Text>
-            <View className="flex-1" />
-            <Button
-              size="sm"
-              containerStyle={{ marginRight: 5, width: 80 }}
-              radius={'md'}
-              color={`${item.linked ? 'error' : '#036635'}`}
-              title={`${item.linked ? 'Unlink' : 'Link'}`}
-            />
-          </TouchableOpacity>
-        );
+      scrollEnabled={scrollEnabled}
+      onContentSizeChange={(contentWidth, contentHeight) => {
+        // Enable scrolling only if content height is greater than screen height
+        setScrollEnabled(contentHeight > windowHeight);
       }}
+      renderItem={({ item }) => (
+        <TouchableOpacity className="flex-row items-center bg-gray-100 border-b px-2 space-x-2" style={{ height: 50 }}>
+          {!imageLoaded[item.accountId] && (
+            <ActivityIndicator size="small" color="#000" style={{ width: 30, height: 30 }} />
+          )}
+          <Image
+            source={{ uri: item.logo }}
+            style={{ width: 30, height: 30, resizeMode: 'contain' }}
+            onLoad={() => handleImageLoad(item.accountId)}
+          />
+          <Text className="text-lg font-semibold mx-3">{item.platform}</Text>
+          <View className="flex-1" />
+          <Button
+            size="sm"
+            containerStyle={{ marginRight: 5, width: 80 }}
+            radius={'md'}
+            color={`${item.linked ? 'error' : '#036635'}`}
+            title={`${item.linked ? 'Unlink' : 'Link'}`}
+          />
+        </TouchableOpacity>
+      )}
     />
   );
 };

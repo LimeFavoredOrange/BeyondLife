@@ -9,15 +9,27 @@ const Dashboard = () => {
   const setup = [
     {
       id: 'Action number',
-      title: '#Actions',
-      backgroundColor: '#68a386',
+      title: '#Accounts',
+      backgroundColor: '#036635',
       num: 3,
     },
     {
       id: 'Executor number',
-      title: '#Executors',
-      backgroundColor: '#68a386',
+      title: '#Heirs',
+      backgroundColor: '#045948',
       num: 2,
+    },
+    {
+      id: 'Notes number',
+      title: '#Notes',
+      backgroundColor: '#02735E',
+      num: 1,
+    },
+    {
+      id: 'Will number',
+      title: '#Wills',
+      backgroundColor: '#056A47',
+      num: 1,
     },
   ];
 
@@ -35,7 +47,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <ScrollView className="pt-8">
+    <View className="pt-8">
       <View>
         <View className="flex-row items-center mb-3">
           <Text className="text-2xl font-bold pl-3 mr-1">Current setup</Text>
@@ -50,13 +62,14 @@ const Dashboard = () => {
           renderItem={({ item }) => {
             return (
               <TouchableOpacity
-                style={{ backgroundColor: `${item.backgroundColor}`, width: 200, height: 120 }}
-                className="p-5 bg-gray-200 m-2 rounded-xl"
+                style={{ backgroundColor: item.backgroundColor, width: 200, height: 120 }}
+                className="relative p-5 m-2 rounded-xl shadow-lg transition-transform duration-300 hover:scale-105"
                 onPress={() => navigation.navigate('Executor')}
               >
-                <View>
-                  <Text className="text-lg font-semibold">{item.title}</Text>
-                  <Text className="text-2xl font-bold">{item.num}</Text>
+                <View className="absolute inset-0 bg-gradient-to-r from-transparent to-black opacity-30 rounded-xl"></View>
+                <View className="relative z-10">
+                  <Text className="text-xl  font-semibold text-white">{item.title}</Text>
+                  <Text className="text-2xl font-bold text-white">{item.num}</Text>
                 </View>
               </TouchableOpacity>
             );
@@ -107,7 +120,7 @@ const Dashboard = () => {
           </View>
         </View>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
