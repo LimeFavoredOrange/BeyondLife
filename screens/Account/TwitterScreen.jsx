@@ -1,6 +1,7 @@
 import { View, Text, SafeAreaView, FlatList, Image } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
+import { Platform } from 'react-native';
 
 import React from 'react';
 import AccountHeader from '../../components/Account/AutomaticWillHeader';
@@ -214,6 +215,8 @@ const TwitterScreen = () => {
         platform="ios"
         onChangeText={(e) => setSearching(e)}
         value={searching}
+        searchIcon={Platform.OS === 'ios' ? { name: 'search' } : null}
+        clearIcon={Platform.OS === 'ios' ? { name: 'close-circle' } : null}
       />
 
       <FlatList

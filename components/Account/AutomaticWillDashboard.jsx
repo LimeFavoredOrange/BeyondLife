@@ -1,24 +1,27 @@
 import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
+import XLogo from '../../assets/logos/x.jpg';
+import GoogleDriveLogo from '../../assets/logos/google_drive.png';
+import GmailLogo from '../../assets/logos/gmail.png';
 
 const AccountDashboard = () => {
   const navigation = useNavigation();
   const platforms = [
     {
       id: 'Twitter',
-      title: 'Twitter',
-      logo: 'https://assets.stickpng.com/images/580b57fcd9996e24bc43c53e.png',
+      title: 'X',
+      logo: XLogo,
     },
     {
       id: 'Google Drive',
       title: 'Google Drive',
-      logo: 'https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png',
+      logo: GoogleDriveLogo,
     },
     {
       id: 'Gmail',
       title: 'Gmail',
-      logo: 'https://www.gstatic.com/images/branding/product/1x/gmail_2020q4_48dp.png',
+      logo: GmailLogo,
     },
   ];
 
@@ -34,7 +37,7 @@ const AccountDashboard = () => {
               navigation.navigate(item.id);
             }}
           >
-            <Image source={{ uri: item.logo, width: 30, height: 30 }} style={{ resizeMode: 'contain' }} />
+            <Image source={item.logo} style={{ width: 30, height: 30, resizeMode: 'contain' }} />
             <Text className="text-lg font-semibold">{item.title}</Text>
           </TouchableOpacity>
         );

@@ -12,7 +12,6 @@ import axiosInstance from '../../api';
 
 const AccountManagerDashboard = () => {
   const accountNumber = useSelector(selectAccountNumber);
-  console.log(accountNumber);
   const token = useSelector(selectToken);
   const navigation = useNavigation();
   const [accounts, setAccounts] = React.useState([]);
@@ -26,7 +25,6 @@ const AccountManagerDashboard = () => {
               Authorization: `Bearer ${token}`,
             },
           });
-          console.log(response.data);
           setAccounts(response.data);
         }
       } catch (error) {
@@ -34,7 +32,7 @@ const AccountManagerDashboard = () => {
       }
     };
     fetchData();
-  }, [accountNumber, token]);
+  });
 
   const tagColor = {
     Work: 'red',
@@ -54,7 +52,7 @@ const AccountManagerDashboard = () => {
             className="flex-row items-center bg-gray-100 border-b px-2 space-x-2"
             style={{ height: 50 }}
             onPress={() => {
-              navigation.navigate('View Account', { accountid: item.accountid });
+              navigation.navigate('View Account', { data: item });
             }}
           >
             <Text className="text-lg font-semibold mx-3">{item.platform}</Text>

@@ -44,6 +44,7 @@ const HomeScreen = () => {
           <LinkAccount />
         </>
       )}
+
       {selectedTab === 'Key' && (
         <>
           <AccountHeader

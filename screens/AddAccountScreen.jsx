@@ -4,13 +4,13 @@ import { Input, Icon, Button } from '@rneui/themed';
 import { vw } from 'react-native-expo-viewport-units';
 import SelectDropdown from 'react-native-select-dropdown';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import axios from 'axios';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { selectToken } from '../redux/slices/auth';
 import { useNavigation } from '@react-navigation/native';
+import axiosInstance from '../api';
 
-import { setAccounts, selectAccounts, setAccountsDetail, selectAccountsDetail } from '../redux/slices/accounts';
+import { setAccounts, setAccountsDetail, selectAccountsDetail } from '../redux/slices/accounts';
 
 function getRandomChars(strings) {
   const targetLength = strings[0].length;
@@ -38,29 +38,13 @@ const AddAccountScreen = () => {
   const [password, setPassword] = React.useState('');
   const [tag, setTag] = React.useState('');
   const [useFor, setUseFor] = React.useState('');
-  const [notes, setNotes] = React.useState('');
+  const [note, setNote] = React.useState('');
 
   const [executors, setExecutors] = React.useState([{ name: 'John' }, { name: 'Peter' }]);
 
   const token = useSelector(selectToken);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const accounts = useSelector(selectAccounts);
-  const accountsDetail = useSelector(selectAccountsDetail);
-
-  // const getExecutors = async () => {
-  //   const response = await axios.get('https://tor2023-203l.onrender.com/executor/all', {
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       Authorization: `Bearer ${token}`,
-  //     },
-  //   });
-  //   setExecutors(response.data.data);
-  // };
-
-  // React.useEffect(() => {
-  //   getExecutors();
-  // }, []);
 
   const tags = [
     { color: 'red', name: 'Work' },
@@ -279,8 +263,8 @@ const AddAccountScreen = () => {
           editable
           multiline
           numberOfLines={4}
-          onChangeText={(text) => setNotes(text)}
-          value={notes}
+          onChangeText={(text) => setNote(text)}
+          value={note}
           style={{ padding: 8 }}
         />
       </View>
@@ -289,53 +273,24 @@ const AddAccountScreen = () => {
         color="#036635"
         buttonStyle={{ width: 300, borderRadius: 15 }}
         onPress={async () => {
-          console.log(useFor);
           try {
-            // console.log(token);
-            // const response = await axios.post(
-            //   'https://tor2023-203l.onrender.com/account/create',
-            //   {
-            //     platform,
-            //     username,
-            //     password,
-            //     useFor,
-            //     tag,
-            //     note,
-            //   },
-            //   {
-            //     headers: {
-            //       'Content-Type': 'application/json',
-            //       Authorization: `Bearer ${token}`,
-            //     },
-            //   }
-            // );
-
-            // if (response.data.status === 'success') {
-            //   navigation.navigate('Home');
-            // }
-
-            // get the latest account id
-            let accountid = 0;
-            for (let index = 0; index < accounts.length; index++) {
-              if (accounts[index].accountid > accountid) {
-                accountid = accounts[index].accountid;
+            const response = await axiosInstance.post(
+              `accounts/add`,
+              {
+                platform,
+                username,
+                password,
+                tag,
+                useFor,
+                note,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
               }
-            }
-            accountid = parseInt(accountid) + 1;
-            dispatch(setAccounts([...accounts, { platform, tag, accountid }]));
-            const temp = JSON.parse(JSON.stringify(accountsDetail));
-            temp[accountid] = {
-              platform,
-              username,
-              password: getRandomChars(randomStrings),
-              useFor,
-              tag,
-              notes,
-              accountid,
-            };
-            console.log(temp);
-            dispatch(setAccountsDetail(temp));
-            navigation.navigate('Home');
+            );
+            navigation.goBack();
           } catch (error) {
             console.log(error);
           }
