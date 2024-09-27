@@ -16,7 +16,9 @@ import AddAccountScreen from '../screens/AddAccountScreen';
 import ViewAccountScreen from '../screens/ViewAccountScreen';
 
 // Account screen
+import TwitterScreenHome from '../screens/Account/TwitterScreenHome';
 import TwitterScreen from '../screens/Account/TwitterScreen';
+import TwitterConfigureWill from '../screens/Account/TwitterConfigureWill';
 import TwitterSettingScreen from '../screens/Account/TwitterSettingScreen';
 import HeirSettingScreen from '../screens/Account/HeirSettingScreen';
 import TwitterDecryptionScreen from '../screens/Account/TwitterDecryptionScreen';
@@ -45,7 +47,10 @@ const Navigation = () => {
     <Stack.Navigator>
       <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Executor" component={ExecutorScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Twitter" component={TwitterScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="TwitterList" component={TwitterScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Twitter" component={TwitterScreenHome} options={{ headerShown: false }} />
+      <Stack.Screen name="Twitter Configure Will" component={TwitterConfigureWill} options={{ headerShown: false }} />
+
       <Stack.Screen name="Twitter Setting" component={TwitterSettingScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Heir Setting" component={HeirSettingScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Twitter Decryption" component={TwitterDecryptionScreen} options={{ headerShown: false }} />

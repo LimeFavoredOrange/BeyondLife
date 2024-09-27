@@ -14,12 +14,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "permissions": [
-      "CAMERA",
-      "CAMERA_ROLL",
-      "READ_EXTERNAL_STORAGE",
-      "WRITE_EXTERNAL_STORAGE"
-    ],
+    "permissions": ["CAMERA", "CAMERA_ROLL", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"],
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -29,9 +24,7 @@
       "fallbackToCacheTimeout": 0,
       "url": "https://u.expo.dev/b773ff8b-02ea-4b8e-831a-8cc85f0d6c89"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.xinzhang9091.digitalWill"
@@ -51,6 +44,7 @@
         "projectId": "b773ff8b-02ea-4b8e-831a-8cc85f0d6c89"
       }
     },
+    "scheme": "digitalWill",
     "runtimeVersion": "1.0.0"
   }
 }

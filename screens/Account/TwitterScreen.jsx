@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, FlatList, Image } from 'react-native';
+import { View, Text, SafeAreaView, FlatList, Image, TouchableOpacity } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { Platform } from 'react-native';
@@ -6,7 +6,7 @@ import { Platform } from 'react-native';
 import React from 'react';
 import AccountHeader from '../../components/Account/AutomaticWillHeader';
 import axios from 'axios';
-import { Button, SearchBar, Badge } from '@rneui/themed';
+import { Button, SearchBar, Badge, Divider } from '@rneui/themed';
 
 import Filter from '../../components/Account/Filter';
 import AutoSetting from '../../components/Account/AutoSetting';
@@ -219,6 +219,40 @@ const TwitterScreen = () => {
         clearIcon={Platform.OS === 'ios' ? { name: 'close-circle' } : null}
       />
 
+      <View className="flex-row justify-center space-x-4 my-2">
+        {/* Download all button */}
+        <TouchableOpacity
+          style={{ backgroundColor: '#036635' }}
+          className=" px-4 py-2 rounded-lg"
+          onPress={async () => {
+            // Send the local backup file to the user (twitterBackup.txt)
+            // ../../Data/twitterData/tweetsData.txt
+            const fileUri = FileSystem.documentDirectory + 'twitterBackup.txt';
+            await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(twitterBackup));
+            const downloadedFile = await FileSystem.getInfoAsync(fileUri);
+
+            const imageFileExts = ['jpg', 'png', 'gif', 'heic', 'webp', 'bmp'];
+            const isIos = Platform.OS === 'ios';
+
+            if (isIos && imageFileExts.every((x) => !downloadedFile.uri.endsWith(x))) {
+              const UTI = 'twitter.item';
+              await Sharing.shareAsync(downloadedFile.uri, { UTI });
+            } else {
+              await Sharing.shareAsync(downloadedFile.uri);
+            }
+          }}
+        >
+          <Text className="text-white text-center font-bold">Download all</Text>
+        </TouchableOpacity>
+
+        {/* Download all & delete from X button */}
+        <TouchableOpacity className="bg-red-500 px-4 py-2 rounded-lg">
+          <Text className="text-white text-center font-bold">Download all & delete from X</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Divider />
+
       <FlatList
         data={targets}
         renderItem={({ item }) => {
@@ -259,7 +293,7 @@ const TwitterScreen = () => {
       />
 
       {/* Filter popup */}
-      <Filter
+      {/* <Filter
         applyFunction={applyFunction}
         setTargets={setTargets}
         setShowOptions={setShowOptions}
@@ -267,10 +301,10 @@ const TwitterScreen = () => {
         tab={tab}
         setTab={setTab}
         current_data={current_data}
-      />
+      /> */}
 
       {/* Setting popup */}
-      <AutoSetting
+      {/* <AutoSetting
         showSetting={showSetting}
         setShowSetting={setShowSetting}
         setTargets={setTargets}
@@ -284,7 +318,7 @@ const TwitterScreen = () => {
         selectOffensive={selectOffensive}
         imageData={imageData}
         offensiveData={offensiveData}
-      />
+      /> */}
     </SafeAreaView>
   );
 };
