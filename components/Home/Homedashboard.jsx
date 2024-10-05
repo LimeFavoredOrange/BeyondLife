@@ -100,7 +100,7 @@ const Dashboard = () => {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => {
             return (
-              <TouchableOpacity className="p-2 bg-gray-200 m-2">
+              <TouchableOpacity className="p-2 bg-gray-200 m-2" onPress={() => navigation.navigate('Heir Management')}>
                 <View>
                   <Text className="mt-2 text-lg font-semibold">{item.title}</Text>
                   {item.id === 'actions' ? (

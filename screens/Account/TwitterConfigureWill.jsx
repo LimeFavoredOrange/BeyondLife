@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { View, SafeAreaView, TouchableOpacity, Text, TextInput } from 'react-native';
+import { View, SafeAreaView, TouchableOpacity, Text, TextInput, FlatList, Modal, ScrollView } from 'react-native';
+
+import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
 import { ProgressBar, Divider } from 'react-native-paper';
-import DateTimePicker from '@react-native-community/datetimepicker'; // Import Date Picker
-import Icon from 'react-native-vector-icons/FontAwesome'; // Import vector icon
+import DateTimePicker from '@react-native-community/datetimepicker';
+
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { HelperText } from 'react-native-paper';
 
 import AccountHeader from '../../components/Account/AutomaticWillHeader';
@@ -21,44 +24,216 @@ const storageOptionDescription = {
 const TwitterConfigureWill = () => {
   const [showLoading, setShowLoading] = useState(false);
   const [storageOption, setStorageOption] = useState('Will Server Only');
-  const [offensiveTweets, setOffensiveTweets] = useState('Will Server Only'); // For step 2
-  const [tweetsWithImages, setTweetsWithImages] = useState('Will Server Only'); // For step 3
-  const [deleteKeywords, setDeleteKeywords] = useState(false); // For step 4
-  const [deleteBeforeDate, setDeleteBeforeDate] = useState(new Date()); // For new step - Delete before date
-  const [showDatePicker, setShowDatePicker] = useState(false); // Show/Hide DatePicker
-
-  const [progressStatus, setProgressStatus] = useState(0.16); // Progress for 6 steps
+  const [offensiveTweets, setOffensiveTweets] = useState('Will Server Only');
+  const [tweetsWithImages, setTweetsWithImages] = useState('Will Server Only');
+  const [deleteBeforeDate, setDeleteBeforeDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [progressStatus, setProgressStatus] = useState(0.16);
   const [currentStep, setCurrentStep] = useState(1);
-  const [keywords, setKeywords] = useState(''); // For step 5
-  const [skippedSteps, setSkippedSteps] = useState(false); // New flag to track if we skipped steps
+  const [animation, setAnimation] = useState('fadeInRight');
+
+  // For Step 5
+  const [keywords, setKeywords] = useState('');
+  const [keywordsList, setKeywordsList] = useState([]);
+
+  // For Step 6 (Attributes configuration)
+  const [attributes, setAttributes] = useState('');
+  const [attributesList, setAttributesList] = useState([]);
+
+  // For Step 7 (Heirs configuration)
+  const [heirs, setHeirs] = useState('');
+  const [selectedAttributes, setSelectedAttributes] = useState([]);
+  const [heirsList, setHeirsList] = useState([]);
+  const [isAttributeModalVisible, setAttributeModalVisible] = useState(false); // Control modal visibility
+  const [tempSelectedAttributes, setTempSelectedAttributes] = useState([]); // Temp storage for modal selections
+
+  // For Step 8 (Default policy)
+  const [policyMatch, setPolicyMatch] = useState('subset');
+
+  const [skippedSteps, setSkippedSteps] = useState(false);
+
+  // For Step 9
+  const [tweetsList, setTweetsList] = useState([
+    { id: 1, text: 'First tweet' },
+    { id: 2, text: 'Second tweet' },
+    { id: 3, text: 'Third tweet' },
+  ]);
+
+  const [tweetsAccessPolicies, setTweetsAccessPolicies] = useState({}); // 保存每个 tweet 的访问策略
+  const [policyError, setPolicyError] = useState(''); // 策略错误提示
+
+  const [currentTweetId, setCurrentTweetId] = useState(null); // 用于跟踪当前正在配置的 tweet ID
+
+  // 点击 Assign Attributes 按钮时打开 modal
+  const handleAssignAttributes = (tweetId) => {
+    setCurrentTweetId(tweetId); // 设置当前的 tweet ID
+    setAttributeModalVisible(true); // 显示属性选择 modal
+  };
+
+  // 关闭 modal 并保存选择的属性
+  const handleConfirmAttributes = () => {
+    setAttributeModalVisible(false);
+  };
+
+  // 为每个 tweet 分配属性
+  const toggleSelectAttributeForTweet = (attribute) => {
+    const currentAttributes = selectedAttributes[currentTweetId] || [];
+    if (currentAttributes.includes(attribute)) {
+      setSelectedAttributes({
+        ...selectedAttributes,
+        [currentTweetId]: currentAttributes.filter((attr) => attr !== attribute),
+      });
+    } else {
+      setSelectedAttributes({
+        ...selectedAttributes,
+        [currentTweetId]: [...currentAttributes, attribute],
+      });
+    }
+  };
+
+  // 验证访问策略输入框的内容
+  const validatePolicyForTweet = (tweetId, policy) => {
+    const validAttributes = selectedAttributes[tweetId] || [];
+    const pattern = new RegExp(`^(${validAttributes.join('|')})( (and|or) (${validAttributes.join('|')}))*$`, 'i');
+    if (!pattern.test(policy)) {
+      setPolicyError('Invalid policy! Only use selected attributes connected with "and" or "or".');
+    } else {
+      setPolicyError('');
+      setTweetsAccessPolicies({
+        ...tweetsAccessPolicies,
+        [tweetId]: policy,
+      });
+    }
+  };
 
   const handlePrev = () => {
-    // Check if we jumped to step 6 by selecting "None (Delete All)" and go back to step 1 directly
-    if (skippedSteps && currentStep === 6) {
+    setAnimation('fadeInLeft');
+    if (skippedSteps && currentStep === 9) {
       setCurrentStep(1);
-      setProgressStatus(0.16); // Reset progress to step 1
-      setSkippedSteps(false); // Reset the skipped flag
+      setProgressStatus(0.16);
+      setSkippedSteps(false);
     } else {
       setCurrentStep((prevStep) => Math.max(prevStep - 1, 1));
-      setProgressStatus((prevProgress) => Math.max(prevProgress - 0.16, 0.16)); // Adjusted for 6 steps
+      setProgressStatus((prevProgress) => Math.max(prevProgress - 0.11, 0.11));
     }
   };
 
   const handleNext = () => {
+    setAnimation('fadeInRight');
     if (currentStep === 1 && storageOption === 'None (Delete All)') {
-      setCurrentStep(6); // Directly jump to final confirmation step
-      setProgressStatus(1); // Full progress when skipping steps
-      setSkippedSteps(true); // Set skipped flag to true
+      setCurrentStep(9);
+      setProgressStatus(1);
+      setSkippedSteps(true);
     } else {
       setCurrentStep((prevStep) => prevStep + 1);
-      setProgressStatus((prevProgress) => Math.min(prevProgress + 0.16, 1)); // Normal increment
+      setProgressStatus((prevProgress) => Math.min(prevProgress + 0.11, 1));
     }
+  };
+
+  // Function to add keyword to list and clear input
+  const handleAddKeyword = () => {
+    if (keywords.trim()) {
+      setKeywordsList([...keywordsList, keywords.trim()]);
+      setKeywords('');
+    }
+  };
+
+  // Function to delete a keyword from the list
+  const handleDeleteKeyword = (index) => {
+    const updatedList = keywordsList.filter((_, i) => i !== index);
+    setKeywordsList(updatedList);
+  };
+
+  // =============================================================================
+  // Step 6: Function to add attribute to list and clear input
+  const handleAddAttribute = () => {
+    if (attributes.trim()) {
+      setAttributesList([...attributesList, attributes.trim()]);
+      setAttributes('');
+    }
+  };
+
+  // Step 6: Function to delete an attribute from the list
+  const handleDeleteAttribute = (index) => {
+    const updatedList = attributesList.filter((_, i) => i !== index);
+    setAttributesList(updatedList);
+  };
+
+  // Step 7: Function to add heirs with selected attributes
+  const handleAddHeir = () => {
+    if (heirs.trim() && selectedAttributes.length > 0) {
+      setHeirsList([...heirsList, { name: heirs, attributes: [...selectedAttributes] }]);
+      setHeirs('');
+      setSelectedAttributes([]);
+    }
+  };
+
+  // Step 7: Function to delete heir from list
+  const handleDeleteHeir = (index) => {
+    const updatedList = heirsList.filter((_, i) => i !== index);
+    setHeirsList(updatedList);
+  };
+
+  // Step 7: Toggle attribute selection within modal
+  const toggleSelectAttribute = (attribute) => {
+    if (tempSelectedAttributes.includes(attribute)) {
+      setTempSelectedAttributes(tempSelectedAttributes.filter((item) => item !== attribute));
+    } else {
+      setTempSelectedAttributes([...tempSelectedAttributes, attribute]);
+    }
+  };
+
+  // Modal for selecting attributes (allows multiple selections)
+  const AttributeSelectionModal = () => {
+    return (
+      <Modal visible={isAttributeModalVisible} transparent={true}>
+        <View
+          style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', justifyContent: 'center', alignItems: 'center' }}
+        >
+          <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, width: '90%', maxHeight: '80%' }}>
+            <Text className="text-lg font-bold mb-4">Select Attributes</Text>
+            <ScrollView>
+              {attributesList.map((attribute, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={{
+                    padding: 10,
+                    backgroundColor: tempSelectedAttributes.includes(attribute) ? '#036635' : '#ccc',
+                    marginBottom: 10,
+                    borderRadius: 5,
+                  }}
+                  onPress={() => toggleSelectAttribute(attribute)}
+                >
+                  <Text style={{ color: tempSelectedAttributes.includes(attribute) ? '#fff' : '#000' }}>
+                    {attribute}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <TouchableOpacity
+              style={{
+                backgroundColor: '#036635',
+                padding: 10,
+                marginTop: 20,
+                borderRadius: 5,
+                alignItems: 'center',
+              }}
+              onPress={() => {
+                setSelectedAttributes([...tempSelectedAttributes]);
+                setAttributeModalVisible(false);
+              }}
+            >
+              <Text style={{ color: '#fff', fontWeight: 'bold' }}>Confirm</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
   };
 
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || deleteBeforeDate;
-    setShowDatePicker(false);
-    setDeleteBeforeDate(currentDate); // Update selected date
+    setDeleteBeforeDate(currentDate);
   };
 
   return (
@@ -67,115 +242,330 @@ const TwitterConfigureWill = () => {
       <AccountHeader setShowLoading={setShowLoading} title={'Configure Will📝'} />
       <ProgressBar progress={progressStatus} color={'#036635'} />
       <View className="h-full">
-        {currentStep === 1 && (
-          <View>
-            <Text className="text-xl font-semibold mt-8 mx-3">Step 1: Where should data be kept?</Text>
-            <Picker
-              selectedValue={storageOption}
-              onValueChange={(itemValue) => setStorageOption(itemValue)} // Save storage option, but do not jump immediately
-            >
-              <Picker.Item label="Will Server Only" value="Will Server Only" />
-              <Picker.Item label="X Server Only" value="X Server Only" />
-              <Picker.Item label="Both" value="Both" />
-              <Picker.Item label="None (Delete All)" value="None (Delete All)" />
-            </Picker>
-            <View className="flex-row items-center ml-6 pr-3">
-              <Icon name="info-circle" size={20} color="#036635" />
-              <HelperText type="info" className="text-base ml-2 font-bold">
-                {storageOptionDescription[storageOption]}
-              </HelperText>
+        <Animatable.View animation={animation} duration={500} key={currentStep} style={{ flex: 1 }}>
+          {/* Step 1 */}
+          {currentStep === 1 && (
+            <View>
+              <Text className="text-xl font-semibold mt-8 mx-3">Step 1: Where should data be kept?</Text>
+              <Picker selectedValue={storageOption} onValueChange={(itemValue) => setStorageOption(itemValue)}>
+                <Picker.Item label="Will Server Only" value="Will Server Only" />
+                <Picker.Item label="X Server Only" value="X Server Only" />
+                <Picker.Item label="Both" value="Both" />
+                <Picker.Item label="None (Delete All)" value="None (Delete All)" />
+              </Picker>
+              <View className="flex-row items-center ml-6 pr-3">
+                <Icon name="info-circle" size={20} color="#036635" />
+                <HelperText type="info" className="text-base ml-2 font-bold">
+                  {storageOptionDescription[storageOption]}
+                </HelperText>
+              </View>
             </View>
-          </View>
-        )}
+          )}
 
-        {currentStep === 2 && (
-          <View>
-            <Text className="text-xl font-semibold mt-8 mx-3">Step 2: Do you want to delete offensive tweets?</Text>
-            <Picker
-              selectedValue={offensiveTweets}
-              onValueChange={(itemValue) => setOffensiveTweets(itemValue)} // Save offensive tweets option
-            >
-              <Picker.Item label="Will Server Only" value="Will Server Only" />
-              <Picker.Item label="X Server Only" value="X Server Only" />
-              <Picker.Item label="Both" value="Both" />
-            </Picker>
-            <View className="flex-row items-center ml-6 pr-3">
-              <Icon name="info-circle" size={20} color="#036635" />
-              <HelperText type="info" className="text-base ml-2 font-bold">
-                Offensive tweets are tweets that contain sensitive content. We will help you to identify them by our AI
-                assistant.
-              </HelperText>
+          {/* Step 2 */}
+          {currentStep === 2 && (
+            <View>
+              <Text className="text-xl font-semibold mt-8 mx-3">Step 2: Do you want to delete offensive tweets?</Text>
+              <Picker selectedValue={offensiveTweets} onValueChange={(itemValue) => setOffensiveTweets(itemValue)}>
+                <Picker.Item label="Will Server Only" value="Will Server Only" />
+                <Picker.Item label="X Server Only" value="X Server Only" />
+                <Picker.Item label="Both" value="Both" />
+              </Picker>
+              <View className="flex-row items-center ml-6 pr-3">
+                <Icon name="info-circle" size={20} color="#036635" />
+                <HelperText type="info" className="text-base ml-2 font-bold">
+                  Offensive tweets refer to those that contain sensitive or inappropriate language. We will help you to
+                  identify them by our AI assistant.
+                </HelperText>
+              </View>
             </View>
-          </View>
-        )}
+          )}
 
-        {currentStep === 3 && (
-          <View>
-            <Text className="text-xl font-semibold mt-8 mx-3">
-              Step 3: Do you want to delete tweets that contain images?
-            </Text>
-            <Picker
-              selectedValue={tweetsWithImages}
-              onValueChange={(itemValue) => setTweetsWithImages(itemValue)} // Save tweets with images option
-            >
-              <Picker.Item label="Will Server Only" value="Will Server Only" />
-              <Picker.Item label="X Server Only" value="X Server Only" />
-              <Picker.Item label="Both" value="Both" />
-            </Picker>
-          </View>
-        )}
+          {/* Step 3 */}
+          {currentStep === 3 && (
+            <View>
+              <Text className="text-xl font-semibold mt-8 mx-3">
+                Step 3: Do you want to delete tweets that contain images?
+              </Text>
+              <Picker selectedValue={tweetsWithImages} onValueChange={(itemValue) => setTweetsWithImages(itemValue)}>
+                <Picker.Item label="Will Server Only" value="Will Server Only" />
+                <Picker.Item label="X Server Only" value="X Server Only" />
+                <Picker.Item label="Both" value="Both" />
+              </Picker>
+            </View>
+          )}
 
-        {currentStep === 4 && (
-          <View>
-            <Text className="text-xl font-semibold mt-8 mx-3">Step 4: Delete tweets before a certain date?</Text>
-            <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+          {/* Step 4 */}
+          {currentStep === 4 && (
+            <View>
+              <Text className="text-xl font-semibold mt-8 mx-3">Step 4: Delete tweets before a certain date?</Text>
+              <View>
+                <View
+                  onPress={() => setShowDatePicker(true)}
+                  style={{
+                    margin: 10,
+                    padding: 10,
+                    borderWidth: 1,
+                    borderColor: '#ccc',
+                    borderRadius: 10,
+                  }}
+                >
+                  <View className="flex-row gap-2 px-6">
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: `${showDatePicker === true ? '#036635' : '#ccc'}`,
+                      }}
+                      onPress={() => setShowDatePicker(true)}
+                      className="flex-1 h-8 bg-gray-400 rounded-lg justify-center items-center font-bold"
+                    >
+                      <Text className="text-white font-bold">Enable</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: `${showDatePicker === false ? '#036635' : '#ccc'}`,
+                      }}
+                      onPress={() => setShowDatePicker(false)}
+                      className="flex-1 h-8 rounded-lg justify-center items-center"
+                    >
+                      <Text className="text-white font-bold">Disable</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                {showDatePicker && (
+                  <Animatable.View
+                    animation="fadeInDown"
+                    duration={800}
+                    onAnimationEnd={() => !showDatePicker && setShowDatePicker(false)}
+                    style={{
+                      margin: 10,
+                      padding: 10,
+                      borderWidth: 1,
+                      borderColor: '#036635',
+                      borderRadius: 10,
+                      alignItems: 'center',
+                      gap: 5,
+                    }}
+                  >
+                    <Text className="text-lg font-semibold ">Delete all tweets before the the date:</Text>
+                    <DateTimePicker value={deleteBeforeDate} mode={'date'} is24Hour={true} onChange={onDateChange} />
+                  </Animatable.View>
+                )}
+              </View>
+            </View>
+          )}
+
+          {/* Step 5 */}
+          {currentStep === 5 && (
+            <View style={{ flex: 1, paddingBottom: 150 }}>
+              {/* Ensure padding at the bottom */}
+              <Text className="text-xl font-semibold mt-8 mx-3">Step 5: Do you want to delete tweets by keywords?</Text>
+              {/* Input Field for Keywords */}
               <TextInput
-                placeholder="Select Date"
-                value={deleteBeforeDate.toDateString()} // Display the selected date
-                editable={false}
-                style={{
-                  margin: 10,
-                  padding: 10,
-                  borderWidth: 1,
-                  borderColor: '#ccc',
-                  borderRadius: 10,
-                }}
+                placeholder="Enter keywords, and press enter to add more"
+                value={keywords}
+                onChangeText={setKeywords}
+                onSubmitEditing={handleAddKeyword} // Press Enter to add keyword
+                className="m-3 p-2 border border-gray-300 rounded-lg"
               />
-            </TouchableOpacity>
-            {showDatePicker && (
-              <DateTimePicker value={deleteBeforeDate} mode="date" display="default" onChange={onDateChange} />
-            )}
-          </View>
-        )}
+              {/* Keywords List */}
+              <FlatList
+                data={keywordsList}
+                keyExtractor={(item, index) => index.toString()}
+                style={{ flex: 1, marginHorizontal: 10 }} // Ensure space for buttons
+                renderItem={({ item, index }) => (
+                  <Animatable.View
+                    animation="fadeIn"
+                    className="flex-row justify-between p-3 mb-2 bg-gray-200 rounded-lg items-center shadow"
+                  >
+                    <Text className="text-lg">{item}</Text>
+                    <TouchableOpacity onPress={() => handleDeleteKeyword(index)}>
+                      <Icon name="trash" size={20} color="#ff0000" />
+                    </TouchableOpacity>
+                  </Animatable.View>
+                )}
+              />
+            </View>
+          )}
 
-        {currentStep === 5 && (
-          <View>
-            <Text className="text-xl font-semibold mt-8 mx-3">Step 5: Do you want to delete tweets by keywords?</Text>
-            <TextInput
-              placeholder="Enter keywords"
-              value={keywords}
-              onChangeText={setKeywords}
-              style={{
-                margin: 10,
-                padding: 10,
-                borderWidth: 1,
-                borderColor: '#ccc',
-                borderRadius: 10,
-              }}
-            />
-          </View>
-        )}
+          {/* Step 6 (Attributes Configuration) */}
+          {currentStep === 6 && (
+            <View style={{ flex: 1, paddingBottom: 150 }}>
+              <Text className="text-xl font-semibold mt-8 mx-3">Step 6: Attributes Configuration</Text>
+              <TextInput
+                placeholder="Enter attribute, and press enter to add"
+                value={attributes}
+                onChangeText={setAttributes}
+                onSubmitEditing={handleAddAttribute}
+                className="m-3 p-2 border border-gray-300 rounded-lg"
+              />
+              <FlatList
+                data={attributesList}
+                keyExtractor={(item, index) => index.toString()}
+                style={{ flex: 1, marginHorizontal: 10 }}
+                renderItem={({ item, index }) => (
+                  <Animatable.View
+                    animation="fadeIn"
+                    className="flex-row justify-between p-3 mb-2 bg-gray-200 rounded-lg items-center shadow"
+                  >
+                    <Text className="text-lg">{item}</Text>
+                    <TouchableOpacity onPress={() => handleDeleteAttribute(index)}>
+                      <Icon name="trash" size={20} color="#ff0000" />
+                    </TouchableOpacity>
+                  </Animatable.View>
+                )}
+              />
+            </View>
+          )}
 
-        {currentStep === 6 && (
-          <View className=" h-3/4 ">
-            <Text className="text-xl font-semibold mt-8 mx-3 mb-3">Step 6: Final Confirmation</Text>
-            <Divider />
-            <TwitterSetting />
-          </View>
-        )}
+          {/* Step 7 (Heirs Configuration) */}
+          {currentStep === 7 && (
+            <View style={{ flex: 1, paddingBottom: 150 }}>
+              <Text className="text-xl font-semibold mt-8 mx-3">Step 7: Heirs Configuration</Text>
+              <TextInput
+                placeholder="Enter heir's name"
+                value={heirs}
+                onChangeText={setHeirs}
+                className="m-3 p-2 border border-gray-300 rounded-lg"
+              />
+
+              <TouchableOpacity
+                style={{
+                  backgroundColor: '#036635',
+                  padding: 10,
+                  margin: 10,
+                  borderRadius: 5,
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                onPress={() => setAttributeModalVisible(true)}
+              >
+                <Text style={{ color: '#fff', fontWeight: 'bold', marginRight: 8 }}>Assign Attributes</Text>
+                <Icon name="chevron-down" size={16} color="#fff" />
+              </TouchableOpacity>
+
+              {/* Selected Attributes */}
+              <View className="m-3 p-2 border border-gray-300 rounded-lg">
+                <Text>Selected Attributes: {selectedAttributes.join(', ') || 'None selected'}</Text>
+              </View>
+
+              <TouchableOpacity
+                style={{
+                  backgroundColor: '#036635',
+                }}
+                className=" w-4/5 self-center h-10 rounded-lg justify-center items-center mb-5"
+                onPress={handleAddHeir}
+              >
+                <Text className="text-white font-bold ">Add Heir</Text>
+              </TouchableOpacity>
+
+              {/* Heirs List */}
+              <FlatList
+                data={heirsList}
+                keyExtractor={(item, index) => index.toString()}
+                style={{ flex: 1, marginHorizontal: 10 }}
+                renderItem={({ item, index }) => (
+                  <Animatable.View
+                    animation="fadeIn"
+                    className="flex-row justify-between p-3 mb-2 bg-gray-200 rounded-lg items-center shadow"
+                  >
+                    <Text className="text-lg">
+                      {item.name} - {item.attributes.join(', ')}
+                    </Text>
+                    <TouchableOpacity onPress={() => handleDeleteHeir(index)}>
+                      <Icon name="trash" size={20} color="#ff0000" />
+                    </TouchableOpacity>
+                  </Animatable.View>
+                )}
+              />
+            </View>
+          )}
+
+          {/* Step 8 (Default Policy) */}
+          {currentStep === 8 && (
+            <View style={{ flex: 1, paddingBottom: 150 }}>
+              <Text className="text-xl font-semibold mt-8 mx-3">Step 8: Default Policy</Text>
+              <Text className="m-3 font-semibold">
+                Should all attributes of an object match with those of the heir, or is a subset enough?
+              </Text>
+              <View className="flex-row justify-around mx-3">
+                <TouchableOpacity
+                  style={{ backgroundColor: policyMatch === 'subset' ? '#036635' : '#ccc' }}
+                  onPress={() => setPolicyMatch('subset')}
+                  className="w-40 h-10 rounded-lg justify-center items-center"
+                >
+                  <Text className="text-white font-bold">Subset is enough</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ backgroundColor: policyMatch === 'full' ? '#036635' : '#ccc' }}
+                  onPress={() => setPolicyMatch('full')}
+                  className="w-40 h-10 rounded-lg justify-center items-center"
+                >
+                  <Text className="text-white font-bold">Full match</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          {/* Step 9 */}
+          {/* Step 9 (Access control for each tweet) */}
+          {currentStep === 9 && (
+            <View style={{ flex: 1, paddingBottom: 150 }}>
+              <Text className="text-xl font-semibold mt-8 mx-3">Step 9: Access Control for Tweets</Text>
+
+              {/* Tweets 列表渲染 */}
+              <FlatList
+                data={tweetsList}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                  <View
+                    key={item.id}
+                    style={{ marginBottom: 15, padding: 15, borderWidth: 1, borderColor: '#ccc', borderRadius: 10 }}
+                  >
+                    <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{item.text}</Text>
+
+                    {/* "Assign Attributes" 按钮 */}
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: '#036635',
+                        padding: 10,
+                        margin: 10,
+                        borderRadius: 5,
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      onPress={() => handleAssignAttributes(item.id)}
+                    >
+                      <Text style={{ color: '#fff', fontWeight: 'bold', marginRight: 8 }}>Assign Attributes</Text>
+                      <Icon name="chevron-down" size={16} color="#fff" />
+                    </TouchableOpacity>
+
+                    {/* 选择的属性展示 */}
+                    <View className="m-3 p-2 border border-gray-300 rounded-lg">
+                      <Text>Selected Attributes: {selectedAttributes[item.id]?.join(', ') || 'None selected'}</Text>
+                    </View>
+
+                    {/* 访问策略输入框 */}
+                    <TextInput
+                      placeholder="Enter access policy (e.g., 'Attribute1 and Attribute2')"
+                      value={tweetsAccessPolicies[item.id] || ''}
+                      onChangeText={(text) => validatePolicyForTweet(item.id, text)}
+                      style={{ marginTop: 10, padding: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 5 }}
+                    />
+
+                    {/* 策略错误显示 */}
+                    {policyError && <HelperText type="error">{policyError}</HelperText>}
+                  </View>
+                )}
+              />
+            </View>
+          )}
+        </Animatable.View>
       </View>
 
-      {/* Circular Buttons with Updated Colors */}
       <View
         style={{
           position: 'absolute',
@@ -186,41 +576,25 @@ const TwitterConfigureWill = () => {
           justifyContent: 'space-between',
         }}
       >
-        {/* Conditionally render Prev Button or a Placeholder */}
         {currentStep !== 1 ? (
           <TouchableOpacity
             onPress={handlePrev}
-            style={{
-              borderColor: '#7e7e7e', // Gray color for the outline
-              borderWidth: 2,
-              width: 60,
-              height: 60,
-              borderRadius: 30,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
+            className="border border-gray-400 w-14 h-14 rounded-full justify-center items-center"
           >
             <Icon name="arrow-left" size={24} color="#7e7e7e" />
           </TouchableOpacity>
         ) : (
-          <View style={{ width: 60 }} />
+          <View className="w-14" />
         )}
 
-        {/* Next Button - Solid Dark Green */}
         <TouchableOpacity
           onPress={handleNext}
-          style={{
-            backgroundColor: '#036635',
-            width: 60,
-            height: 60,
-            borderRadius: 30,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
+          className="bg-green-700 w-14 h-14 rounded-full justify-center items-center"
         >
-          <Icon name="arrow-right" size={24} color="#fff" />
+          <Icon name={currentStep === 9 ? 'check' : 'arrow-right'} size={24} color="#fff" />
         </TouchableOpacity>
       </View>
+      <AttributeSelectionModal />
     </SafeAreaView>
   );
 };
