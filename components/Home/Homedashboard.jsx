@@ -10,8 +10,11 @@ import {
 } from '../../redux/slices/homeSlice';
 import { useSelector } from 'react-redux';
 
+import storageConfiguration from '../../assets/storage.png';
+import heirConfiguration from '../../assets/heir.png';
+
 // Dashboard screen component
-const Dashboard = () => {
+const Dashboard = ({ setShowStorageOptionScreen }) => {
   const navigation = useNavigation();
   const accountNumber = useSelector(selectAccountNumber);
   const heirNumber = useSelector(selectHeirNumber);
@@ -47,14 +50,16 @@ const Dashboard = () => {
 
   const cards = [
     {
-      id: 'actions',
-      title: 'Actions',
-      image: 'actions.png',
+      id: 'Storage Configuration',
+      title: 'Storage Configuration',
+      image: storageConfiguration,
+      action: () => setShowStorageOptionScreen(true),
     },
     {
-      id: 'executors',
-      title: 'Executors',
-      image: 'executors.png',
+      id: 'Executors Configuration',
+      title: 'Executors Configuration',
+      image: heirConfiguration,
+      action: () => navigation.navigate('Heir Management'),
     },
   ];
 
@@ -100,20 +105,19 @@ const Dashboard = () => {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => {
             return (
-              <TouchableOpacity className="p-2 bg-gray-200 m-2" onPress={() => navigation.navigate('Heir Management')}>
+              <TouchableOpacity
+                className="p-2 bg-gray-200 m-2 rounded-lg"
+                style={{ width: 135 }}
+                onPress={() => item.action()}
+              >
                 <View>
-                  <Text className="mt-2 text-lg font-semibold">{item.title}</Text>
-                  {item.id === 'actions' ? (
-                    <Image
-                      source={require(`../../assets/actions.png`)}
-                      style={{ width: 100, height: 100, resizeMode: 'contain' }}
-                    />
-                  ) : (
-                    <Image
-                      source={require(`../../assets/executors.png`)}
-                      style={{ width: 100, height: 100, resizeMode: 'contain' }}
-                    />
-                  )}
+                  <Text className="mt-2 text-lg font-semibold" numberOfLines={2} style={{ flexWrap: 'wrap' }}>
+                    {item.title}
+                  </Text>
+                  <Image
+                    source={item.image}
+                    style={{ width: 100, height: 100, resizeMode: 'contain', alignSelf: 'left' }}
+                  />
                 </View>
               </TouchableOpacity>
             );
@@ -129,6 +133,7 @@ const Dashboard = () => {
         <View>
           <View className="justify-center items-center " style={{ height: 120, backgroundColor: '#036635' }}>
             <Text className="text-white text-2xl font-bold">Digital will System</Text>
+            <Text className="text-gray-300 text-base font-semibold ">@Beyond Life</Text>
           </View>
         </View>
       </View>

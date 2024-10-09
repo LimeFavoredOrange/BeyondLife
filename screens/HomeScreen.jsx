@@ -18,22 +18,24 @@ import AccountManagerDashboard from '../components/Account/AccountManagerDashboa
 import LinkAccount from '../components/Link/LinkAccount';
 import AccountHeader from '../components/Account/AutomaticWillHeader';
 import AccountDashboard from '../components/Account/AutomaticWillDashboard';
+import { set } from 'ramda';
 
 const HomeScreen = () => {
   const selectedTab = useSelector(selectSelectedTab);
   const navigation = useNavigation();
 
   const [showStorageOptionScreen, setShowStorageOptionScreen] = React.useState(true);
-  const [showCloudPlatforms, setShowCloudPlatforms] = React.useState(false); // 控制显示云平台按钮
+  const [showCloudPlatforms, setShowCloudPlatforms] = React.useState(false);
+  const [firstTimeDelay, setFirstTimeDelay] = React.useState(1200);
 
   const showStorageOption = {
     0: {
       opacity: 0,
-      transform: [{ translateY: 500 }], // 初始位置在屏幕下方
+      transform: [{ translateY: 500 }],
     },
     1: {
       opacity: 0.98,
-      transform: [{ translateY: 0 }], // 完全显示并覆盖屏幕
+      transform: [{ translateY: 0 }],
     },
   };
 
@@ -42,7 +44,7 @@ const HomeScreen = () => {
       {selectedTab === 'Home' && (
         <>
           <HomeHeader />
-          <HomeDashboard />
+          <HomeDashboard setShowStorageOptionScreen={setShowStorageOptionScreen} />
         </>
       )}
 
@@ -64,6 +66,7 @@ const HomeScreen = () => {
           <AccountManagerDashboard />
         </>
       )}
+
       {selectedTab === 'Document' && (
         <>
           <AccountHeader
@@ -93,12 +96,12 @@ const HomeScreen = () => {
       {showStorageOptionScreen && (
         <Animatable.View
           animation={showStorageOption}
-          duration={1200}
+          duration={1100}
           className="absolute top-0 left-0 right-0 bottom-0 bg-gray-200 h-screen w-screen opacity-20"
         >
           <View style={{ paddingTop: 80 }} className="p-6 w-full h-full rounded-t-3xl absolute bottom-0">
             {showCloudPlatforms === false && (
-              <View>
+              <Animatable.View animation={'fadeInLeft'} delay={firstTimeDelay}>
                 <Text className="text-2xl font-bold mb-4 text-center">Welcome to BeyondLife</Text>
                 <Text className="text-base text-center mb-6">
                   At BeyondLife, your memories and important data matter. Choose how you want to store your data—whether
@@ -120,6 +123,7 @@ const HomeScreen = () => {
                     className="p-4 bg-blue-500 rounded-lg"
                     onPress={() => {
                       setShowStorageOptionScreen(false);
+                      setFirstTimeDelay(1200);
                     }}
                   >
                     <Text className="text-white font-bold text-center">Use BeyondLife Cloud Storage</Text>
@@ -143,14 +147,17 @@ const HomeScreen = () => {
                     due to redundancy.
                   </Text>
                 </View>
-              </View>
+              </Animatable.View>
             )}
 
             {showCloudPlatforms && (
               <Animatable.View className="mt-6 space-y-4" animation={'fadeInRight'}>
                 <TouchableOpacity
                   className="p-4 bg-gray-300 rounded-lg flex-row items-center space-x-2"
-                  onPress={() => setShowCloudPlatforms(false)} // 返回上一步
+                  onPress={() => {
+                    setShowCloudPlatforms(false);
+                    setFirstTimeDelay(0);
+                  }}
                 >
                   <Icon name="arrow-left" size={24} color="#000" />
                   <Text className="text-black font-bold">Back</Text>
