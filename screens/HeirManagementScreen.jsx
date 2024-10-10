@@ -8,34 +8,64 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const HeirManagementScreen = () => {
   const [showLoading, setShowLoading] = useState(false);
-  const [showAddHeirScreen, setShowAddHeirScreen] = useState(false); // 控制是否显示添加继承人页面
-  const [heirs, setHeirs] = useState([]); // 存储已添加的继承人
+  const [showAddHeirScreen, setShowAddHeirScreen] = useState(false);
+  const [heirs, setHeirs] = useState([]);
   const [heirName, setHeirName] = useState('');
   const [heirEmail, setHeirEmail] = useState('');
-  const [currentStep, setCurrentStep] = useState(1); // 当前步骤
+  const [currentStep, setCurrentStep] = useState(1);
   const navigation = useNavigation();
 
-  // 添加继承人的引导流程
-  const handleNextStep = () => {
-    if (currentStep < 3) {
-      setCurrentStep(currentStep + 1);
+  // Predefined attributes for the heir
+  const predefinedAttributes = ['Reliable', 'Family', 'Friend', 'Trusted', 'Work'];
+  const [selectedAttributes, setSelectedAttributes] = useState([]);
+
+  // Customized attributes for the heir
+  const [customAttribute, setCustomAttribute] = useState('');
+  const [customAttributes, setCustomAttributes] = useState([]);
+
+  const toggleAttribute = (attribute) => {
+    if (selectedAttributes.includes(attribute)) {
+      setSelectedAttributes(selectedAttributes.filter((item) => item !== attribute));
     } else {
-      // 完成引导，添加新的继承人
-      const newHeir = { name: heirName, email: heirEmail };
-      setHeirs([...heirs, newHeir]);
-      setShowAddHeirScreen(false);
-      setCurrentStep(1);
-      setHeirName('');
-      setHeirEmail('');
+      setSelectedAttributes([...selectedAttributes, attribute]);
     }
   };
 
-  // 渲染步骤内容
+  const handleAddAttribute = () => {
+    if (customAttribute.trim()) {
+      setCustomAttributes([...customAttributes, customAttribute.trim()]);
+      setCustomAttribute('');
+    }
+  };
+
+  const handleDeleteAttribute = (attribute) => {
+    setCustomAttributes(customAttributes.filter((item) => item !== attribute));
+  };
+
+  const handleNextStep = () => {
+    if (currentStep < 5) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      setShowAddHeirScreen(false);
+      setHeirs([
+        ...heirs,
+        { name: heirName, email: heirEmail, attributes: [...selectedAttributes, ...customAttributes] },
+      ]);
+      setHeirName('');
+      setHeirEmail('');
+      setSelectedAttributes([]);
+      setCustomAttributes([]);
+      setCurrentStep(1);
+    }
+  };
+
   const renderStepContent = () => {
     if (currentStep === 1) {
       return (
         <View>
-          <Text className="text-xl mb-4 text-center">Who’s the lucky person you’re adding to your will today?</Text>
+          <Text className="text-xl mb-4 text-center">
+            Who’s the special person you trust to inherit your digital world?
+          </Text>
           <TextInput
             value={heirName}
             onChangeText={setHeirName}
@@ -47,7 +77,9 @@ const HeirManagementScreen = () => {
     } else if (currentStep === 2) {
       return (
         <View>
-          <Text className="text-xl mb-4 text-center">Let’s make sure we can contact them! What’s their email?</Text>
+          <Text className="text-xl mb-4 text-center">
+            Let’s keep your chosen one in the loop! What’s your heir’s email?
+          </Text>
           <TextInput
             value={heirEmail}
             onChangeText={setHeirEmail}
@@ -58,11 +90,69 @@ const HeirManagementScreen = () => {
       );
     } else if (currentStep === 3) {
       return (
+        <View className="items-center px-4">
+          <Text className="text-xl mb-4 text-center">
+            Let’s paint a picture of {heirName}—select some fitting attributes!
+          </Text>
+          <Text className="text-lg text-gray-600 text-center mb-4">e.g., Reliable, Family, Friend...</Text>
+
+          <View className="flex-row flex-wrap justify-center">
+            {predefinedAttributes.map((attribute) => (
+              <TouchableOpacity
+                key={attribute}
+                className={`px-4 py-2 rounded-full m-2 ${
+                  selectedAttributes.includes(attribute) ? 'bg-green-500' : 'bg-gray-300'
+                }`}
+                onPress={() => toggleAttribute(attribute)}
+              >
+                <Text className={`${selectedAttributes.includes(attribute) ? 'text-white' : 'text-gray-700'} text-sm`}>
+                  {attribute}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      );
+    } else if (currentStep === 4) {
+      return (
+        <View className="px-4">
+          <Text className="text-xl mb-4 text-center">Add some unique attributes for your heir!</Text>
+
+          <View className="flex-row items-center mb-4">
+            <TextInput
+              value={customAttribute}
+              onChangeText={setCustomAttribute}
+              placeholder="Enter custom attribute"
+              className="flex-1 p-3 bg-white rounded-lg border border-gray-300"
+            />
+            <TouchableOpacity
+              onPress={handleAddAttribute}
+              className="ml-2 p-3 bg-green-500 rounded-lg justify-center items-center"
+            >
+              <Icon name="plus" size={24} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+          {customAttributes.length > 0 && (
+            <FlatList
+              data={customAttributes}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <View className="flex-row items-center bg-gray-200 rounded-lg p-3 mb-2">
+                  <Text className="flex-1 text-gray-700 text-lg">{item}</Text>
+                  <TouchableOpacity onPress={() => handleDeleteAttribute(item)}>
+                    <Icon name="delete" size={24} color="#ff0000" />
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+          )}
+        </View>
+      );
+    } else if (currentStep === 5) {
+      return (
         <View>
-          <Text className="text-xl mb-4 text-center">What best describes {heirName}? Pick some fun attributes!</Text>
-          {/* 这里可以是一些属性选择的按钮或复选框 */}
-          <Text className="text-base text-center">e.g., Reliable, Caring, Funny...</Text>
-          {/* Add actual attribute selections here */}
+          <Text className="text-xl mb-4 text-center">All set! Your heir has been added to your list.</Text>
         </View>
       );
     }
@@ -73,7 +163,7 @@ const HeirManagementScreen = () => {
       <Loading showLoading={showLoading} />
       <AccountHeader setShowLoading={setShowLoading} title={'Heirs Management'} />
 
-      {/* 添加新继承人的按钮 */}
+      {/* The button to add a new user */}
       <View className="p-6">
         <TouchableOpacity
           className="p-4 bg-blue-600 rounded-lg flex-row items-center justify-center"
@@ -84,7 +174,7 @@ const HeirManagementScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* 展示已添加的继承人列表 */}
+      {/* A list to show all the heirs */}
       <View className="p-6">
         <Text className="text-lg font-semibold mb-4">Your Heirs:</Text>
         {heirs.length > 0 ? (
@@ -108,9 +198,9 @@ const HeirManagementScreen = () => {
         <Animatable.View
           animation="slideInUp"
           duration={800}
-          className="absolute top-0 left-0 right-0 bottom-0 bg-gray-100"
+          className="absolute top-0 left-0 right-0 bottom-0 bg-gray-100 h-screen w-screen"
         >
-          <View className="p-6 w-full h-full">
+          <View style={{ paddingTop: 80 }} className="p-6 w-full h-full">
             {renderStepContent()}
             <TouchableOpacity
               className="p-4 bg-green-600 rounded-lg flex-row items-center justify-center mt-4"

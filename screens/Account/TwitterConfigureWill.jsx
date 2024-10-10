@@ -12,7 +12,9 @@ import { HelperText } from 'react-native-paper';
 import AccountHeader from '../../components/Account/AutomaticWillHeader';
 import Loading from '../../components/Loading';
 
-import TwitterSetting from './TwitterSetting';
+import { useNavigation } from '@react-navigation/native';
+
+import showToast from '../../utils/showToast';
 
 const storageOptionDescription = {
   'Will Server Only': 'Data will be kept on Will server only, which is a secure server that hosting by us.',
@@ -31,6 +33,8 @@ const TwitterConfigureWill = () => {
   const [progressStatus, setProgressStatus] = useState(0.16);
   const [currentStep, setCurrentStep] = useState(1);
   const [animation, setAnimation] = useState('fadeInRight');
+
+  const navigation = useNavigation();
 
   // For Step 2
   const [offensiveTweetsEnabled, setOffensiveTweetsEnabled] = useState(false);
@@ -121,6 +125,25 @@ const TwitterConfigureWill = () => {
   };
 
   const handleNext = () => {
+    if (currentStep === 7) {
+      // Submit data
+      console.log('Submit data:', {
+        storageOption,
+        offensiveTweets,
+        tweetsWithImages,
+        deleteBeforeDate,
+        keywordsList,
+        attributesList,
+        heirsList,
+        policyMatch,
+        tweetsAccessPolicies,
+      });
+      // Navigate back to Home screen
+      navigation.navigate('Home');
+      showToast('✅ Your will has been successfully set on X!', 'success');
+      return;
+    }
+
     setAnimation('fadeInRight');
     if (currentStep === 1 && storageOption === 'None (Delete All)') {
       setCurrentStep(7);
@@ -639,7 +662,7 @@ const TwitterConfigureWill = () => {
           onPress={handleNext}
           className="bg-green-700 w-14 h-14 rounded-full justify-center items-center"
         >
-          <Icon name={currentStep === 9 ? 'check' : 'arrow-right'} size={24} color="#fff" />
+          <Icon name={currentStep === 7 ? 'check' : 'arrow-right'} size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
