@@ -32,6 +32,12 @@ const TwitterConfigureWill = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [animation, setAnimation] = useState('fadeInRight');
 
+  // For Step 2
+  const [offensiveTweetsEnabled, setOffensiveTweetsEnabled] = useState(false);
+
+  // For Step 3
+  const [tweetsWithImagesEnabled, setTweetsWithImagesEnabled] = useState(false);
+
   // For Step 5
   const [keywords, setKeywords] = useState('');
   const [keywordsList, setKeywordsList] = useState([]);
@@ -59,23 +65,20 @@ const TwitterConfigureWill = () => {
     { id: 3, text: 'Third tweet' },
   ]);
 
-  const [tweetsAccessPolicies, setTweetsAccessPolicies] = useState({}); // 保存每个 tweet 的访问策略
-  const [policyError, setPolicyError] = useState(''); // 策略错误提示
+  const [tweetsAccessPolicies, setTweetsAccessPolicies] = useState({});
+  const [policyError, setPolicyError] = useState('');
 
-  const [currentTweetId, setCurrentTweetId] = useState(null); // 用于跟踪当前正在配置的 tweet ID
+  const [currentTweetId, setCurrentTweetId] = useState(null);
 
-  // 点击 Assign Attributes 按钮时打开 modal
   const handleAssignAttributes = (tweetId) => {
-    setCurrentTweetId(tweetId); // 设置当前的 tweet ID
-    setAttributeModalVisible(true); // 显示属性选择 modal
+    setCurrentTweetId(tweetId);
+    setAttributeModalVisible(true);
   };
 
-  // 关闭 modal 并保存选择的属性
   const handleConfirmAttributes = () => {
     setAttributeModalVisible(false);
   };
 
-  // 为每个 tweet 分配属性
   const toggleSelectAttributeForTweet = (attribute) => {
     const currentAttributes = selectedAttributes[currentTweetId] || [];
     if (currentAttributes.includes(attribute)) {
@@ -91,7 +94,6 @@ const TwitterConfigureWill = () => {
     }
   };
 
-  // 验证访问策略输入框的内容
   const validatePolicyForTweet = (tweetId, policy) => {
     const validAttributes = selectedAttributes[tweetId] || [];
     const pattern = new RegExp(`^(${validAttributes.join('|')})( (and|or) (${validAttributes.join('|')}))*$`, 'i');
@@ -108,25 +110,25 @@ const TwitterConfigureWill = () => {
 
   const handlePrev = () => {
     setAnimation('fadeInLeft');
-    if (skippedSteps && currentStep === 9) {
+    if (skippedSteps && currentStep === 7) {
       setCurrentStep(1);
-      setProgressStatus(0.16);
+      setProgressStatus(0.15);
       setSkippedSteps(false);
     } else {
       setCurrentStep((prevStep) => Math.max(prevStep - 1, 1));
-      setProgressStatus((prevProgress) => Math.max(prevProgress - 0.11, 0.11));
+      setProgressStatus((prevProgress) => Math.max(prevProgress - 0.15, 0.15));
     }
   };
 
   const handleNext = () => {
     setAnimation('fadeInRight');
     if (currentStep === 1 && storageOption === 'None (Delete All)') {
-      setCurrentStep(9);
+      setCurrentStep(7);
       setProgressStatus(1);
       setSkippedSteps(true);
     } else {
       setCurrentStep((prevStep) => prevStep + 1);
-      setProgressStatus((prevProgress) => Math.min(prevProgress + 0.11, 1));
+      setProgressStatus((prevProgress) => Math.min(prevProgress + 0.15, 1));
     }
   };
 
@@ -266,18 +268,41 @@ const TwitterConfigureWill = () => {
           {currentStep === 2 && (
             <View>
               <Text className="text-xl font-semibold mt-8 mx-3">Step 2: Do you want to delete offensive tweets?</Text>
-              <Picker selectedValue={offensiveTweets} onValueChange={(itemValue) => setOffensiveTweets(itemValue)}>
-                <Picker.Item label="Will Server Only" value="Will Server Only" />
-                <Picker.Item label="X Server Only" value="X Server Only" />
-                <Picker.Item label="Both" value="Both" />
-              </Picker>
-              <View className="flex-row items-center ml-6 pr-3">
-                <Icon name="info-circle" size={20} color="#036635" />
-                <HelperText type="info" className="text-base ml-2 font-bold">
-                  Offensive tweets refer to those that contain sensitive or inappropriate language. We will help you to
-                  identify them by our AI assistant.
-                </HelperText>
+              <View style={{ margin: 10, padding: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 10 }}>
+                <View className="flex-row gap-2 px-6">
+                  <TouchableOpacity
+                    style={{ backgroundColor: offensiveTweetsEnabled ? '#036635' : '#ccc' }}
+                    onPress={() => setOffensiveTweetsEnabled(true)}
+                    className="flex-1 h-8 rounded-lg justify-center items-center"
+                  >
+                    <Text className="text-white font-bold">Enable</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ backgroundColor: !offensiveTweetsEnabled ? '#036635' : '#ccc' }}
+                    onPress={() => setOffensiveTweetsEnabled(false)}
+                    className="flex-1 h-8 rounded-lg justify-center items-center"
+                  >
+                    <Text className="text-white font-bold">Disable</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
+
+              {offensiveTweetsEnabled && (
+                <Animatable.View animation="fadeInDown" duration={800} style={{ margin: 10 }}>
+                  <Picker selectedValue={offensiveTweets} onValueChange={(itemValue) => setOffensiveTweets(itemValue)}>
+                    <Picker.Item label="Will Server Only" value="Will Server Only" />
+                    <Picker.Item label="X Server Only" value="X Server Only" />
+                    <Picker.Item label="Both" value="Both" />
+                  </Picker>
+                  <View className="flex-row items-center ml-6 pr-3">
+                    <Icon name="info-circle" size={20} color="#036635" />
+                    <HelperText type="info" className="text-base ml-2 font-bold">
+                      Offensive tweets refer to those that contain sensitive or inappropriate language. We will help you
+                      to identify them by our AI assistant.
+                    </HelperText>
+                  </View>
+                </Animatable.View>
+              )}
             </View>
           )}
 
@@ -287,11 +312,37 @@ const TwitterConfigureWill = () => {
               <Text className="text-xl font-semibold mt-8 mx-3">
                 Step 3: Do you want to delete tweets that contain images?
               </Text>
-              <Picker selectedValue={tweetsWithImages} onValueChange={(itemValue) => setTweetsWithImages(itemValue)}>
-                <Picker.Item label="Will Server Only" value="Will Server Only" />
-                <Picker.Item label="X Server Only" value="X Server Only" />
-                <Picker.Item label="Both" value="Both" />
-              </Picker>
+              <View style={{ margin: 10, padding: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 10 }}>
+                <View className="flex-row gap-2 px-6">
+                  <TouchableOpacity
+                    style={{ backgroundColor: tweetsWithImagesEnabled ? '#036635' : '#ccc' }}
+                    onPress={() => setTweetsWithImagesEnabled(true)}
+                    className="flex-1 h-8 rounded-lg justify-center items-center"
+                  >
+                    <Text className="text-white font-bold">Enable</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ backgroundColor: !tweetsWithImagesEnabled ? '#036635' : '#ccc' }}
+                    onPress={() => setTweetsWithImagesEnabled(false)}
+                    className="flex-1 h-8 rounded-lg justify-center items-center"
+                  >
+                    <Text className="text-white font-bold">Disable</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {tweetsWithImagesEnabled && (
+                <Animatable.View animation="fadeInDown" duration={800} style={{ margin: 10 }}>
+                  <Picker
+                    selectedValue={tweetsWithImages}
+                    onValueChange={(itemValue) => setTweetsWithImages(itemValue)}
+                  >
+                    <Picker.Item label="Will Server Only" value="Will Server Only" />
+                    <Picker.Item label="X Server Only" value="X Server Only" />
+                    <Picker.Item label="Both" value="Both" />
+                  </Picker>
+                </Animatable.View>
+              )}
             </View>
           )}
 
@@ -390,7 +441,7 @@ const TwitterConfigureWill = () => {
           )}
 
           {/* Step 6 (Attributes Configuration) */}
-          {currentStep === 6 && (
+          {/* {currentStep === 6 && (
             <View style={{ flex: 1, paddingBottom: 150 }}>
               <Text className="text-xl font-semibold mt-8 mx-3">Step 6: Attributes Configuration</Text>
               <TextInput
@@ -417,10 +468,10 @@ const TwitterConfigureWill = () => {
                 )}
               />
             </View>
-          )}
+          )} */}
 
           {/* Step 7 (Heirs Configuration) */}
-          {currentStep === 7 && (
+          {/* {currentStep === 7 && (
             <View style={{ flex: 1, paddingBottom: 150 }}>
               <Text className="text-xl font-semibold mt-8 mx-3">Step 7: Heirs Configuration</Text>
               <TextInput
@@ -446,7 +497,6 @@ const TwitterConfigureWill = () => {
                 <Icon name="chevron-down" size={16} color="#fff" />
               </TouchableOpacity>
 
-              {/* Selected Attributes */}
               <View className="m-3 p-2 border border-gray-300 rounded-lg">
                 <Text>Selected Attributes: {selectedAttributes.join(', ') || 'None selected'}</Text>
               </View>
@@ -461,7 +511,6 @@ const TwitterConfigureWill = () => {
                 <Text className="text-white font-bold ">Add Heir</Text>
               </TouchableOpacity>
 
-              {/* Heirs List */}
               <FlatList
                 data={heirsList}
                 keyExtractor={(item, index) => index.toString()}
@@ -481,12 +530,12 @@ const TwitterConfigureWill = () => {
                 )}
               />
             </View>
-          )}
+          )} */}
 
           {/* Step 8 (Default Policy) */}
-          {currentStep === 8 && (
+          {currentStep === 6 && (
             <View style={{ flex: 1, paddingBottom: 150 }}>
-              <Text className="text-xl font-semibold mt-8 mx-3">Step 8: Default Policy</Text>
+              <Text className="text-xl font-semibold mt-8 mx-3">Step 6: Default Policy</Text>
               <Text className="m-3 font-semibold">
                 Should all attributes of an object match with those of the heir, or is a subset enough?
               </Text>
@@ -509,11 +558,10 @@ const TwitterConfigureWill = () => {
             </View>
           )}
 
-          {/* Step 9 */}
           {/* Step 9 (Access control for each tweet) */}
-          {currentStep === 9 && (
+          {currentStep === 7 && (
             <View style={{ flex: 1, paddingBottom: 150 }}>
-              <Text className="text-xl font-semibold mt-8 mx-3">Step 9: Access Control for Tweets</Text>
+              <Text className="text-xl font-semibold mt-8 mx-3">Step 7: Access Control for Tweets</Text>
 
               {/* Tweets 列表渲染 */}
               <FlatList
@@ -594,6 +642,7 @@ const TwitterConfigureWill = () => {
           <Icon name={currentStep === 9 ? 'check' : 'arrow-right'} size={24} color="#fff" />
         </TouchableOpacity>
       </View>
+
       <AttributeSelectionModal />
     </SafeAreaView>
   );

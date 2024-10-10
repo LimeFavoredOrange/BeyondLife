@@ -32,7 +32,7 @@ const AccountManagerDashboard = () => {
       }
     };
     fetchData();
-  });
+  }, [accountNumber]);
 
   const tagColor = {
     Work: 'red',
