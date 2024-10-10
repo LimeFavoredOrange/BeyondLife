@@ -1,30 +1,29 @@
 import { SafeAreaView, View, TouchableOpacity, Text, TextInput, FlatList } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AccountHeader from '../components/Account/AutomaticWillHeader';
 import Loading from '../components/Loading';
-import { useNavigation } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axiosInstance from '../api';
 import { selectToken } from '../redux/slices/auth';
 import { useSelector } from 'react-redux';
+import { ProgressBar } from 'react-native-paper';
+import showToast from '../utils/showToast';
 
 const HeirManagementScreen = () => {
   const [showLoading, setShowLoading] = useState(false);
   const [showAddHeirScreen, setShowAddHeirScreen] = useState(false);
   const [heirs, setHeirs] = useState([]);
   const [heirName, setHeirName] = useState('');
+  const [heir, setHeir] = useState(undefined);
   const [heirEmail, setHeirEmail] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
-  const navigation = useNavigation();
-
+  const [progressStatus, setProgressStatus] = useState(0.2);
+  const [currentAnimation, setCurrentAnimation] = useState('slideInRight');
   const token = useSelector(selectToken);
 
-  // Predefined attributes for the heir
   const predefinedAttributes = ['Reliable', 'Family', 'Friend', 'Trusted', 'Work'];
   const [selectedAttributes, setSelectedAttributes] = useState([]);
-
-  // Customized attributes for the heir
   const [customAttribute, setCustomAttribute] = useState('');
   const [customAttributes, setCustomAttributes] = useState([]);
 
@@ -38,6 +37,7 @@ const HeirManagementScreen = () => {
 
   const handleAddAttribute = () => {
     if (customAttribute.trim()) {
+      setSelectedAttributes([...selectedAttributes, customAttribute.trim()]);
       setCustomAttributes([...customAttributes, customAttribute.trim()]);
       setCustomAttribute('');
     }
@@ -49,24 +49,106 @@ const HeirManagementScreen = () => {
 
   const handlePrevStep = () => {
     if (currentStep > 1) {
+      setCurrentAnimation('slideInLeft');
       setCurrentStep(currentStep - 1);
+      setProgressStatus(progressStatus - 0.2);
     }
   };
 
-  const handleNextStep = () => {
-    if (currentStep < 5) {
-      setCurrentStep(currentStep + 1);
+  const handleFirstStep = () => {
+    if (!heirName) {
+      showToast('Please enter heir name', 'error');
+      throw new Error('Please enter heir name');
+    }
+    // Check the given name is not in the Heirs list
+    const nameExists = heirs.find((heir) => heir.alias === heirName);
+    if (nameExists) {
+      showToast('Heir name already exists', 'error');
+      throw new Error('Heir name already exists');
+    }
+  };
+
+  const handleSecondStep = async () => {
+    try {
+      const response = await axiosInstance.get('auth/check', {
+        params: { email: heirEmail },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setHeir(response.data['message']);
+    } catch (error) {
+      if (error.response) {
+        showToast(error.response.data.message || 'An error occurred', 'error');
+      } else {
+        showToast('Network error or server did not respond', 'error');
+      }
+      throw error;
+    }
+  };
+
+  const handleThirdStep = () => {
+    console.log('Selected Attributes:', selectedAttributes);
+  };
+
+  const handleAddHeir = async (name, heir, attributes) => {
+    try {
+      setShowLoading(true);
+      const response = await axiosInstance.post(
+        'heirs/add',
+        {
+          alias: name,
+          heir: heir,
+          attributes: attributes,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log('Heir added:', response.data);
+      setHeirs([...heirs, { alias: name, userId: heir, attributes: attributes }]);
+    } catch (error) {
+      console.error('Error adding heir:', error);
+    } finally {
+      setShowLoading(false);
+    }
+  };
+
+  const handleNextStep = async () => {
+    console.log('Current Step:', currentStep);
+    if (currentStep < 4) {
+      try {
+        if (currentStep === 1) {
+          handleFirstStep();
+        } else if (currentStep === 2) {
+          await handleSecondStep();
+        } else if (currentStep === 3) {
+          handleThirdStep();
+        }
+        setCurrentAnimation('slideInRight');
+        setCurrentStep(currentStep + 1);
+        setProgressStatus(progressStatus + 0.2);
+      } catch (error) {
+        setShowLoading(false);
+      }
     } else {
+      console.log('Add Heir');
+      console.log('Heir Name:', heirName);
+      console.log('Heir Email:', heirEmail);
+      console.log('Selected Attributes:', selectedAttributes.join(','));
+      handleAddHeir(heirName, heirEmail, selectedAttributes.join(','));
+
       setShowAddHeirScreen(false);
-      setHeirs([
-        ...heirs,
-        { name: heirName, email: heirEmail, attributes: [...selectedAttributes, ...customAttributes] },
-      ]);
       setHeirName('');
       setHeirEmail('');
       setSelectedAttributes([]);
       setCustomAttributes([]);
       setCurrentStep(1);
+      setProgressStatus(0.2);
+      // setHeirs([
+      //   ...heirs,
+      //   { name: heirName, email: heirEmail, attributes: [...selectedAttributes, ...customAttributes] },
+      // ]);
     }
   };
 
@@ -87,9 +169,9 @@ const HeirManagementScreen = () => {
     }
   };
 
-  const renderStepContent = () => {
-    if (currentStep === 1) {
-      return (
+  const renderStepContent = () => (
+    <Animatable.View animation={currentAnimation} duration={500} key={currentStep} className="w-full">
+      {currentStep === 1 && (
         <View>
           <Text className="text-xl mb-4 text-center">
             Who’s the special person you trust to inherit your digital world?
@@ -101,13 +183,12 @@ const HeirManagementScreen = () => {
             className="p-4 bg-white rounded-lg"
           />
         </View>
-      );
-    } else if (currentStep === 2) {
-      return (
+      )}
+      {currentStep === 2 && (
         <View>
           <Text className="text-xl mb-4 text-center">
             Let’s keep your chosen one in the loop! Please enter the email of an heir who’s already registered with
-            BeyondLife
+            BeyondLife.
           </Text>
           <TextInput
             value={heirEmail}
@@ -116,15 +197,14 @@ const HeirManagementScreen = () => {
             className="p-4 bg-white rounded-lg"
           />
         </View>
-      );
-    } else if (currentStep === 3) {
-      return (
+      )}
+
+      {currentStep === 3 && (
         <View className="items-center px-4">
           <Text className="text-xl mb-4 text-center">
-            Let’s paint a picture of {heirName}—select some fitting attributes!
+            Let’s paint a picture of <Text className="font-bold">{heirName}</Text>, select some fitting attributes!
           </Text>
           <Text className="text-lg text-gray-600 text-center mb-4">e.g., Reliable, Family, Friend...</Text>
-
           <View className="flex-row flex-wrap justify-center">
             {predefinedAttributes.map((attribute) => (
               <TouchableOpacity
@@ -140,13 +220,22 @@ const HeirManagementScreen = () => {
               </TouchableOpacity>
             ))}
           </View>
+          {/* Cannot find fitting attributes */}
+          <TouchableOpacity
+            onPress={() => {
+              setCurrentStep((prev) => prev + 1);
+              setProgressStatus((progressStatus) => progressStatus + 0.2);
+            }}
+            className="mt-4 p-2"
+          >
+            <Text className=" text-blue-600 font-semibold text-sm">Can't find fitting attributes? Add your own!</Text>
+          </TouchableOpacity>
         </View>
-      );
-    } else if (currentStep === 4) {
-      return (
+      )}
+
+      {currentStep === 4 && (
         <View className="px-4">
           <Text className="text-xl mb-4 text-center">Add some unique attributes for your heir!</Text>
-
           <View className="flex-row items-center mb-4">
             <TextInput
               value={customAttribute}
@@ -161,7 +250,6 @@ const HeirManagementScreen = () => {
               <Icon name="plus" size={24} color="#fff" />
             </TouchableOpacity>
           </View>
-
           {customAttributes.length > 0 && (
             <FlatList
               data={customAttributes}
@@ -170,24 +258,23 @@ const HeirManagementScreen = () => {
                 <View className="flex-row items-center bg-gray-200 rounded-lg p-3 mb-2">
                   <Text className="flex-1 text-gray-700 text-lg">{item}</Text>
                   <TouchableOpacity onPress={() => handleDeleteAttribute(item)}>
-                    <Icon name="delete" size={24} color="#ff0000" />
+                    <Icon name="delete" size={24} color="#FF6B6B" />
                   </TouchableOpacity>
                 </View>
               )}
             />
           )}
         </View>
-      );
-    } else if (currentStep === 5) {
-      return (
+      )}
+      {currentStep === 5 && (
         <View>
           <Text className="text-xl mb-4 text-center">All set! Your heir has been added to your list.</Text>
         </View>
-      );
-    }
-  };
+      )}
+    </Animatable.View>
+  );
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       try {
         setShowLoading(true);
@@ -212,7 +299,6 @@ const HeirManagementScreen = () => {
       <Loading showLoading={showLoading} />
       <AccountHeader setShowLoading={setShowLoading} title={'Heirs Management'} />
 
-      {/* The button to add a new user */}
       <View className="p-6">
         <TouchableOpacity
           className="p-4 bg-blue-600 rounded-lg flex-row items-center justify-center"
@@ -223,7 +309,6 @@ const HeirManagementScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* A list to show all the heirs */}
       <View className="p-6">
         <Text className="text-lg font-semibold mb-4">Your Heirs:</Text>
         {heirs.length > 0 ? (
@@ -254,22 +339,37 @@ const HeirManagementScreen = () => {
           className="absolute top-0 left-0 right-0 bottom-0 bg-gray-100 h-screen w-screen"
         >
           <View style={{ paddingTop: 80 }} className="p-6 w-full h-full">
+            <ProgressBar className=" mb-8 " progress={progressStatus} color={'#036635'} />
             {renderStepContent()}
-            {currentStep > 1 && (
-              <TouchableOpacity
-                className="p-4 bg-gray-400 rounded-lg flex-row items-center justify-center mt-4"
-                onPress={handlePrevStep}
-              >
-                <Text className="text-white font-bold text-center">Prev</Text>
-              </TouchableOpacity>
-            )}
 
-            <TouchableOpacity
-              className="p-4 bg-green-600 rounded-lg flex-row items-center justify-center mt-2"
-              onPress={handleNextStep}
+            <View
+              style={{
+                position: 'absolute',
+                bottom: 35,
+                left: 30,
+                right: 30,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}
             >
-              <Text className="text-white font-bold text-center">Next</Text>
-            </TouchableOpacity>
+              {currentStep > 1 ? (
+                <TouchableOpacity
+                  onPress={handlePrevStep}
+                  className="bg-gray-400 w-14 h-14 rounded-full justify-center items-center"
+                >
+                  <Icon name="arrow-left" size={24} color="#fff" />
+                </TouchableOpacity>
+              ) : (
+                <View style={{ width: 56 }} />
+              )}
+
+              <TouchableOpacity
+                onPress={async () => await handleNextStep()}
+                className="bg-green-600 w-14 h-14 rounded-full justify-center items-center"
+              >
+                <Icon name={currentStep === 4 ? 'check' : 'arrow-right'} size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
           </View>
         </Animatable.View>
       )}
