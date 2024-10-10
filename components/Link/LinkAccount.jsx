@@ -126,7 +126,7 @@ const AccountManagerDashboard = () => {
             size="sm"
             containerStyle={{ marginRight: 5, width: 80 }}
             radius={'md'}
-            color={`${item.linked ? 'error' : '#036635'}`}
+            color={`${item.linked ? '#DC143C' : '#036635'}`}
             title={`${item.linked ? 'Unlink' : 'Link'}`}
             onPress={item.linkFunction}
           />

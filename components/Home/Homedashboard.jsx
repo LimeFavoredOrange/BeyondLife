@@ -7,6 +7,7 @@ import {
   selectHeirNumber,
   selectNoteNumber,
   selectWillsNumber,
+  selectStorageNumber,
 } from '../../redux/slices/homeSlice';
 import { useSelector } from 'react-redux';
 
@@ -20,6 +21,7 @@ const Dashboard = ({ setShowStorageOptionScreen }) => {
   const heirNumber = useSelector(selectHeirNumber);
   const noteNumber = useSelector(selectNoteNumber);
   const willsNumber = useSelector(selectWillsNumber);
+  const storageNumber = useSelector(selectStorageNumber);
 
   const setup = [
     {
@@ -35,15 +37,21 @@ const Dashboard = ({ setShowStorageOptionScreen }) => {
       num: heirNumber,
     },
     {
+      id: 'Storage number',
+      title: '#Storage',
+      backgroundColor: '#02735E',
+      num: storageNumber,
+    },
+    {
       id: 'Notes number',
       title: '#Notes',
-      backgroundColor: '#02735E',
+      backgroundColor: '#056A47',
       num: noteNumber,
     },
     {
       id: 'Will number',
       title: '#Wills',
-      backgroundColor: '#056A47',
+      backgroundColor: '#028760',
       num: willsNumber,
     },
   ];

@@ -9,6 +9,7 @@ import {
   setHeirNumber,
   setNoteNumber,
   setWillsNumber,
+  setStorageNumber,
   setLinkToFacebook,
   setLinkToTwitter,
   setLinkToInstagram,
@@ -45,16 +46,20 @@ const Login = ({
         heir_number,
         note_number,
         wills_number,
+        storage_number,
         link_to_facebook,
         link_to_twitter,
         link_to_instagram,
         link_to_gmail,
         link_to_google_drive,
       } = response.data;
+
+      console.log(response.data);
       dispatch(setAccountNumber(account_number));
       dispatch(setHeirNumber(heir_number));
       dispatch(setNoteNumber(note_number));
       dispatch(setWillsNumber(wills_number));
+      dispatch(setStorageNumber(storage_number));
       dispatch(setLinkToFacebook(link_to_facebook));
       dispatch(setLinkToTwitter(link_to_twitter));
       dispatch(setLinkToInstagram(link_to_instagram));

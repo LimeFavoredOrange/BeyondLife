@@ -5,6 +5,9 @@ import Loading from '../components/Loading';
 import { useNavigation } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import axiosInstance from '../api';
+import { selectToken } from '../redux/slices/auth';
+import { useSelector } from 'react-redux';
 
 const HeirManagementScreen = () => {
   const [showLoading, setShowLoading] = useState(false);
@@ -14,6 +17,8 @@ const HeirManagementScreen = () => {
   const [heirEmail, setHeirEmail] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
   const navigation = useNavigation();
+
+  const token = useSelector(selectToken);
 
   // Predefined attributes for the heir
   const predefinedAttributes = ['Reliable', 'Family', 'Friend', 'Trusted', 'Work'];
@@ -42,6 +47,12 @@ const HeirManagementScreen = () => {
     setCustomAttributes(customAttributes.filter((item) => item !== attribute));
   };
 
+  const handlePrevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   const handleNextStep = () => {
     if (currentStep < 5) {
       setCurrentStep(currentStep + 1);
@@ -56,6 +67,23 @@ const HeirManagementScreen = () => {
       setSelectedAttributes([]);
       setCustomAttributes([]);
       setCurrentStep(1);
+    }
+  };
+
+  const handleDeleteHeir = async (heir) => {
+    try {
+      setShowLoading(true);
+      const response = await axiosInstance.delete(`heirs/delete/${heir}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log('Heir deleted:', response.data);
+      setHeirs(heirs.filter((item) => item.userId !== heir));
+      setShowLoading(false);
+    } catch (error) {
+      console.error('Error deleting heir:', error);
+      setShowLoading(false);
     }
   };
 
@@ -78,12 +106,13 @@ const HeirManagementScreen = () => {
       return (
         <View>
           <Text className="text-xl mb-4 text-center">
-            Let’s keep your chosen one in the loop! What’s your heir’s email?
+            Let’s keep your chosen one in the loop! Please enter the email of an heir who’s already registered with
+            BeyondLife
           </Text>
           <TextInput
             value={heirEmail}
             onChangeText={setHeirEmail}
-            placeholder="Enter their email"
+            placeholder="Heir's email"
             className="p-4 bg-white rounded-lg"
           />
         </View>
@@ -158,6 +187,26 @@ const HeirManagementScreen = () => {
     }
   };
 
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setShowLoading(true);
+        const response = await axiosInstance.get('heirs/list', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log('Heirs:', response.data);
+        setHeirs(response.data);
+        setShowLoading(false);
+      } catch (error) {
+        console.error('Error fetching heirs:', error);
+        setShowLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F3F4F6' }}>
       <Loading showLoading={showLoading} />
@@ -182,9 +231,14 @@ const HeirManagementScreen = () => {
             data={heirs}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
-              <View className="p-4 bg-white mb-2 rounded-lg">
-                <Text className="text-lg">{item.name}</Text>
-                <Text className="text-sm text-gray-600">{item.email}</Text>
+              <View className="p-4 bg-white mb-2 rounded-lg flex-row justify-between items-center">
+                <View>
+                  <Text className="text-lg">{item.alias}</Text>
+                  <Text className="text-sm text-gray-600">{item.attributes}</Text>
+                </View>
+                <TouchableOpacity onPress={() => handleDeleteHeir(item.userId)}>
+                  <Icon name="delete" size={24} color="#FF6B6B" />
+                </TouchableOpacity>
               </View>
             )}
           />
@@ -193,7 +247,6 @@ const HeirManagementScreen = () => {
         )}
       </View>
 
-      {/* 添加继承人的滑动页面 */}
       {showAddHeirScreen && (
         <Animatable.View
           animation="slideInUp"
@@ -202,8 +255,17 @@ const HeirManagementScreen = () => {
         >
           <View style={{ paddingTop: 80 }} className="p-6 w-full h-full">
             {renderStepContent()}
+            {currentStep > 1 && (
+              <TouchableOpacity
+                className="p-4 bg-gray-400 rounded-lg flex-row items-center justify-center mt-4"
+                onPress={handlePrevStep}
+              >
+                <Text className="text-white font-bold text-center">Prev</Text>
+              </TouchableOpacity>
+            )}
+
             <TouchableOpacity
-              className="p-4 bg-green-600 rounded-lg flex-row items-center justify-center mt-4"
+              className="p-4 bg-green-600 rounded-lg flex-row items-center justify-center mt-2"
               onPress={handleNextStep}
             >
               <Text className="text-white font-bold text-center">Next</Text>

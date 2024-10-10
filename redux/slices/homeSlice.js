@@ -17,6 +17,7 @@ const initialState = {
   heir_number: 0,
   note_number: 0,
   wills_number: 0,
+  storage_number: 0,
   link_to_facebook: false,
   link_to_twitter: false,
   link_to_instagram: false,
@@ -46,6 +47,9 @@ export const navSlice = createSlice({
     setWillsNumber: (state, action) => {
       state.wills_number = action.payload;
     },
+    setStorageNumber: (state, action) => {
+      state.storage_number = action.payload;
+    },
     setLinkToFacebook: (state, action) => {
       state.link_to_facebook = action.payload;
     },
@@ -71,6 +75,7 @@ export const {
   setHeirNumber,
   setNoteNumber,
   setWillsNumber,
+  setStorageNumber,
   setLinkToFacebook,
   setLinkToTwitter,
   setLinkToInstagram,
@@ -84,6 +89,7 @@ export const selectAccountNumber = (state) => state.home.account_number;
 export const selectHeirNumber = (state) => state.home.heir_number;
 export const selectNoteNumber = (state) => state.home.note_number;
 export const selectWillsNumber = (state) => state.home.wills_number;
+export const selectStorageNumber = (state) => state.home.storage_number;
 export const selectLinkToFacebook = (state) => state.home.link_to_facebook;
 export const selectLinkToTwitter = (state) => state.home.link_to_twitter;
 export const selectLinkToInstagram = (state) => state.home.link_to_instagram;
