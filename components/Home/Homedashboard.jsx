@@ -71,8 +71,8 @@ const Dashboard = ({ setShowStorageOptionScreen }) => {
       action: () => setShowStorageOptionScreen(true),
     },
     {
-      id: 'Executors Configuration',
-      title: 'Executors Configuration',
+      id: 'Heir Management',
+      title: 'Heir Management',
       image: heirConfiguration,
       action: () => navigation.navigate('Heir Management'),
     },

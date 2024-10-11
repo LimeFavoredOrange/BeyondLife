@@ -254,6 +254,10 @@ const HeirManagementScreen = () => {
               <Icon name="plus" size={24} color="#fff" />
             </TouchableOpacity>
           </View>
+          <Text className="text-base text-center mb-4 text-gray-600">
+            Spice it up! Think about their role, where they live, or that quirky trait only they have!
+          </Text>
+
           {customAttributes.length > 0 && (
             <FlatList
               data={customAttributes}
@@ -270,6 +274,7 @@ const HeirManagementScreen = () => {
           )}
         </View>
       )}
+
       {currentStep === 5 && (
         <View>
           <Text className="text-xl mb-4 text-center">All set! Your heir has been added to your list.</Text>
@@ -338,7 +343,7 @@ const HeirManagementScreen = () => {
 
       {showAddHeirScreen && (
         <Animatable.View
-          animation="slideInUp"
+          animation="slideInRight"
           duration={800}
           className="absolute top-0 left-0 right-0 bottom-0 bg-gray-100 h-screen w-screen"
         >

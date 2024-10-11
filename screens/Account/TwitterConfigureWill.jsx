@@ -15,6 +15,9 @@ import Loading from '../../components/Loading';
 import { useNavigation } from '@react-navigation/native';
 
 import showToast from '../../utils/showToast';
+import axiosInstance from '../../api';
+import { selectToken } from '../../redux/slices/auth';
+import { useSelector } from 'react-redux';
 
 const storageOptionDescription = {
   'Will Server Only': 'Data will be kept on Will server only, which is a secure server that hosting by us.',
@@ -35,6 +38,7 @@ const TwitterConfigureWill = () => {
   const [animation, setAnimation] = useState('fadeInRight');
 
   const navigation = useNavigation();
+  const token = useSelector(selectToken);
 
   // For Step 2
   const [offensiveTweetsEnabled, setOffensiveTweetsEnabled] = useState(false);
@@ -46,16 +50,25 @@ const TwitterConfigureWill = () => {
   const [keywords, setKeywords] = useState('');
   const [keywordsList, setKeywordsList] = useState([]);
 
-  // For Step 6 (Attributes configuration)
-  const [attributes, setAttributes] = useState('');
   const [attributesList, setAttributesList] = useState([]);
+  const [selectedAttributes, setSelectedAttributes] = useState({});
 
-  // For Step 7 (Heirs configuration)
-  const [heirs, setHeirs] = useState('');
-  const [selectedAttributes, setSelectedAttributes] = useState([]);
-  const [heirsList, setHeirsList] = useState([]);
-  const [isAttributeModalVisible, setAttributeModalVisible] = useState(false); // Control modal visibility
-  const [tempSelectedAttributes, setTempSelectedAttributes] = useState([]); // Temp storage for modal selections
+  React.useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axiosInstance.get('auth/attributes', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log('Attributes:', response.data.attributes);
+        setAttributesList(response.data.attributes);
+      } catch (error) {
+        console.error('Error fetching attributes:', error);
+      }
+    }
+    fetchData();
+  }, []);
 
   // For Step 8 (Default policy)
   const [policyMatch, setPolicyMatch] = useState('subset');
@@ -77,25 +90,6 @@ const TwitterConfigureWill = () => {
   const handleAssignAttributes = (tweetId) => {
     setCurrentTweetId(tweetId);
     setAttributeModalVisible(true);
-  };
-
-  const handleConfirmAttributes = () => {
-    setAttributeModalVisible(false);
-  };
-
-  const toggleSelectAttributeForTweet = (attribute) => {
-    const currentAttributes = selectedAttributes[currentTweetId] || [];
-    if (currentAttributes.includes(attribute)) {
-      setSelectedAttributes({
-        ...selectedAttributes,
-        [currentTweetId]: currentAttributes.filter((attr) => attr !== attribute),
-      });
-    } else {
-      setSelectedAttributes({
-        ...selectedAttributes,
-        [currentTweetId]: [...currentAttributes, attribute],
-      });
-    }
   };
 
   const validatePolicyForTweet = (tweetId, policy) => {
@@ -167,93 +161,6 @@ const TwitterConfigureWill = () => {
   const handleDeleteKeyword = (index) => {
     const updatedList = keywordsList.filter((_, i) => i !== index);
     setKeywordsList(updatedList);
-  };
-
-  // =============================================================================
-  // Step 6: Function to add attribute to list and clear input
-  const handleAddAttribute = () => {
-    if (attributes.trim()) {
-      setAttributesList([...attributesList, attributes.trim()]);
-      setAttributes('');
-    }
-  };
-
-  // Step 6: Function to delete an attribute from the list
-  const handleDeleteAttribute = (index) => {
-    const updatedList = attributesList.filter((_, i) => i !== index);
-    setAttributesList(updatedList);
-  };
-
-  // Step 7: Function to add heirs with selected attributes
-  const handleAddHeir = () => {
-    if (heirs.trim() && selectedAttributes.length > 0) {
-      setHeirsList([...heirsList, { name: heirs, attributes: [...selectedAttributes] }]);
-      setHeirs('');
-      setSelectedAttributes([]);
-    }
-  };
-
-  // Step 7: Function to delete heir from list
-  const handleDeleteHeir = (index) => {
-    const updatedList = heirsList.filter((_, i) => i !== index);
-    setHeirsList(updatedList);
-  };
-
-  // Step 7: Toggle attribute selection within modal
-  const toggleSelectAttribute = (attribute) => {
-    if (tempSelectedAttributes.includes(attribute)) {
-      setTempSelectedAttributes(tempSelectedAttributes.filter((item) => item !== attribute));
-    } else {
-      setTempSelectedAttributes([...tempSelectedAttributes, attribute]);
-    }
-  };
-
-  // Modal for selecting attributes (allows multiple selections)
-  const AttributeSelectionModal = () => {
-    return (
-      <Modal visible={isAttributeModalVisible} transparent={true}>
-        <View
-          style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', justifyContent: 'center', alignItems: 'center' }}
-        >
-          <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, width: '90%', maxHeight: '80%' }}>
-            <Text className="text-lg font-bold mb-4">Select Attributes</Text>
-            <ScrollView>
-              {attributesList.map((attribute, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={{
-                    padding: 10,
-                    backgroundColor: tempSelectedAttributes.includes(attribute) ? '#036635' : '#ccc',
-                    marginBottom: 10,
-                    borderRadius: 5,
-                  }}
-                  onPress={() => toggleSelectAttribute(attribute)}
-                >
-                  <Text style={{ color: tempSelectedAttributes.includes(attribute) ? '#fff' : '#000' }}>
-                    {attribute}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-            <TouchableOpacity
-              style={{
-                backgroundColor: '#036635',
-                padding: 10,
-                marginTop: 20,
-                borderRadius: 5,
-                alignItems: 'center',
-              }}
-              onPress={() => {
-                setSelectedAttributes([...tempSelectedAttributes]);
-                setAttributeModalVisible(false);
-              }}
-            >
-              <Text style={{ color: '#fff', fontWeight: 'bold' }}>Confirm</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    );
   };
 
   const onDateChange = (event, selectedDate) => {
@@ -465,99 +372,7 @@ const TwitterConfigureWill = () => {
             </View>
           )}
 
-          {/* Step 6 (Attributes Configuration) */}
-          {/* {currentStep === 6 && (
-            <View style={{ flex: 1, paddingBottom: 150 }}>
-              <Text className="text-xl font-semibold mt-8 mx-3">Step 6: Attributes Configuration</Text>
-              <TextInput
-                placeholder="Enter attribute, and press enter to add"
-                value={attributes}
-                onChangeText={setAttributes}
-                onSubmitEditing={handleAddAttribute}
-                className="m-3 p-2 border border-gray-300 rounded-lg"
-              />
-              <FlatList
-                data={attributesList}
-                keyExtractor={(item, index) => index.toString()}
-                style={{ flex: 1, marginHorizontal: 10 }}
-                renderItem={({ item, index }) => (
-                  <Animatable.View
-                    animation="fadeIn"
-                    className="flex-row justify-between p-3 mb-2 bg-gray-200 rounded-lg items-center shadow"
-                  >
-                    <Text className="text-lg">{item}</Text>
-                    <TouchableOpacity onPress={() => handleDeleteAttribute(index)}>
-                      <Icon name="trash" size={20} color="#ff0000" />
-                    </TouchableOpacity>
-                  </Animatable.View>
-                )}
-              />
-            </View>
-          )} */}
-
-          {/* Step 7 (Heirs Configuration) */}
-          {/* {currentStep === 7 && (
-            <View style={{ flex: 1, paddingBottom: 150 }}>
-              <Text className="text-xl font-semibold mt-8 mx-3">Step 7: Heirs Configuration</Text>
-              <TextInput
-                placeholder="Enter heir's name"
-                value={heirs}
-                onChangeText={setHeirs}
-                className="m-3 p-2 border border-gray-300 rounded-lg"
-              />
-
-              <TouchableOpacity
-                style={{
-                  backgroundColor: '#036635',
-                  padding: 10,
-                  margin: 10,
-                  borderRadius: 5,
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-                onPress={() => setAttributeModalVisible(true)}
-              >
-                <Text style={{ color: '#fff', fontWeight: 'bold', marginRight: 8 }}>Assign Attributes</Text>
-                <Icon name="chevron-down" size={16} color="#fff" />
-              </TouchableOpacity>
-
-              <View className="m-3 p-2 border border-gray-300 rounded-lg">
-                <Text>Selected Attributes: {selectedAttributes.join(', ') || 'None selected'}</Text>
-              </View>
-
-              <TouchableOpacity
-                style={{
-                  backgroundColor: '#036635',
-                }}
-                className=" w-4/5 self-center h-10 rounded-lg justify-center items-center mb-5"
-                onPress={handleAddHeir}
-              >
-                <Text className="text-white font-bold ">Add Heir</Text>
-              </TouchableOpacity>
-
-              <FlatList
-                data={heirsList}
-                keyExtractor={(item, index) => index.toString()}
-                style={{ flex: 1, marginHorizontal: 10 }}
-                renderItem={({ item, index }) => (
-                  <Animatable.View
-                    animation="fadeIn"
-                    className="flex-row justify-between p-3 mb-2 bg-gray-200 rounded-lg items-center shadow"
-                  >
-                    <Text className="text-lg">
-                      {item.name} - {item.attributes.join(', ')}
-                    </Text>
-                    <TouchableOpacity onPress={() => handleDeleteHeir(index)}>
-                      <Icon name="trash" size={20} color="#ff0000" />
-                    </TouchableOpacity>
-                  </Animatable.View>
-                )}
-              />
-            </View>
-          )} */}
-
-          {/* Step 8 (Default Policy) */}
+          {/* Step 6 (Default Policy) */}
           {currentStep === 6 && (
             <View style={{ flex: 1, paddingBottom: 150 }}>
               <Text className="text-xl font-semibold mt-8 mx-3">
@@ -582,10 +397,15 @@ const TwitterConfigureWill = () => {
                   <Text className="text-white font-bold">Full match</Text>
                 </TouchableOpacity>
               </View>
+
+              <Text className="font-semibold mt-5 text-gray-700 ml-3 ">
+                Choose "Subset" if just a few attributes match, like "Family" or "Friend." For a stricter rule, pick
+                "Full Match"— all attributes must line up!
+              </Text>
             </View>
           )}
 
-          {/* Step 9 (Access control for each tweet) */}
+          {/* Step 7 (Access control for each tweet) */}
           {currentStep === 7 && (
             <View style={{ flex: 1, paddingBottom: 150 }}>
               <Text className="text-xl font-semibold mt-8 mx-3 mb-3">🎫 Step 7: Fine-Tune Who Gets Tweet Access</Text>
@@ -618,7 +438,6 @@ const TwitterConfigureWill = () => {
                       <Icon name="chevron-down" size={16} color="#fff" />
                     </TouchableOpacity>
 
-                    {/* 选择的属性展示 */}
                     <View className="m-3 p-2 border border-gray-300 rounded-lg">
                       <Text>Selected Attributes: {selectedAttributes[item.id]?.join(', ') || 'None selected'}</Text>
                     </View>
@@ -669,8 +488,6 @@ const TwitterConfigureWill = () => {
           <Icon name={currentStep === 7 ? 'check' : 'arrow-right'} size={24} color="#fff" />
         </TouchableOpacity>
       </View>
-
-      <AttributeSelectionModal />
     </SafeAreaView>
   );
 };
