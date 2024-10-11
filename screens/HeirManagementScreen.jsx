@@ -9,6 +9,8 @@ import { selectToken } from '../redux/slices/auth';
 import { useSelector } from 'react-redux';
 import { ProgressBar } from 'react-native-paper';
 import showToast from '../utils/showToast';
+import { setHeirNumber, selectHeirNumber } from '../redux/slices/homeSlice';
+import { useDispatch } from 'react-redux';
 
 const HeirManagementScreen = () => {
   const [showLoading, setShowLoading] = useState(false);
@@ -21,6 +23,9 @@ const HeirManagementScreen = () => {
   const [progressStatus, setProgressStatus] = useState(0.2);
   const [currentAnimation, setCurrentAnimation] = useState('slideInRight');
   const token = useSelector(selectToken);
+
+  const dispatch = useDispatch();
+  const heirNumber = useSelector(selectHeirNumber);
 
   const predefinedAttributes = ['Reliable', 'Family', 'Friend', 'Trusted', 'Work'];
   const [selectedAttributes, setSelectedAttributes] = useState([]);
@@ -132,10 +137,11 @@ const HeirManagementScreen = () => {
         setShowLoading(false);
       }
     } else {
-      console.log('Add Heir');
-      console.log('Heir Name:', heirName);
-      console.log('Heir Email:', heirEmail);
-      console.log('Selected Attributes:', selectedAttributes.join(','));
+      // If the selected attributes are empty, show an error
+      if (selectedAttributes.length === 0) {
+        showToast('Please select at least one attribute', 'error');
+        return;
+      }
       handleAddHeir(heirName, heirEmail, selectedAttributes.join(','));
 
       setShowAddHeirScreen(false);
@@ -145,10 +151,7 @@ const HeirManagementScreen = () => {
       setCustomAttributes([]);
       setCurrentStep(1);
       setProgressStatus(0.2);
-      // setHeirs([
-      //   ...heirs,
-      //   { name: heirName, email: heirEmail, attributes: [...selectedAttributes, ...customAttributes] },
-      // ]);
+      dispatch(setHeirNumber(heirNumber + 1));
     }
   };
 
@@ -163,6 +166,7 @@ const HeirManagementScreen = () => {
       console.log('Heir deleted:', response.data);
       setHeirs(heirs.filter((item) => item.userId !== heir));
       setShowLoading(false);
+      dispatch(setHeirNumber(heirNumber - 1));
     } catch (error) {
       console.error('Error deleting heir:', error);
       setShowLoading(false);

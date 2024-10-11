@@ -271,7 +271,7 @@ const TwitterConfigureWill = () => {
           {/* Step 1 */}
           {currentStep === 1 && (
             <View>
-              <Text className="text-xl font-semibold mt-8 mx-3">Step 1: Where should data be kept?</Text>
+              <Text className="text-xl font-semibold mt-8 mx-3">🌍 Step 1: Pick Your Tweets’ Forever Home</Text>
               <Picker selectedValue={storageOption} onValueChange={(itemValue) => setStorageOption(itemValue)}>
                 <Picker.Item label="Will Server Only" value="Will Server Only" />
                 <Picker.Item label="X Server Only" value="X Server Only" />
@@ -290,7 +290,9 @@ const TwitterConfigureWill = () => {
           {/* Step 2 */}
           {currentStep === 2 && (
             <View>
-              <Text className="text-xl font-semibold mt-8 mx-3">Step 2: Do you want to delete offensive tweets?</Text>
+              <Text className="text-xl font-semibold mt-8 mx-3">
+                🧹 Step 2: Time to Toss Out the Troublesome Tweets!
+              </Text>
               <View style={{ margin: 10, padding: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 10 }}>
                 <View className="flex-row gap-2 px-6">
                   <TouchableOpacity
@@ -332,9 +334,7 @@ const TwitterConfigureWill = () => {
           {/* Step 3 */}
           {currentStep === 3 && (
             <View>
-              <Text className="text-xl font-semibold mt-8 mx-3">
-                Step 3: Do you want to delete tweets that contain images?
-              </Text>
+              <Text className="text-xl font-semibold mt-8 mx-3">📷 Step 3: Filter Out Those Snapshot Moments!</Text>
               <View style={{ margin: 10, padding: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 10 }}>
                 <View className="flex-row gap-2 px-6">
                   <TouchableOpacity
@@ -372,7 +372,9 @@ const TwitterConfigureWill = () => {
           {/* Step 4 */}
           {currentStep === 4 && (
             <View>
-              <Text className="text-xl font-semibold mt-8 mx-3">Step 4: Delete tweets before a certain date?</Text>
+              <Text className="text-xl font-semibold mt-8 mx-3">
+                ⏰ Step 4: Set the Clock – Say Farewell to Old Tweets!
+              </Text>
               <View>
                 <View
                   onPress={() => setShowDatePicker(true)}
@@ -434,7 +436,7 @@ const TwitterConfigureWill = () => {
           {currentStep === 5 && (
             <View style={{ flex: 1, paddingBottom: 150 }}>
               {/* Ensure padding at the bottom */}
-              <Text className="text-xl font-semibold mt-8 mx-3">Step 5: Do you want to delete tweets by keywords?</Text>
+              <Text className="text-xl font-semibold mt-8 mx-3">🔍 Step 5: Keep It Clean – Search by Keywords</Text>
               {/* Input Field for Keywords */}
               <TextInput
                 placeholder="Enter keywords, and press enter to add more"
@@ -558,7 +560,9 @@ const TwitterConfigureWill = () => {
           {/* Step 8 (Default Policy) */}
           {currentStep === 6 && (
             <View style={{ flex: 1, paddingBottom: 150 }}>
-              <Text className="text-xl font-semibold mt-8 mx-3">Step 6: Default Policy</Text>
+              <Text className="text-xl font-semibold mt-8 mx-3">
+                🔒 Step 6: Perfect Match or Partial Fit? Choose Your Access Rule!
+              </Text>
               <Text className="m-3 font-semibold">
                 Should all attributes of an object match with those of the heir, or is a subset enough?
               </Text>
@@ -584,10 +588,10 @@ const TwitterConfigureWill = () => {
           {/* Step 9 (Access control for each tweet) */}
           {currentStep === 7 && (
             <View style={{ flex: 1, paddingBottom: 150 }}>
-              <Text className="text-xl font-semibold mt-8 mx-3">Step 7: Access Control for Tweets</Text>
+              <Text className="text-xl font-semibold mt-8 mx-3 mb-3">🎫 Step 7: Fine-Tune Who Gets Tweet Access</Text>
 
-              {/* Tweets 列表渲染 */}
               <FlatList
+                className="px-2"
                 data={tweetsList}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (

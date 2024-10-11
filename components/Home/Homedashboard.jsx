@@ -8,8 +8,9 @@ import {
   selectNoteNumber,
   selectWillsNumber,
   selectStorageNumber,
+  setSelectedTab,
 } from '../../redux/slices/homeSlice';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import storageConfiguration from '../../assets/storage.png';
 import heirConfiguration from '../../assets/heir.png';
@@ -22,6 +23,7 @@ const Dashboard = ({ setShowStorageOptionScreen }) => {
   const noteNumber = useSelector(selectNoteNumber);
   const willsNumber = useSelector(selectWillsNumber);
   const storageNumber = useSelector(selectStorageNumber);
+  const dispatch = useDispatch();
 
   const setup = [
     {
@@ -29,30 +31,35 @@ const Dashboard = ({ setShowStorageOptionScreen }) => {
       title: '#Accounts',
       backgroundColor: '#036635',
       num: accountNumber,
+      linkTo: () => dispatch(setSelectedTab('Link')),
     },
     {
       id: 'Executor number',
       title: '#Heirs',
       backgroundColor: '#045948',
       num: heirNumber,
+      linkTo: () => navigation.navigate('Heir Management'),
     },
     {
       id: 'Storage number',
       title: '#Storage',
       backgroundColor: '#02735E',
       num: storageNumber,
+      linkTo: () => setShowStorageOptionScreen(true),
     },
     {
       id: 'Notes number',
-      title: '#Notes',
+      title: '#Passwords',
       backgroundColor: '#056A47',
       num: noteNumber,
+      linkTo: () => dispatch(setSelectedTab('Key')),
     },
     {
       id: 'Will number',
       title: '#Wills',
       backgroundColor: '#028760',
       num: willsNumber,
+      linkTo: () => dispatch(setSelectedTab('Document')),
     },
   ];
 
@@ -89,7 +96,7 @@ const Dashboard = ({ setShowStorageOptionScreen }) => {
               <TouchableOpacity
                 style={{ backgroundColor: item.backgroundColor, width: 200, height: 120 }}
                 className="relative p-5 m-2 rounded-xl shadow-lg transition-transform duration-300 hover:scale-105"
-                onPress={() => navigation.navigate('Executor')}
+                onPress={() => item.linkTo()}
               >
                 <View className="absolute inset-0 bg-gradient-to-r from-transparent to-black opacity-30 rounded-xl"></View>
                 <View className="relative z-10">
