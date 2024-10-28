@@ -51,7 +51,7 @@ const TwitterConfigureWill = () => {
   const [keywordsList, setKeywordsList] = useState([]);
 
   const [attributesList, setAttributesList] = useState([]);
-  const [selectedAttributes, setSelectedAttributes] = useState({});
+  const [selectedAttributes, setSelectedAttributes] = useState([]);
 
   const [attributeModalVisible, setAttributeModalVisible] = useState(false);
 
@@ -82,15 +82,25 @@ const TwitterConfigureWill = () => {
     { id: 3, text: 'Third tweet', attributes: [], policy: '' },
   ]);
 
-  const hideModal = () => setAttributeModalVisible(false);
+  const hideModal = () => {
+    // Set the current selected attributes to the selected tweet
+    const tweetIndex = tweetsList.findIndex((tweet) => tweet.id === currentTweetId);
+    const updatedTweetsList = [...tweetsList];
+    updatedTweetsList[tweetIndex].attributes = selectedAttributes;
+    setTweetsList(updatedTweetsList);
+
+    // Reset selected attributes
+    setSelectedAttributes([]);
+    setAttributeModalVisible(false);
+  };
 
   const containerStyle = {
     backgroundColor: 'white',
     padding: 20,
-    alignSelf: 'center',
-    width: '80%',
-    height: '80%',
     borderRadius: 10,
+    width: '90%',
+    height: '50%',
+    alignSelf: 'center',
   };
 
   const [tweetsAccessPolicies, setTweetsAccessPolicies] = useState({});
@@ -100,6 +110,10 @@ const TwitterConfigureWill = () => {
 
   const handleAssignAttributes = (tweetId) => {
     setCurrentTweetId(tweetId);
+
+    // Set the selected attributes for the current tweet
+    const tweet = tweetsList.find((tweet) => tweet.id === tweetId);
+    setSelectedAttributes(tweet.attributes);
     setAttributeModalVisible(true);
   };
 
@@ -180,10 +194,14 @@ const TwitterConfigureWill = () => {
   };
 
   const toggleAttribute = (attribute) => {
+    console.log(selectedAttributes);
+    console.log([...selectedAttributes, attribute]);
+    console.log(selectedAttributes.includes(attribute));
+
     if (selectedAttributes.includes(attribute)) {
-      setSelectedAttributes(selectedAttributes.filter((item) => item !== attribute));
+      setSelectedAttributes((current) => current.filter((item) => item !== attribute));
     } else {
-      setSelectedAttributes([...selectedAttributes, attribute]);
+      setSelectedAttributes((current) => [...current, attribute]);
     }
   };
 
@@ -452,53 +470,7 @@ const TwitterConfigureWill = () => {
           {currentStep === 7 && (
             <View style={{ flex: 1, paddingBottom: 150 }}>
               <Text className="text-xl font-semibold mt-8 mx-3 mb-3">🎫 Step 7: Fine-Tune Who Gets Tweet Access</Text>
-
-              <PaperProvider>
-                <Portal>
-                  <Modal visible={attributeModalVisible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
-                    <View className="flex-row flex-wrap justify-center">
-                      {attributesList.map((attribute) => (
-                        <TouchableOpacity
-                          key={attribute}
-                          className={`px-4 py-2 rounded-full m-2 ${
-                            attributesList.includes(attribute) ? 'bg-green-500' : 'bg-gray-300'
-                          }`}
-                          onPress={() => toggleAttribute(attribute)}
-                        >
-                          <Text
-                            className={`${attributesList.includes(attribute) ? 'text-white' : 'text-gray-700'} text-sm`}
-                          >
-                            {attribute}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </Modal>
-                </Portal>
-                <Button style={{ marginTop: 30 }} onPress={handleAssignAttributes}>
-                  Show
-                </Button>
-              </PaperProvider>
-
-              {/* <View className="flex-row flex-wrap justify-center">
-                {attributesList.map((attribute) => (
-                  <TouchableOpacity
-                    key={attribute}
-                    className={`px-4 py-2 rounded-full m-2 ${
-                      selectedAttributes.includes(attribute) ? 'bg-green-500' : 'bg-gray-300'
-                    }`}
-                    onPress={() => toggleAttribute(attribute)}
-                  >
-                    <Text
-                      className={`${selectedAttributes.includes(attribute) ? 'text-white' : 'text-gray-700'} text-sm`}
-                    >
-                      {attribute}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View> */}
-
-              {/* <FlatList
+              <FlatList
                 className="px-2"
                 data={tweetsList}
                 keyExtractor={(item) => item.id.toString()}
@@ -526,7 +498,7 @@ const TwitterConfigureWill = () => {
                     </TouchableOpacity>
 
                     <View className="m-3 p-2 border border-gray-300 rounded-lg">
-                      <Text>Selected Attributes: {selectedAttributes[item.id]?.join(', ') || 'None selected'}</Text>
+                      <Text>Selected Attributes: {item.attributes.join(', ') || 'None selected'}</Text>
                     </View>
 
                     <TextInput
@@ -539,7 +511,47 @@ const TwitterConfigureWill = () => {
                     {policyError && <HelperText type="error">{policyError}</HelperText>}
                   </View>
                 )}
-              /> */}
+              />
+
+              <Modal visible={attributeModalVisible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
+                <Text className="text-xl font-semibold mb-4 text-center">Select Attributes</Text>
+
+                {/* Scrollable area for attributes */}
+                <ScrollView
+                  contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}
+                >
+                  {attributesList.map((attribute) => (
+                    <TouchableOpacity
+                      key={attribute}
+                      onPress={() => toggleAttribute(attribute)}
+                      className={`px-4 py-2 rounded-full m-1 ${
+                        selectedAttributes.includes(attribute) ? 'bg-green-600' : 'bg-gray-300'
+                      }`}
+                      style={{
+                        minWidth: 80,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Text
+                        className={`${selectedAttributes.includes(attribute) ? 'text-white' : 'text-gray-700'} text-sm`}
+                      >
+                        {attribute}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+
+                {/* Done Button */}
+                <Button
+                  mode="contained"
+                  onPress={hideModal}
+                  className="mt-4 rounded-lg"
+                  style={{ width: '40%', alignSelf: 'center' }}
+                >
+                  Done
+                </Button>
+              </Modal>
             </View>
           )}
         </Animatable.View>
