@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, SafeAreaView, TouchableOpacity, Text, TextInput, FlatList, Modal, ScrollView } from 'react-native';
+import { View, SafeAreaView, TouchableOpacity, Text, TextInput, FlatList, ScrollView } from 'react-native';
 
 import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
-import { ProgressBar, Divider } from 'react-native-paper';
+import { ProgressBar, Modal, Portal, Button, PaperProvider } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -20,8 +20,8 @@ import { selectToken } from '../../redux/slices/auth';
 import { useSelector } from 'react-redux';
 
 const storageOptionDescription = {
-  'Will Server Only': 'Data will be kept on Will server only, which is a secure server that hosting by us.',
-  'X Server Only': 'Data will be kept on X server only. We are not going to keep any data on our server.',
+  'Will Server Only': 'Data will be kept on the Will server only, which is a secure server that hosting by us.',
+  'X Server Only': 'Data will be kept on the X server only. We are not going to keep any data on our server.',
   Both: 'Data will be kept on both servers.',
   'None (Delete All)': 'Delete all data.',
 };
@@ -53,6 +53,8 @@ const TwitterConfigureWill = () => {
   const [attributesList, setAttributesList] = useState([]);
   const [selectedAttributes, setSelectedAttributes] = useState({});
 
+  const [attributeModalVisible, setAttributeModalVisible] = useState(false);
+
   React.useEffect(() => {
     async function fetchData() {
       try {
@@ -70,17 +72,26 @@ const TwitterConfigureWill = () => {
     fetchData();
   }, []);
 
-  // For Step 8 (Default policy)
   const [policyMatch, setPolicyMatch] = useState('subset');
 
   const [skippedSteps, setSkippedSteps] = useState(false);
 
-  // For Step 9
   const [tweetsList, setTweetsList] = useState([
-    { id: 1, text: 'First tweet' },
-    { id: 2, text: 'Second tweet' },
-    { id: 3, text: 'Third tweet' },
+    { id: 1, text: 'First tweet', attributes: [], policy: '' },
+    { id: 2, text: 'Second tweet', attributes: [], policy: '' },
+    { id: 3, text: 'Third tweet', attributes: [], policy: '' },
   ]);
+
+  const hideModal = () => setAttributeModalVisible(false);
+
+  const containerStyle = {
+    backgroundColor: 'white',
+    padding: 20,
+    alignSelf: 'center',
+    width: '80%',
+    height: '80%',
+    borderRadius: 10,
+  };
 
   const [tweetsAccessPolicies, setTweetsAccessPolicies] = useState({});
   const [policyError, setPolicyError] = useState('');
@@ -168,6 +179,14 @@ const TwitterConfigureWill = () => {
     setDeleteBeforeDate(currentDate);
   };
 
+  const toggleAttribute = (attribute) => {
+    if (selectedAttributes.includes(attribute)) {
+      setSelectedAttributes(selectedAttributes.filter((item) => item !== attribute));
+    } else {
+      setSelectedAttributes([...selectedAttributes, attribute]);
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Loading showLoading={showLoading} />
@@ -230,7 +249,7 @@ const TwitterConfigureWill = () => {
                     <Icon name="info-circle" size={20} color="#036635" />
                     <HelperText type="info" className="text-base ml-2 font-bold">
                       Offensive tweets refer to those that contain sensitive or inappropriate language. We will help you
-                      to identify them by our AI assistant.
+                      to identify them by our AI assistant, you can choose to delete them or not.
                     </HelperText>
                   </View>
                 </Animatable.View>
@@ -271,6 +290,13 @@ const TwitterConfigureWill = () => {
                     <Picker.Item label="X Server Only" value="X Server Only" />
                     <Picker.Item label="Both" value="Both" />
                   </Picker>
+                  <View className="flex-row items-center ml-6 pr-3">
+                    <Icon name="info-circle" size={20} color="#036635" />
+                    <HelperText type="info" className="text-base ml-2 font-bold">
+                      Snapshot moments refer to tweets that contain images. We will help you to identify them by our AI
+                      assistant, you can choose to delete them or not.
+                    </HelperText>
+                  </View>
                 </Animatable.View>
               )}
             </View>
@@ -280,7 +306,7 @@ const TwitterConfigureWill = () => {
           {currentStep === 4 && (
             <View>
               <Text className="text-xl font-semibold mt-8 mx-3">
-                ⏰ Step 4: Set the Clock – Say Farewell to Old Tweets!
+                ⏰ Step 4: Set the Clock - Say Farewell to Old Tweets!
               </Text>
               <View>
                 <View
@@ -343,7 +369,7 @@ const TwitterConfigureWill = () => {
           {currentStep === 5 && (
             <View style={{ flex: 1, paddingBottom: 150 }}>
               {/* Ensure padding at the bottom */}
-              <Text className="text-xl font-semibold mt-8 mx-3">🔍 Step 5: Keep It Clean – Search by Keywords</Text>
+              <Text className="text-xl font-semibold mt-8 mx-3">🔍 Step 5: Keep It Clean - Search by Keywords</Text>
               {/* Input Field for Keywords */}
               <TextInput
                 placeholder="Enter keywords, and press enter to add more"
@@ -378,30 +404,47 @@ const TwitterConfigureWill = () => {
               <Text className="text-xl font-semibold mt-8 mx-3">
                 🔒 Step 6: Perfect Match or Partial Fit? Choose Your Access Rule!
               </Text>
-              <Text className="m-3 font-semibold">
-                Should all attributes of an object match with those of the heir, or is a subset enough?
-              </Text>
-              <View className="flex-row justify-around mx-3">
-                <TouchableOpacity
-                  style={{ backgroundColor: policyMatch === 'subset' ? '#036635' : '#ccc' }}
-                  onPress={() => setPolicyMatch('subset')}
-                  className="w-40 h-10 rounded-lg justify-center items-center"
-                >
-                  <Text className="text-white font-bold">Subset is enough</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={{ backgroundColor: policyMatch === 'full' ? '#036635' : '#ccc' }}
-                  onPress={() => setPolicyMatch('full')}
-                  className="w-40 h-10 rounded-lg justify-center items-center"
-                >
-                  <Text className="text-white font-bold">Full match</Text>
-                </TouchableOpacity>
+
+              <View
+                style={{
+                  margin: 10,
+                  padding: 10,
+                  borderWidth: 1,
+                  borderColor: '#036635',
+                  borderRadius: 10,
+                  alignItems: 'center',
+                  gap: 5,
+                }}
+              >
+                <Text className="text-lg font-medium">
+                  Should all attributes of an object match with those of the heir, or is a subset enough?
+                </Text>
+                <View className="flex-row gap-2 justify-around">
+                  <TouchableOpacity
+                    style={{ backgroundColor: policyMatch === 'subset' ? '#036635' : '#ccc' }}
+                    onPress={() => setPolicyMatch('subset')}
+                    className="w-40 h-10 rounded-lg justify-center items-center"
+                  >
+                    <Text className="text-white font-bold">Subset is enough</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={{ backgroundColor: policyMatch === 'full' ? '#036635' : '#ccc' }}
+                    onPress={() => setPolicyMatch('full')}
+                    className="w-40 h-10 rounded-lg justify-center items-center"
+                  >
+                    <Text className="text-white font-bold">Full match</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
 
-              <Text className="font-semibold mt-5 text-gray-700 ml-3 ">
-                Choose "Subset" if just a few attributes match, like "Family" or "Friend." For a stricter rule, pick
-                "Full Match"— all attributes must line up!
-              </Text>
+              <View className="flex-row items-center mt-10 ml-6 pr-3">
+                <Icon name="info-circle" size={20} color="#036635" />
+                <HelperText type="info" className="text-base ml-2 font-bold">
+                  Choose "Subset" if just a few attributes match, like "Family" or "Friend." For a stricter rule, pick
+                  "Full Match"— all attributes must line up!
+                </HelperText>
+              </View>
             </View>
           )}
 
@@ -410,7 +453,52 @@ const TwitterConfigureWill = () => {
             <View style={{ flex: 1, paddingBottom: 150 }}>
               <Text className="text-xl font-semibold mt-8 mx-3 mb-3">🎫 Step 7: Fine-Tune Who Gets Tweet Access</Text>
 
-              <FlatList
+              <PaperProvider>
+                <Portal>
+                  <Modal visible={attributeModalVisible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
+                    <View className="flex-row flex-wrap justify-center">
+                      {attributesList.map((attribute) => (
+                        <TouchableOpacity
+                          key={attribute}
+                          className={`px-4 py-2 rounded-full m-2 ${
+                            attributesList.includes(attribute) ? 'bg-green-500' : 'bg-gray-300'
+                          }`}
+                          onPress={() => toggleAttribute(attribute)}
+                        >
+                          <Text
+                            className={`${attributesList.includes(attribute) ? 'text-white' : 'text-gray-700'} text-sm`}
+                          >
+                            {attribute}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </Modal>
+                </Portal>
+                <Button style={{ marginTop: 30 }} onPress={handleAssignAttributes}>
+                  Show
+                </Button>
+              </PaperProvider>
+
+              {/* <View className="flex-row flex-wrap justify-center">
+                {attributesList.map((attribute) => (
+                  <TouchableOpacity
+                    key={attribute}
+                    className={`px-4 py-2 rounded-full m-2 ${
+                      selectedAttributes.includes(attribute) ? 'bg-green-500' : 'bg-gray-300'
+                    }`}
+                    onPress={() => toggleAttribute(attribute)}
+                  >
+                    <Text
+                      className={`${selectedAttributes.includes(attribute) ? 'text-white' : 'text-gray-700'} text-sm`}
+                    >
+                      {attribute}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View> */}
+
+              {/* <FlatList
                 className="px-2"
                 data={tweetsList}
                 keyExtractor={(item) => item.id.toString()}
@@ -421,7 +509,6 @@ const TwitterConfigureWill = () => {
                   >
                     <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{item.text}</Text>
 
-                    {/* "Assign Attributes" 按钮 */}
                     <TouchableOpacity
                       style={{
                         backgroundColor: '#036635',
@@ -442,19 +529,17 @@ const TwitterConfigureWill = () => {
                       <Text>Selected Attributes: {selectedAttributes[item.id]?.join(', ') || 'None selected'}</Text>
                     </View>
 
-                    {/* 访问策略输入框 */}
                     <TextInput
-                      placeholder="Enter access policy (e.g., 'Attribute1 and Attribute2')"
+                      placeholder="More specific policy for this tweet"
                       value={tweetsAccessPolicies[item.id] || ''}
                       onChangeText={(text) => validatePolicyForTweet(item.id, text)}
                       style={{ marginTop: 10, padding: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 5 }}
                     />
 
-                    {/* 策略错误显示 */}
                     {policyError && <HelperText type="error">{policyError}</HelperText>}
                   </View>
                 )}
-              />
+              /> */}
             </View>
           )}
         </Animatable.View>

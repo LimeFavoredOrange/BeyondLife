@@ -37,7 +37,7 @@ const AccountManagerDashboard = () => {
 
   // Twitter OAuth configuration
   const redirectUri = makeRedirectUri({
-    scheme: 'myapp', // Custom scheme, ensure this matches your app config
+    scheme: 'digitalWill', // Custom scheme, ensure this matches your app config
     useProxy: false,
   });
 

@@ -178,7 +178,7 @@ const HeirManagementScreen = () => {
       {currentStep === 1 && (
         <View>
           <Text className="text-xl mb-4 text-center">
-            Who’s the special person you trust to inherit your digital world?
+            Who's the special person you trust to inherit your digital world?
           </Text>
           <TextInput
             value={heirName}
@@ -206,7 +206,7 @@ const HeirManagementScreen = () => {
       {currentStep === 3 && (
         <View className="items-center px-4">
           <Text className="text-xl mb-4 text-center">
-            Let’s paint a picture of <Text className="font-bold">{heirName}</Text>, select some fitting attributes!
+            Let's paint a picture of <Text className="font-bold">{heirName}</Text>, select some fitting attributes!
           </Text>
           <Text className="text-lg text-gray-600 text-center mb-4">e.g., Reliable, Family, Friend...</Text>
           <View className="flex-row flex-wrap justify-center">
@@ -224,6 +224,7 @@ const HeirManagementScreen = () => {
               </TouchableOpacity>
             ))}
           </View>
+
           {/* Cannot find fitting attributes */}
           <TouchableOpacity
             onPress={() => {

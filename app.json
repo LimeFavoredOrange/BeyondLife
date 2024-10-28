@@ -44,7 +44,7 @@
         "projectId": "b773ff8b-02ea-4b8e-831a-8cc85f0d6c89"
       }
     },
-    "scheme": "digitalWill",
+    "scheme": ["myapp", "digitalWill", "com.xinzhang0901.digitalWill"],
     "runtimeVersion": "1.0.0"
   }
 }
