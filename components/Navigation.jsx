@@ -26,10 +26,16 @@ import TwitterDecryptionScreen from '../screens/Account/TwitterDecryptionScreen'
 import GoogleDriveScreen from '../screens/Account/GoogleDriveScreen';
 import GoogleDriveFolderScreen from '../screens/Account/GoogleDriveFolderScreen';
 import GoogleDriveFolderContent from '../screens/Account/GoogleDriveFolderContent';
+import GoogleDriveScreenHome from '../screens/Account/GoogleDriveScreenHome';
+import GoogleDriveConfigureWill from '../screens/Account/GoogleDriveConfigureWIll';
+
 import GmailNav from '../screens/Account/Gmail/GmailNav';
 import GmailDelete from '../screens/Account/Gmail/GmailDelete';
 import GmailForward from '../screens/Account/Gmail/GmailForward';
 import GmailDownload from '../screens/Account/Gmail/GmailDownload';
+import GmailScreenHome from '../screens/Account/Gmail/GmailScreenHome';
+import GmailConfigureWill from '../screens/Account/Gmail/GmailConfigureWill';
+
 import ViewBackupScreen from '../screens/ViewBackupScreen';
 
 // Heir Management Screen
@@ -57,17 +63,28 @@ const Navigation = () => {
       <Stack.Screen name="Twitter Setting" component={TwitterSettingScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Heir Setting" component={HeirSettingScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Twitter Decryption" component={TwitterDecryptionScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Google Drive" component={GoogleDriveScreen} options={{ headerShown: false }} />
+
+      <Stack.Screen name="Google Drive" component={GoogleDriveScreenHome} options={{ headerShown: false }} />
+      <Stack.Screen name="Google Drive List" component={GoogleDriveScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Google Drive Folder" component={GoogleDriveFolderScreen} options={{ headerShown: false }} />
       <Stack.Screen
         name="Google Drive Folder Content"
         component={GoogleDriveFolderContent}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="Gmail" component={GmailNav} options={{ headerShown: false }} />
+      <Stack.Screen
+        name="Google Drive Configure Will"
+        component={GoogleDriveConfigureWill}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen name="Gmail" component={GmailScreenHome} options={{ headerShown: false }} />
+      <Stack.Screen name="GmailNav" component={GmailNav} options={{ headerShown: false }} />
       <Stack.Screen name="GmailDelete" component={GmailDelete} options={{ headerShown: false }} />
       <Stack.Screen name="GmailForward" component={GmailForward} options={{ headerShown: false }} />
       <Stack.Screen name="GmailDownload" component={GmailDownload} options={{ headerShown: false }} />
+      <Stack.Screen name="Gmail Configure Will" component={GmailConfigureWill} options={{ headerShown: false }} />
+
       <Stack.Screen name="Add Account" component={AddAccountScreen} />
       <Stack.Screen name="View Account" component={ViewAccountScreen} options={{ headerShown: false }} />
       <Stack.Screen name="View Backup" component={ViewBackupScreen} />

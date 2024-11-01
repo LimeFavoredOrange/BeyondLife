@@ -25,7 +25,7 @@ const GmailNav = () => {
             onPress={() => navigation.navigate(item.linkTo)}
           >
             <Text className="text-lg font-semibold">{item.title}</Text>
-            <Icon size={18} type="ionicon" name="ios-arrow-forward" />
+            <Icon size={18} type="ionicon" name="arrow-forward" />
           </TouchableOpacity>
         )}
       />

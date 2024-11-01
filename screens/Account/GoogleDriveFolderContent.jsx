@@ -88,7 +88,7 @@ const GoogleDriveFolderContent = ({ route }) => {
       <FlatList
         data={data}
         renderItem={({ item }) => {
-          return <FileItem item={item} deleteFile={deleteFile} />;
+          return <FileItem actionColor="#FF2E2E" item={item} action={deleteFile} actionText="Delete" />;
         }}
       />
     </SafeAreaView>

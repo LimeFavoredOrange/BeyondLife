@@ -27,9 +27,9 @@ const GmailForward = () => {
 
   const navigation = useNavigation();
 
-  React.useEffect(() => {
-    alert('Forward function is not available for this static demo');
-  }, []);
+  // React.useEffect(() => {
+  //   alert('Forward function is not available for this static demo');
+  // }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

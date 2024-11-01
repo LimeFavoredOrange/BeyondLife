@@ -18,9 +18,16 @@ import showToast from '../../utils/showToast';
 import axiosInstance from '../../api';
 import { selectToken } from '../../redux/slices/auth';
 import { useSelector } from 'react-redux';
+import * as FileSystem from 'expo-file-system';
+import * as DocumentPicker from 'expo-document-picker';
+import * as Sharing from 'expo-sharing';
+
+import { formatPolicy } from '../../utils/policyFormator';
 
 const storageOptionDescription = {
   'Will Server Only': 'Data will be kept on the Will server only, which is a secure server that hosting by us.',
+  'Private Server Only':
+    "Data will be split across your configured storage locations, if you haven't set them up, they will be stored on our server (save as above)",
   'X Server Only': 'Data will be kept on the X server only. We are not going to keep any data on our server.',
   Both: 'Data will be kept on both servers.',
   'None (Delete All)': 'Delete all data.',
@@ -29,13 +36,21 @@ const storageOptionDescription = {
 const TwitterConfigureWill = () => {
   const [showLoading, setShowLoading] = useState(false);
   const [storageOption, setStorageOption] = useState('Will Server Only');
-  const [offensiveTweets, setOffensiveTweets] = useState('Will Server Only');
-  const [tweetsWithImages, setTweetsWithImages] = useState('Will Server Only');
-  const [deleteBeforeDate, setDeleteBeforeDate] = useState(new Date());
+  // const [offensiveTweets, setOffensiveTweets] = useState('Will Server Only');
+  // const [tweetsWithImages, setTweetsWithImages] = useState('Will Server Only');
+  // const [deleteBeforeDate, setDeleteBeforeDate] = useState(new Date());
+  const [offensiveTweets, setOffensiveTweets] = useState('Disable');
+  const [tweetsWithImages, setTweetsWithImages] = useState('Disable');
+  const [deleteBeforeDate, setDeleteBeforeDate] = useState('Disable');
+
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [progressStatus, setProgressStatus] = useState(0.16);
   const [currentStep, setCurrentStep] = useState(1);
   const [animation, setAnimation] = useState('fadeInRight');
+  const [currentPolicy, setCurrentPolicy] = useState('');
+
+  // TODO: Remove if for now
+  const [showOption, setShowOption] = useState(false);
 
   const navigation = useNavigation();
   const token = useSelector(selectToken);
@@ -54,6 +69,8 @@ const TwitterConfigureWill = () => {
   const [selectedAttributes, setSelectedAttributes] = useState([]);
 
   const [attributeModalVisible, setAttributeModalVisible] = useState(false);
+
+  const [skippedSteps, setSkippedSteps] = useState(false);
 
   React.useEffect(() => {
     async function fetchData() {
@@ -74,7 +91,7 @@ const TwitterConfigureWill = () => {
 
   const [policyMatch, setPolicyMatch] = useState('subset');
 
-  const [skippedSteps, setSkippedSteps] = useState(false);
+  const [inputedPolicy, setInputedPolicy] = useState('');
 
   const [tweetsList, setTweetsList] = useState([
     { id: 1, text: 'First tweet', attributes: [], policy: '' },
@@ -88,6 +105,7 @@ const TwitterConfigureWill = () => {
     const updatedTweetsList = [...tweetsList];
     updatedTweetsList[tweetIndex].attributes = selectedAttributes;
     setTweetsList(updatedTweetsList);
+    validatePolicyForTweet(selectedAttributes, inputedPolicy);
 
     // Reset selected attributes
     setSelectedAttributes([]);
@@ -117,17 +135,33 @@ const TwitterConfigureWill = () => {
     setAttributeModalVisible(true);
   };
 
-  const validatePolicyForTweet = (tweetId, policy) => {
-    const validAttributes = selectedAttributes[tweetId] || [];
+  const validatePolicyForTweet = (attributeList, policy) => {
+    const validAttributes = attributeList || [];
+
+    // Check if the policy contains some attributes that are not in the list, except for 'and' and 'or'
+    const invalidAttributes = policy
+      .split(' ')
+      .filter((word) => !['and', 'or'].includes(word) && !validAttributes.includes(word));
+
+    console.log(invalidAttributes);
+    if (policy !== '' && invalidAttributes.length > 0) {
+      setPolicyError(
+        "You can only use the selected attributes. Invalid attributes: '" + invalidAttributes.join(', ') + "'"
+      );
+      return;
+    }
+
     const pattern = new RegExp(`^(${validAttributes.join('|')})( (and|or) (${validAttributes.join('|')}))*$`, 'i');
-    if (!pattern.test(policy)) {
-      setPolicyError('Invalid policy! Only use selected attributes connected with "and" or "or".');
+
+    if (policy !== '' && !pattern.test(policy)) {
+      setPolicyError('Invalid policy! Only use selected attributes connected with "and" or "or"');
     } else {
-      setPolicyError('');
-      setTweetsAccessPolicies({
-        ...tweetsAccessPolicies,
-        [tweetId]: policy,
-      });
+      setPolicyError(null);
+      // Set the policy for the current tweet
+      const tweetIndex = tweetsList.findIndex((tweet) => tweet.id === currentTweetId);
+      const updatedTweetsList = [...tweetsList];
+      updatedTweetsList[tweetIndex].policy = policy;
+      setTweetsList(updatedTweetsList);
     }
   };
 
@@ -143,38 +177,69 @@ const TwitterConfigureWill = () => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep === 7) {
-      // Submit data
-      console.log('Submit data:', {
+      const tweetsListWithoutText = tweetsList.map(({ text, ...rest }) => rest);
+      const requestData = {
         storageOption,
         offensiveTweets,
         tweetsWithImages,
         deleteBeforeDate,
         keywordsList,
-        attributesList,
-        heirsList,
         policyMatch,
-        tweetsAccessPolicies,
-      });
-      // Navigate back to Home screen
-      navigation.navigate('Home');
-      showToast('✅ Your will has been successfully set on X!', 'success');
-      return;
-    }
+        tweetsListWithoutText,
+      };
 
-    setAnimation('fadeInRight');
-    if (currentStep === 1 && storageOption === 'None (Delete All)') {
-      setCurrentStep(7);
-      setProgressStatus(1);
-      setSkippedSteps(true);
+      try {
+        setShowLoading(true);
+
+        const response = await axiosInstance.post('/twitter/setup', requestData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/xml',
+          },
+          responseType: 'text',
+        });
+
+        if (response.data) {
+          const xmlContent = response.data;
+
+          const fileUri = `${FileSystem.cacheDirectory}DigitalWill.xml`;
+          await FileSystem.writeAsStringAsync(fileUri, xmlContent, {
+            encoding: FileSystem.EncodingType.UTF8,
+          });
+
+          if (await Sharing.isAvailableAsync()) {
+            await Sharing.shareAsync(fileUri);
+            showToast('✅ Your will has been successfully set and shared!', 'success');
+          } else {
+            showToast('⚠️ Sharing is not available on this device.', 'warning');
+          }
+        } else {
+          showToast('⚠️ Failed to retrieve XML data from server response.', 'warning');
+        }
+
+        setShowLoading(false);
+
+        navigation.navigate('Home');
+      } catch (error) {
+        setShowLoading(false);
+        console.error('Error setting up Twitter will:', error);
+        showToast('❌ Error setting up your will. Please try again.', 'danger');
+      }
     } else {
-      setCurrentStep((prevStep) => prevStep + 1);
-      setProgressStatus((prevProgress) => Math.min(prevProgress + 0.15, 1));
+      setAnimation('fadeInRight');
+      if (currentStep === 1 && storageOption === 'None (Delete All)') {
+        setCurrentStep(7);
+        setProgressStatus(1);
+        setSkippedSteps(true);
+      } else {
+        setCurrentStep((prevStep) => prevStep + 1);
+        setProgressStatus((prevProgress) => Math.min(prevProgress + 0.15, 1));
+      }
     }
   };
 
-  // Function to add keyword to list and clear input
   const handleAddKeyword = () => {
     if (keywords.trim()) {
       setKeywordsList([...keywordsList, keywords.trim()]);
@@ -194,10 +259,6 @@ const TwitterConfigureWill = () => {
   };
 
   const toggleAttribute = (attribute) => {
-    console.log(selectedAttributes);
-    console.log([...selectedAttributes, attribute]);
-    console.log(selectedAttributes.includes(attribute));
-
     if (selectedAttributes.includes(attribute)) {
       setSelectedAttributes((current) => current.filter((item) => item !== attribute));
     } else {
@@ -218,6 +279,7 @@ const TwitterConfigureWill = () => {
               <Text className="text-xl font-semibold mt-8 mx-3">🌍 Step 1: Pick Your Tweets’ Forever Home</Text>
               <Picker selectedValue={storageOption} onValueChange={(itemValue) => setStorageOption(itemValue)}>
                 <Picker.Item label="Will Server Only" value="Will Server Only" />
+                <Picker.Item label="Private Server Only" value="Private Server Only" />
                 <Picker.Item label="X Server Only" value="X Server Only" />
                 <Picker.Item label="Both" value="Both" />
                 <Picker.Item label="None (Delete All)" value="None (Delete All)" />
@@ -256,10 +318,21 @@ const TwitterConfigureWill = () => {
                 </View>
               </View>
 
-              {offensiveTweetsEnabled && (
+              {showOption === false && (
+                <View className="flex-row items-center ml-6 pr-3 mt-5">
+                  <Icon name="info-circle" size={20} color="#036635" />
+                  <HelperText type="info" className="text-base ml-2 font-bold">
+                    Offensive tweets refer to those that contain sensitive or inappropriate language. We will help you
+                    to identify them by our AI assistant, you can choose to delete them or not.
+                  </HelperText>
+                </View>
+              )}
+
+              {showOption === true && offensiveTweetsEnabled && (
                 <Animatable.View animation="fadeInDown" duration={800} style={{ margin: 10 }}>
                   <Picker selectedValue={offensiveTweets} onValueChange={(itemValue) => setOffensiveTweets(itemValue)}>
                     <Picker.Item label="Will Server Only" value="Will Server Only" />
+                    <Picker.Item label="Private Server Only" value="Private Server Only" />
                     <Picker.Item label="X Server Only" value="X Server Only" />
                     <Picker.Item label="Both" value="Both" />
                   </Picker>
@@ -298,13 +371,24 @@ const TwitterConfigureWill = () => {
                 </View>
               </View>
 
-              {tweetsWithImagesEnabled && (
+              {showOption === false && (
+                <View className="flex-row items-center ml-6 pr-3">
+                  <Icon name="info-circle" size={20} color="#036635" />
+                  <HelperText type="info" className="text-base ml-2 font-bold">
+                    Snapshot moments refer to tweets that contain images. We will help you to identify them by our AI
+                    assistant, you can choose to delete them or not.
+                  </HelperText>
+                </View>
+              )}
+
+              {showOption === true && tweetsWithImagesEnabled && (
                 <Animatable.View animation="fadeInDown" duration={800} style={{ margin: 10 }}>
                   <Picker
                     selectedValue={tweetsWithImages}
                     onValueChange={(itemValue) => setTweetsWithImages(itemValue)}
                   >
                     <Picker.Item label="Will Server Only" value="Will Server Only" />
+                    <Picker.Item label="Private Server Only" value="Private Server Only" />
                     <Picker.Item label="X Server Only" value="X Server Only" />
                     <Picker.Item label="Both" value="Both" />
                   </Picker>
@@ -360,7 +444,7 @@ const TwitterConfigureWill = () => {
                   </View>
                 </View>
 
-                {showDatePicker && (
+                {showOption === true && showDatePicker && (
                   <Animatable.View
                     animation="fadeInDown"
                     duration={800}
@@ -502,13 +586,29 @@ const TwitterConfigureWill = () => {
                     </View>
 
                     <TextInput
-                      placeholder="More specific policy for this tweet"
-                      value={tweetsAccessPolicies[item.id] || ''}
-                      onChangeText={(text) => validatePolicyForTweet(item.id, text)}
+                      placeholder="More specific policy for this tweet, press enter to save"
+                      onFocus={() => {
+                        setCurrentTweetId(item.id);
+                      }}
+                      onChangeText={(text) => {
+                        validatePolicyForTweet(item.attributes, text);
+                      }}
                       style={{ marginTop: 10, padding: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 5 }}
                     />
-
-                    {policyError && <HelperText type="error">{policyError}</HelperText>}
+                    {currentTweetId === item.id && policyError && <HelperText type="error">{policyError}</HelperText>}
+                    {currentTweetId === item.id && policyError === null && (
+                      <>
+                        <Text className="text-green-700 text-sm font-semibold">Policy saved ✅</Text>
+                        {/* <TouchableOpacity
+                          className="inline-block"
+                          onPress={() => {
+                            formatPolicy();
+                          }}
+                        >
+                          <Text className="text-blue-500 underline text-sm font-semibold">View Policy</Text>
+                        </TouchableOpacity> */}
+                      </>
+                    )}
                   </View>
                 )}
               />
@@ -542,7 +642,6 @@ const TwitterConfigureWill = () => {
                   ))}
                 </ScrollView>
 
-                {/* Done Button */}
                 <Button
                   mode="contained"
                   onPress={hideModal}

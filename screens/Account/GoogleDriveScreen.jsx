@@ -3,11 +3,13 @@ import { Text, SafeAreaView, FlatList, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import Loading from '../../components/Loading';
-import { SearchBar, Icon } from '@rneui/base';
+import { Icon } from '@rneui/base';
 import FileItem from '../../components/GoogleDrive/FileItem';
 import Setting from '../../components/GoogleDrive/Setting';
 import Date1 from '../../components/GoogleDrive/Date';
 import driveData from '../../Data/GoogleDrive/driveData';
+import { SearchBar } from '@rneui/themed';
+import { Platform } from 'react-native';
 
 import AccountHeader from '../../components/Account/AutomaticWillHeader';
 
@@ -25,7 +27,7 @@ const GoogleDriveScreen = () => {
 
   // Function to search file in Google Drive
   const applySearch = async (keyword) => {
-    alert('Search, keyword delete and date range delete functions are not available for this static demo');
+    // alert('Search, keyword delete and date range delete functions are not available for this static demo');
     // if (keyword === '') {
     //   getData();
     // }
@@ -127,12 +129,12 @@ const GoogleDriveScreen = () => {
   //   }
   // };
 
-  React.useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      applySearch(searching);
-    }, 300);
-    return () => clearTimeout(delayDebounceFn);
-  }, [searching]);
+  // React.useEffect(() => {
+  //   const delayDebounceFn = setTimeout(() => {
+  //     applySearch(searching);
+  //   }, 300);
+  //   return () => clearTimeout(delayDebounceFn);
+  // }, [searching]);
 
   React.useEffect(() => {
     getData();
@@ -195,7 +197,15 @@ const GoogleDriveScreen = () => {
         ]}
       />
 
-      <SearchBar placeholder="Search content" platform="ios" onChangeText={(e) => setSearching(e)} value={searching} />
+      <SearchBar
+        placeholder="Search tweets......"
+        platform="ios"
+        onChangeText={(e) => setSearching(e)}
+        value={searching}
+        searchIcon={Platform.OS === 'ios' ? { name: 'search' } : null}
+        clearIcon={Platform.OS === 'ios' ? { name: 'close-circle' } : null}
+      />
+
       <TouchableOpacity
         className="w-screen flex-row items-center justify-center bg-gray-400"
         style={{ height: 40 }}
@@ -213,7 +223,15 @@ const GoogleDriveScreen = () => {
       <FlatList
         data={data}
         renderItem={({ item }) => {
-          return <FileItem item={item} deleteFile={deleteFile} showOffensive={showOffensive} />;
+          return (
+            <FileItem
+              actionColor="#FF2E2E"
+              item={item}
+              action={deleteFile}
+              showOffensive={showOffensive}
+              actionText="Delete"
+            />
+          );
         }}
       />
     </SafeAreaView>
