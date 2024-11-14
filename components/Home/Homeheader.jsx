@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectGreeting } from '../../redux/slices/homeSlice';
 import { setIsLogin, setToken } from '../../redux/slices/auth';
 
-const Header = () => {
+const Header = ({ setShowNotification }) => {
   const dispatch = useDispatch();
   const greeting = useSelector(selectGreeting);
   return (
@@ -24,7 +24,7 @@ const Header = () => {
           </TouchableOpacity>
           <View className="flex-1"></View>
           <TouchableOpacity>
-            <Icon name="notifications" type="ionicon" color={'#036635'} />
+            <Icon name="notifications" type="ionicon" color={'#036635'} onPress={() => setShowNotification(true)} />
           </TouchableOpacity>
         </View>
         <Text className="text-3xl mt-5 font-medium tracking-wide mb-5">{greeting}, mate</Text>

@@ -1,5 +1,6 @@
 import * as WebBrowser from 'expo-web-browser';
 import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
+import { CLIENT_ID, CLIENT_SECRET } from '@env';
 
 // WebBrowser session handling for mobile
 WebBrowser.maybeCompleteAuthSession();
@@ -11,7 +12,6 @@ const discovery = {
   revocationEndpoint: 'https://twitter.com/i/oauth2/revoke',
 };
 
-// 创建一个函数，进行 Twitter OAuth 流程
 export function handleTwitterOAuth() {
   // Generate the redirect URI using custom scheme
   const redirectUri = makeRedirectUri({
@@ -19,12 +19,10 @@ export function handleTwitterOAuth() {
     useProxy: false,
   });
 
-  console.log('Redirect URI:', redirectUri);
-
   // Twitter OAuth request configuration
   const [request, response, promptAsync] = useAuthRequest(
     {
-      clientId: 'ZXFBLXNMSnVsRlRBdGxHVF95V2Q6MTpjaQ', // 你的 Twitter client ID
+      clientId: CLIENT_ID, // 你的 Twitter client ID
       redirectUri: redirectUri,
       scopes: ['tweet.read', 'users.read', 'follows.read', 'offline.access'], // OAuth scopes
       responseType: 'code',
@@ -39,17 +37,15 @@ export function handleTwitterOAuth() {
 
     if (result?.type === 'success') {
       const { code } = result.params;
-      console.log('Authorization Code:', code);
 
       const tokenRequest = {
         code,
         redirect_uri: redirectUri,
-        client_id: 'ZXFBLXNMSnVsRlRBdGxHVF95V2Q6MTpjaQ', // 你的 Twitter client ID
+        client_id: CLIENT_ID,
         grant_type: 'authorization_code',
-        code_verifier: request.codeVerifier, // PKCE challenge
+        code_verifier: request.codeVerifier,
       };
 
-      // 发送 token 请求
       return fetch('https://api.x.com/2/oauth2/token', {
         method: 'POST',
         headers: {

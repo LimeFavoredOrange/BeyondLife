@@ -7,6 +7,7 @@ import { Badge } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
 import { selectAccounts } from '../../redux/slices/accounts';
 import { selectAccountNumber } from '../../redux/slices/homeSlice';
+import Loading from '../../components/Loading';
 
 import axiosInstance from '../../api';
 
@@ -15,6 +16,7 @@ const AccountManagerDashboard = () => {
   const token = useSelector(selectToken);
   const navigation = useNavigation();
   const [accounts, setAccounts] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -25,9 +27,12 @@ const AccountManagerDashboard = () => {
               Authorization: `Bearer ${token}`,
             },
           });
+          console.log(response.data);
           setAccounts(response.data);
         }
+        setLoading(false);
       } catch (error) {
+        setLoading(false);
         console.error('Error fetching account data:', error);
       }
     };
@@ -43,24 +48,27 @@ const AccountManagerDashboard = () => {
   };
 
   return (
-    <FlatList
-      data={accounts}
-      keyExtractor={(item) => `${item.accountid}_${item.platform}`}
-      renderItem={({ item }) => {
-        return (
-          <TouchableOpacity
-            className="flex-row items-center bg-gray-100 border-b px-2 space-x-2"
-            style={{ height: 50 }}
-            onPress={() => {
-              navigation.navigate('View Account', { data: item });
-            }}
-          >
-            <Text className="text-lg font-semibold mx-3">{item.platform}</Text>
-            <Badge value={item.tag} badgeStyle={{ backgroundColor: `${tagColor[item.tag]}` }} />
-          </TouchableOpacity>
-        );
-      }}
-    />
+    <>
+      <Loading showLoading={loading} />
+      <FlatList
+        data={accounts}
+        keyExtractor={(item) => `${item.accountid}_${item.platform}`}
+        renderItem={({ item }) => {
+          return (
+            <TouchableOpacity
+              className="flex-row items-center bg-gray-100 border-b px-2 space-x-2"
+              style={{ height: 50 }}
+              onPress={() => {
+                navigation.navigate('View Account', { data: item });
+              }}
+            >
+              <Text className="text-lg font-semibold mx-3">{item.platform}</Text>
+              <Badge value={item.tag} badgeStyle={{ backgroundColor: `${tagColor[item.tag]}` }} />
+            </TouchableOpacity>
+          );
+        }}
+      />
+    </>
   );
 };
 

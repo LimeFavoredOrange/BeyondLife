@@ -14,7 +14,6 @@ const Register = ({ setAnimating, setCurrentMode, setCurrentHeight, loginAnimati
   const [confirmPassword, setConfirmPassword] = React.useState('');
 
   // const showToast = useSelector(getShowToast);
-
   const handleRegister = async () => {
     // Check the given email is not empty and in the correct format, check the format properly
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -26,7 +25,7 @@ const Register = ({ setAnimating, setCurrentMode, setCurrentHeight, loginAnimati
     if (password === confirmPassword) {
       setShowLoading(true);
       try {
-        await axiosInstance.post('https://goshawk-robust-plainly.ngrok-free.app/auth/register', {
+        await axiosInstance.post('auth/register', {
           email,
           password,
         });
@@ -35,6 +34,7 @@ const Register = ({ setAnimating, setCurrentMode, setCurrentHeight, loginAnimati
         setAnimating(loginAnimation);
         setCurrentHeight(loginHeight);
         setCurrentMode('Login');
+
         // Notify the user that the registration is successful
         showToast('Registration successful ✅', 'success');
       } catch (error) {

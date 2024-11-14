@@ -41,7 +41,7 @@ const TwitterConfigureWill = () => {
   // const [deleteBeforeDate, setDeleteBeforeDate] = useState(new Date());
   const [offensiveTweets, setOffensiveTweets] = useState('Disable');
   const [tweetsWithImages, setTweetsWithImages] = useState('Disable');
-  const [deleteBeforeDate, setDeleteBeforeDate] = useState('Disable');
+  const [deleteBeforeDate, setDeleteBeforeDate] = useState(new Date());
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [progressStatus, setProgressStatus] = useState(0.16);
@@ -213,10 +213,10 @@ const TwitterConfigureWill = () => {
             await Sharing.shareAsync(fileUri);
             showToast('✅ Your will has been successfully set and shared!', 'success');
           } else {
-            showToast('⚠️ Sharing is not available on this device.', 'warning');
+            showToast('⚠️ Sharing is not available on this device.', 'error');
           }
         } else {
-          showToast('⚠️ Failed to retrieve XML data from server response.', 'warning');
+          showToast('⚠️ Failed to retrieve XML data from server response.', 'error');
         }
 
         setShowLoading(false);
@@ -225,7 +225,7 @@ const TwitterConfigureWill = () => {
       } catch (error) {
         setShowLoading(false);
         console.error('Error setting up Twitter will:', error);
-        showToast('❌ Error setting up your will. Please try again.', 'danger');
+        showToast('❌ Error setting up your will. Please try again.', 'error');
       }
     } else {
       setAnimation('fadeInRight');
@@ -444,7 +444,7 @@ const TwitterConfigureWill = () => {
                   </View>
                 </View>
 
-                {showOption === true && showDatePicker && (
+                {showDatePicker && (
                   <Animatable.View
                     animation="fadeInDown"
                     duration={800}

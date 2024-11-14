@@ -9,6 +9,13 @@
         {
           "iCloudContainerEnvironment": "Production"
         }
+      ],
+      "expo-secure-store",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.759598077912-b2sv2au01e7otsttmru0702p9k4ednfc"
+        }
       ]
     ],
     "orientation": "portrait",
@@ -27,7 +34,14 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.xinzhang9091.digitalWill"
+      "bundleIdentifier": "com.xinzhang9091.digitalWill",
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": ["com.googleusercontent.apps.759598077912-r27lg26pndr093siik6fd1ah3tf4ug1h"]
+          }
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -44,7 +58,7 @@
         "projectId": "b773ff8b-02ea-4b8e-831a-8cc85f0d6c89"
       }
     },
-    "scheme": ["myapp", "digitalWill", "com.xinzhang0901.digitalWill"],
+    "scheme": ["digitalWill"],
     "runtimeVersion": "1.0.0"
   }
 }

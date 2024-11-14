@@ -14,6 +14,8 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import storageConfiguration from '../../assets/storage.png';
 import heirConfiguration from '../../assets/heir.png';
+import willTriggerSetting from '../../assets/willTriggerSetting.png';
+import willActivation from '../../assets/willActivation.png';
 
 // Dashboard screen component
 const Dashboard = ({ setShowStorageOptionScreen }) => {
@@ -76,13 +78,25 @@ const Dashboard = ({ setShowStorageOptionScreen }) => {
       image: heirConfiguration,
       action: () => navigation.navigate('Heir Management'),
     },
+    {
+      id: 'Will Trigger Settings',
+      title: 'Will trigger settings',
+      image: willTriggerSetting,
+      action: () => navigation.navigate('Will Trigger Setting'),
+    },
+    {
+      id: 'Will Trigger Activation',
+      title: 'Will Trigger Activation',
+      image: willActivation,
+      action: () => navigation.navigate('Will Trigger Setting'),
+    },
   ];
 
   return (
     <View className="pt-8">
       <View>
         <View className="flex-row items-center mb-3">
-          <Text className="text-2xl font-bold pl-3 mr-1">Current setup</Text>
+          <Text className="text-2xl font-bold pl-3 mr-1">Current Setup</Text>
           <Icon name="wifi-protected-setup" type="materialicons" color={'#036635'} />
         </View>
 

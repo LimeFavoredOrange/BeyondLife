@@ -36,6 +36,8 @@ import GmailDownload from '../screens/Account/Gmail/GmailDownload';
 import GmailScreenHome from '../screens/Account/Gmail/GmailScreenHome';
 import GmailConfigureWill from '../screens/Account/Gmail/GmailConfigureWill';
 
+import WillTriggerSettingScreen from '../screens/WillTriggerSettingScreen';
+
 import ViewBackupScreen from '../screens/ViewBackupScreen';
 
 // Heir Management Screen
@@ -90,6 +92,7 @@ const Navigation = () => {
       <Stack.Screen name="View Backup" component={ViewBackupScreen} />
 
       <Stack.Screen name="Heir Management" component={HeirManagementScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Will Trigger Setting" component={WillTriggerSettingScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 };

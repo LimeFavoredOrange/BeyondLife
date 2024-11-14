@@ -5,9 +5,11 @@ import { vw } from 'react-native-expo-viewport-units';
 import SelectDropdown from 'react-native-select-dropdown';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
+import { setAccountNumber, selectAccountNumber } from '../redux/slices/homeSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectToken } from '../redux/slices/auth';
 import { useNavigation } from '@react-navigation/native';
+
 import axiosInstance from '../api';
 
 import { setAccounts, setAccountsDetail, selectAccountsDetail } from '../redux/slices/accounts';
@@ -40,7 +42,7 @@ const AddAccountScreen = () => {
   const [useFor, setUseFor] = React.useState('');
   const [note, setNote] = React.useState('');
 
-  const [executors, setExecutors] = React.useState([{ name: 'John' }, { name: 'Peter' }]);
+  const [executors, setExecutors] = React.useState([]);
 
   const token = useSelector(selectToken);
   const navigation = useNavigation();
@@ -53,6 +55,27 @@ const AddAccountScreen = () => {
     { color: 'orange', name: 'Shopping' },
     { color: 'purple', name: 'Other' },
   ];
+
+  const newAccountNumber = useSelector(selectAccountNumber) + 1;
+
+  React.useEffect(() => {
+    console.log('加入新的账户');
+
+    const getAccounts = async () => {
+      try {
+        const response = await axiosInstance.get(`heirs/list`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setExecutors(response.data);
+      } catch (error) {
+        console.error('Get accounts error:', error);
+      }
+    };
+
+    getAccounts();
+  }, []);
 
   return (
     <ScrollView
@@ -118,20 +141,20 @@ const AddAccountScreen = () => {
         <SelectDropdown
           data={executors}
           onSelect={(selectedItem, index) => {
-            setTag(selectedItem.name);
+            setTag(selectedItem.alias);
           }}
           defaultButtonText={'Link executor'}
           buttonTextAfterSelection={(selectedItem, index) => {
-            return selectedItem.name;
+            return selectedItem.alias;
           }}
           rowTextForSelection={(item, index) => {
-            return item.name;
+            return item.alias;
           }}
           renderCustomizedRowChild={(item, index) => {
             return (
               <View className="flex-row justify-center items-center">
                 <View className="flex-1">
-                  <Text className="font-semibold">{item.name}</Text>
+                  <Text className="font-semibold px-3">{item.alias}</Text>
                 </View>
               </View>
             );
@@ -290,6 +313,7 @@ const AddAccountScreen = () => {
                 },
               }
             );
+            dispatch(setAccountNumber(newAccountNumber));
             navigation.goBack();
           } catch (error) {
             console.log(error);

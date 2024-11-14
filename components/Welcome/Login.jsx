@@ -2,8 +2,8 @@ import { Text, ScrollView } from 'react-native';
 import React from 'react';
 import { Input, Icon, Button } from '@rneui/themed';
 import { View } from 'react-native-animatable';
-import { useDispatch } from 'react-redux';
-import { setIsLogin, setToken } from '../../redux/slices/auth';
+import { useDispatch, useSelector } from 'react-redux';
+import { setIsLogin, setToken, selectNotificationToken } from '../../redux/slices/auth';
 import {
   setAccountNumber,
   setHeirNumber,
@@ -20,6 +20,8 @@ import showToast from '../../utils/showToast';
 
 import axiosInstance from '../../api';
 
+import { getFromSecureStore } from '../../utils/storage';
+
 const Login = ({
   setAnimating,
   setCurrentMode,
@@ -32,15 +34,17 @@ const Login = ({
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const notificationToken = useSelector(selectNotificationToken);
 
   const handleLogin = async () => {
     try {
       setShowLoading(true);
+      const notificationToken = await getFromSecureStore('notificationToken');
       const response = await axiosInstance.post('auth/login', {
         email,
         password,
+        notificationToken: notificationToken,
       });
-      console.log(response.data);
       const {
         account_number,
         heir_number,
@@ -53,6 +57,8 @@ const Login = ({
         link_to_gmail,
         link_to_google_drive,
       } = response.data;
+
+      // Sand an api call to update the notification token
 
       console.log(response.data);
       dispatch(setAccountNumber(account_number));
