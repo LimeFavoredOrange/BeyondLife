@@ -27,12 +27,32 @@ import * as WebBrowser from 'expo-web-browser';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
 
+import * as Crypto from 'expo-crypto';
+import * as Random from 'expo-random';
+
 WebBrowser.maybeCompleteAuthSession();
 
 // Endpoint
 const discovery = {
   authorizationEndpoint: 'https://www.dropbox.com/oauth2/authorize',
   tokenEndpoint: 'https://www.dropbox.com/oauth2/token',
+};
+
+const generateCodeVerifier = async () => {
+  const randomBytes = await Crypto.getRandomBytesAsync(32);
+  const codeVerifier = Array.from(randomBytes)
+    .map((byte) => ('0' + byte.toString(16)).slice(-2))
+    .join('');
+
+  // 使用 BASE64 编码生成 code_challenge，然后转换为 BASE64URL
+  let codeChallenge = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, codeVerifier, {
+    encoding: Crypto.CryptoEncoding.BASE64,
+  });
+
+  // 将 BASE64 编码转换为 BASE64URL 格式
+  codeChallenge = codeChallenge.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+  return { codeVerifier, codeChallenge };
 };
 
 const HomeScreen = () => {
@@ -98,39 +118,70 @@ const HomeScreen = () => {
     discovery
   );
 
-  console.log(
-    makeRedirectUri({
-      scheme: 'digitalWill',
-      path: 'oauth',
-    })
-  );
+  // useEffect(() => {
+  //   if (response?.type === 'success') {
+  //     const { code } = response.params;
+  //     console.log('Authorization Code:', code);
+
+  //     const tokenRequest = {
+  //       code,
+  //       redirect_uri: makeRedirectUri({
+  //         scheme: 'digitalWill',
+  //       }),
+  //       client_id: 'f99a4yglyytbmgo',
+  //       grant_type: 'access_token',
+  //     };
+
+  //   }
+  // }, [response]);
 
   useEffect(() => {
-    if (response?.type === 'success') {
-      const { code } = response.params;
-      console.log('Authorization Code:', code);
+    const getToken = async () => {
+      if (response?.type === 'success') {
+        const { code } = response.params;
+        console.log('Authorization Code:', code);
 
-      const tokenRequest = {
-        code,
-        redirect_uri: makeRedirectUri({
-          scheme: 'digitalWill',
-        }),
-        client_id: 'f99a4yglyytbmgo',
-        grant_type: 'authorization_code',
-      };
+        // 获取 code_verifier 和 code_challenge
+        // const { codeVerifier } = await generateCodeVerifier();
 
-      fetch('https://www.dropbox.com/oauth2/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams(tokenRequest).toString(),
-      })
-        .then((tokenResponse) => tokenResponse.json())
-        .then((tokenData) => {
-          console.log('Access Token:', tokenData);
-        });
-    }
+        // const redirectUri = AuthSession.makeRedirectUri({
+        //   scheme: 'digitalWill',
+        //   path: 'oauth',
+        // });
+
+        // // 构建 token 请求
+        // const tokenRequestBody = new URLSearchParams({
+        //   code,
+        //   grant_type: 'authorization_code',
+        //   client_id: 'f99a4yglyytbmgo',
+        //   redirect_uri: redirectUri,
+        //   code_verifier: codeVerifier,
+        // }).toString();
+
+        // try {
+        //   // 发送请求到 Dropbox 获取 access_token
+        //   const tokenResponse = await fetch('https://api.dropboxapi.com/oauth2/token', {
+        //     method: 'POST',
+        //     headers: {
+        //       'Content-Type': 'application/x-www-form-urlencoded',
+        //     },
+        //     body: tokenRequestBody,
+        //   });
+
+        //   const tokenData = await tokenResponse.json();
+
+        //   if (tokenData.access_token) {
+        //     console.log('Access Token:', tokenData.access_token);
+        //   } else {
+        //     console.error('Failed to obtain access token:', tokenData);
+        //   }
+        // } catch (error) {
+        //   console.error('Access Token Error:', error);
+        // }
+      }
+    };
+
+    getToken();
   }, [response]);
 
   return (
