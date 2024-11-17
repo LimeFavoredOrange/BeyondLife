@@ -20,43 +20,25 @@ import AccountHeader from '../components/Account/AutomaticWillHeader';
 import AccountDashboard from '../components/Account/AutomaticWillDashboard';
 import { set } from 'ramda';
 import NotificationOverlay from '../components/NotificationOverlay';
-
-import * as Linking from 'expo-linking';
-import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
-import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
+import { makeRedirectUri, useAuthRequest, ResponseType } from 'expo-auth-session';
 
-import * as Crypto from 'expo-crypto';
-import * as Random from 'expo-random';
+import { selectToken } from '../redux/slices/auth';
+
+import { DROPBOX_KEY, GOOGLE_IOSCLIENT_ID, GOOGLE_WEB_ID } from '@env';
+import axiosInstance from '../api';
 
 WebBrowser.maybeCompleteAuthSession();
 
-// Endpoint
 const discovery = {
   authorizationEndpoint: 'https://www.dropbox.com/oauth2/authorize',
   tokenEndpoint: 'https://www.dropbox.com/oauth2/token',
 };
 
-const generateCodeVerifier = async () => {
-  const randomBytes = await Crypto.getRandomBytesAsync(32);
-  const codeVerifier = Array.from(randomBytes)
-    .map((byte) => ('0' + byte.toString(16)).slice(-2))
-    .join('');
-
-  // 使用 BASE64 编码生成 code_challenge，然后转换为 BASE64URL
-  let codeChallenge = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, codeVerifier, {
-    encoding: Crypto.CryptoEncoding.BASE64,
-  });
-
-  // 将 BASE64 编码转换为 BASE64URL 格式
-  codeChallenge = codeChallenge.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-
-  return { codeVerifier, codeChallenge };
-};
-
 const HomeScreen = () => {
   const selectedTab = useSelector(selectSelectedTab);
+  const token = useSelector(selectToken);
   const navigation = useNavigation();
 
   const [showStorageOptionScreen, setShowStorageOptionScreen] = React.useState(true);
@@ -85,8 +67,11 @@ const HomeScreen = () => {
 
   const configureGoogleSignIn = () => {
     GoogleSignin.configure({
-      iosClientId: '759598077912-r27lg26pndr093siik6fd1ah3tf4ug1h.apps.googleusercontent.com',
+      iosClientId: GOOGLE_IOSCLIENT_ID,
+      webClientId: GOOGLE_WEB_ID,
       scopes: ['https://www.googleapis.com/auth/drive.file'],
+      offlineAccess: true,
+      forceCodeForRefreshToken: true,
     });
   };
 
@@ -98,91 +83,206 @@ const HomeScreen = () => {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      console.log(userInfo, '\n');
+      const serverAuthCode = userInfo.data.serverAuthCode;
 
-      const tokens = await GoogleSignin.getTokens();
-      console.log(tokens);
+      const response = await axiosInstance.post(
+        'upload/googleDrive/exchangeToken',
+        {
+          serverAuthCode: serverAuthCode,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Update the connected platforms
+      const connected = [...connectedPlatforms];
+      connected.push('googleDrive');
+      setConnectedPlatforms(connected);
     } catch (error) {}
   };
 
   const [request, response, promptAsync] = useAuthRequest(
     {
-      clientId: 'f99a4yglyytbmgo',
-      // There are no scopes so just pass an empty array
+      clientId: DROPBOX_KEY,
       scopes: [],
       redirectUri: makeRedirectUri({
         scheme: 'digitalWill',
         path: 'oauth',
       }),
+      extraParams: {
+        token_access_type: 'offline', // Request offline access for refresh token
+      },
+      usePKCE: true,
+      responseType: ResponseType.Code,
     },
     discovery
   );
 
-  // useEffect(() => {
-  //   if (response?.type === 'success') {
-  //     const { code } = response.params;
-  //     console.log('Authorization Code:', code);
+  const dropbox_exchange_token = async (code, codeVerifier) => {
+    try {
+      console.log('Code:', code);
+      console.log('Code Verifier:', codeVerifier);
+      const response = await axiosInstance.post(
+        'upload/dropbox/exchange_token',
+        {
+          code: code,
+          codeVerifier: codeVerifier,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-  //     const tokenRequest = {
-  //       code,
-  //       redirect_uri: makeRedirectUri({
-  //         scheme: 'digitalWill',
-  //       }),
-  //       client_id: 'f99a4yglyytbmgo',
-  //       grant_type: 'access_token',
-  //     };
+      // Update the connected platforms
+      const connected = [...connectedPlatforms];
+      connected.push('dropbox');
+      setConnectedPlatforms(connected);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
-  //   }
-  // }, [response]);
+  // Handle Authorization Response
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { code } = response.params;
+      const codeVerifier = request?.codeVerifier;
+      console.log('Authorization Code:', response?.params?.code);
+      console.log('Code Verifier:', request?.codeVerifier);
+
+      // Exchange the code for the access token
+      dropbox_exchange_token(code, codeVerifier);
+    }
+  }, [response]);
+
+  const [connectedPlatforms, setConnectedPlatforms] = React.useState([]);
+  const [unconnectedPlatforms, setUnconnectedPlatforms] = React.useState([]);
+
+  const GoogleDriveButton = ({ connected }) => {
+    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#4285F4]'; // 已连接用浅绿色，未连接用Google蓝
+    const textColor = connected ? 'text-[#1E7D32]' : 'text-white'; // 已连接文字深绿色
+    const iconColor = connected ? '#1E7D32' : '#FFFFFF'; // 已连接图标深绿色
+
+    return (
+      <TouchableOpacity
+        className={`p-4 ${bgColor} rounded-lg flex-row items-center space-x-2 mt-2 shadow-md`}
+        onPress={connected ? () => alert('Are you sure you want to unlink Google Drive?') : () => googleSignIn()}
+      >
+        <Icon name="google-drive" size={24} color={iconColor} />
+        <Text className={`font-bold ${textColor}`}>{connected ? 'Unlink ' : 'Connect to '}Google Drive</Text>
+        {connected && <Icon name="check-circle" size={20} color="#1E7D32" className="ml-2" />}
+      </TouchableOpacity>
+    );
+  };
+
+  const DropboxButton = ({ connected }) => {
+    const color = connected ? 'bg-[#DFF7E1]' : 'bg-[#0061FF]'; // 已连接使用浅绿色，未连接为蓝色
+    const textColor = connected ? 'text-[#1E7D32]' : 'text-white'; // 已连接文字为深绿色，未连接为白色
+    const iconColor = connected ? '#1E7D32' : '#FFFFFF'; // 已连接图标深绿色，未连接图标为白色
+
+    return (
+      <TouchableOpacity
+        className={`p-4 ${color} rounded-lg flex-row items-center space-x-2 mt-2 shadow-md`}
+        onPress={connected ? () => alert('Are you sure you want to unlink Dropbox?') : () => promptAsync()}
+      >
+        <Icon name="dropbox" size={24} color={iconColor} />
+        <Text className={`font-bold ${textColor}`}>{connected ? 'Unlink ' : 'Connect to '}Dropbox</Text>
+        {connected && <Icon name="check-circle" size={20} color="#1E7D32" className="ml-2" />}
+      </TouchableOpacity>
+    );
+  };
+
+  const OneDriveButton = ({ connected }) => {
+    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#0078D4]'; // 已连接用浅绿色，未连接用微软蓝
+    const textColor = connected ? 'text-[#1E7D32]' : 'text-white';
+    const iconColor = connected ? '#1E7D32' : '#FFFFFF';
+
+    return (
+      <TouchableOpacity
+        className={`p-4 ${bgColor} rounded-lg flex-row items-center space-x-2 mt-2 shadow-md`}
+        onPress={connected ? () => alert('Are you sure you want to unlink OneDrive?') : null}
+      >
+        <Icon name="microsoft-onedrive" size={24} color={iconColor} />
+        <Text className={`font-bold ${textColor}`}>{connected ? 'Unlink ' : 'Connect to '}OneDrive</Text>
+        {connected && <Icon name="check-circle" size={20} color="#1E7D32" className="ml-2" />}
+      </TouchableOpacity>
+    );
+  };
+
+  const ICloudButton = ({ connected }) => {
+    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#4A90E2]'; // 已连接用浅绿色，未连接用柔和的蓝
+    const textColor = connected ? 'text-[#1E7D32]' : 'text-white';
+    const iconColor = connected ? '#1E7D32' : '#FFFFFF';
+
+    return (
+      <TouchableOpacity
+        className={`p-4 ${bgColor} rounded-lg flex-row items-center space-x-2 mt-2 shadow-md`}
+        onPress={connected ? () => alert('Are you sure you want to unlink iCloud?') : null}
+      >
+        <Icon name="apple" size={24} color={iconColor} />
+        <Text className={`font-bold ${textColor}`}>{connected ? 'Unlink ' : 'Connect to '}iCloud</Text>
+        {connected && <Icon name="check-circle" size={20} color="#1E7D32" className="ml-2" />}
+      </TouchableOpacity>
+    );
+  };
+
+  const renderButton = (platform, connected) => {
+    switch (platform) {
+      case 'googleDrive':
+        return <GoogleDriveButton key={platform} connected={connected} />;
+      case 'dropbox':
+        return <DropboxButton key={platform} connected={connected} />;
+      case 'oneDrive':
+        return <OneDriveButton key={platform} connected={connected} />;
+      case 'iCloud':
+        return <ICloudButton key={platform} connected={connected} />;
+      default:
+        return null;
+    }
+  };
 
   useEffect(() => {
-    const getToken = async () => {
-      if (response?.type === 'success') {
-        const { code } = response.params;
-        console.log('Authorization Code:', code);
+    // Get the upload platform setup status for the current user
+    const getUploadPlatformSetup = async () => {
+      try {
+        if (!token) {
+          return;
+        }
+        const response = await axiosInstance.get('upload/setup_status', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-        // 获取 code_verifier 和 code_challenge
-        // const { codeVerifier } = await generateCodeVerifier();
+        // Set the connected and unconnected platforms
+        const setupStatus = response.data;
+        const connected = [];
+        const unconnected = [];
 
-        // const redirectUri = AuthSession.makeRedirectUri({
-        //   scheme: 'digitalWill',
-        //   path: 'oauth',
-        // });
+        for (const platform in setupStatus) {
+          if (setupStatus[platform] === true) {
+            connected.push(platform);
+          } else {
+            unconnected.push(platform);
+          }
+        }
 
-        // // 构建 token 请求
-        // const tokenRequestBody = new URLSearchParams({
-        //   code,
-        //   grant_type: 'authorization_code',
-        //   client_id: 'f99a4yglyytbmgo',
-        //   redirect_uri: redirectUri,
-        //   code_verifier: codeVerifier,
-        // }).toString();
-
-        // try {
-        //   // 发送请求到 Dropbox 获取 access_token
-        //   const tokenResponse = await fetch('https://api.dropboxapi.com/oauth2/token', {
-        //     method: 'POST',
-        //     headers: {
-        //       'Content-Type': 'application/x-www-form-urlencoded',
-        //     },
-        //     body: tokenRequestBody,
-        //   });
-
-        //   const tokenData = await tokenResponse.json();
-
-        //   if (tokenData.access_token) {
-        //     console.log('Access Token:', tokenData.access_token);
-        //   } else {
-        //     console.error('Failed to obtain access token:', tokenData);
-        //   }
-        // } catch (error) {
-        //   console.error('Access Token Error:', error);
-        // }
+        setConnectedPlatforms(connected);
+        setUnconnectedPlatforms(unconnected);
+      } catch (error) {
+        console.error(error.message);
       }
     };
 
-    getToken();
-  }, [response]);
+    getUploadPlatformSetup();
+  }, [token]);
 
   return (
     <>
@@ -309,33 +409,19 @@ const HomeScreen = () => {
                     <Text className="text-black font-bold">Back</Text>
                   </TouchableOpacity>
 
-                  <Text className="text-lg font-semibold mb-2 text-center">Available Cloud Platforms:</Text>
+                  {unconnectedPlatforms.length > 0 && (
+                    <View>
+                      <Text className="text-lg font-semibold mb-2 text-center">Available Cloud Platforms:</Text>
+                      {unconnectedPlatforms.map((platform, index) => renderButton(platform, false))}
+                    </View>
+                  )}
 
-                  <TouchableOpacity
-                    className="p-4 bg-[#4285F4] rounded-lg flex-row items-center space-x-2"
-                    onPress={() => googleSignIn()}
-                  >
-                    <Icon name="google-drive" size={24} color="#FFFFFF" />
-                    <Text className="text-white font-bold">Connect to Google Drive</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    className="p-4 bg-[#0061FF] rounded-lg flex-row items-center space-x-2"
-                    onPress={() => promptAsync()}
-                  >
-                    <Icon name="dropbox" size={24} color="#FFFFFF" />
-                    <Text className="text-white font-bold">Connect to Dropbox</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity className="p-4 bg-[#0078D4] rounded-lg flex-row items-center space-x-2">
-                    <Icon name="microsoft-onedrive" size={24} color="#FFFFFF" />
-                    <Text className="text-white font-bold">Connect to OneDrive</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity className="p-4 bg-[#A9A9A9] rounded-lg flex-row items-center space-x-2">
-                    <Icon name="apple" size={24} color="#FFFFFF" />
-                    <Text className="text-white font-bold">Connect to iCloud</Text>
-                  </TouchableOpacity>
+                  {connectedPlatforms.length > 0 && (
+                    <>
+                      <Text className="text-lg font-semibold mb-2 text-center mt-5">Connected Cloud Platforms:</Text>
+                      {connectedPlatforms.map((platform, index) => renderButton(platform, true))}
+                    </>
+                  )}
 
                   <View className="mt-6">
                     <Text className="text-center text-sm text-gray-600">
