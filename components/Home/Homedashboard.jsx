@@ -31,35 +31,28 @@ const Dashboard = ({ setShowStorageOptionScreen }) => {
     {
       id: 'Action number',
       title: '#Accounts',
-      backgroundColor: '#036635',
+      backgroundColor: '#056A47',
       num: accountNumber,
       linkTo: () => dispatch(setSelectedTab('Link')),
     },
     {
       id: 'Executor number',
       title: '#Heirs',
-      backgroundColor: '#045948',
+      backgroundColor: '#036635',
       num: heirNumber,
       linkTo: () => navigation.navigate('Heir Management'),
     },
     {
       id: 'Storage number',
       title: '#Storage',
-      backgroundColor: '#02735E',
+      backgroundColor: '#045948',
       num: storageNumber,
       linkTo: () => setShowStorageOptionScreen(true),
     },
     {
-      id: 'Notes number',
-      title: '#Passwords',
-      backgroundColor: '#056A47',
-      num: noteNumber,
-      linkTo: () => dispatch(setSelectedTab('Key')),
-    },
-    {
       id: 'Will number',
       title: '#Wills',
-      backgroundColor: '#028760',
+      backgroundColor: '#02735E',
       num: willsNumber,
       linkTo: () => dispatch(setSelectedTab('Document')),
     },
@@ -80,7 +73,7 @@ const Dashboard = ({ setShowStorageOptionScreen }) => {
     },
     {
       id: 'Will Trigger Settings',
-      title: 'Will trigger settings',
+      title: 'Will Trigger Settings',
       image: willTriggerSetting,
       action: () => navigation.navigate('Will Trigger Setting'),
     },
@@ -161,7 +154,7 @@ const Dashboard = ({ setShowStorageOptionScreen }) => {
         </View>
         <View>
           <View className="justify-center items-center " style={{ height: 120, backgroundColor: '#036635' }}>
-            <Text className="text-white text-2xl font-bold">Digital will System</Text>
+            <Text className="text-white text-2xl font-bold">Digital Will System</Text>
             <Text className="text-gray-300 text-base font-semibold ">@Beyond Life</Text>
           </View>
         </View>

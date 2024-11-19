@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
 
 // Screens
+import SplashScreen from '../screens/SplashScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ExecutorScreen from '../screens/ExecutorScreen';
@@ -44,6 +45,13 @@ import ViewBackupScreen from '../screens/ViewBackupScreen';
 import HeirManagementScreen from '../screens/HeirManagementScreen';
 
 const Navigation = () => {
+  // const [isSplashVisible, setIsSplashVisible] = React.useState(true);
+
+  // if (isSplashVisible) {
+  //   console.log('Splash screen');
+  //   return <SplashScreen onFinish={() => setIsSplashVisible(false)} />;
+  // }
+
   // Haven't login yet.
   if (useSelector(selectIsLogin) === false) {
     return (

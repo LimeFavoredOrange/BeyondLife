@@ -28,6 +28,7 @@ import { selectToken } from '../redux/slices/auth';
 
 import { DROPBOX_KEY, GOOGLE_IOSCLIENT_ID, GOOGLE_WEB_ID } from '@env';
 import axiosInstance from '../api';
+import Loading from '../components/Loading';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -40,6 +41,8 @@ const HomeScreen = () => {
   const selectedTab = useSelector(selectSelectedTab);
   const token = useSelector(selectToken);
   const navigation = useNavigation();
+
+  const [showLoading, setShowLoading] = useState(false);
 
   const [showStorageOptionScreen, setShowStorageOptionScreen] = React.useState(true);
   const [showCloudPlatforms, setShowCloudPlatforms] = React.useState(false);
@@ -81,6 +84,7 @@ const HomeScreen = () => {
 
   const googleSignIn = async () => {
     try {
+      setShowLoading(true);
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
       const serverAuthCode = userInfo.data.serverAuthCode;
@@ -102,7 +106,11 @@ const HomeScreen = () => {
       const connected = [...connectedPlatforms];
       connected.push('googleDrive');
       setConnectedPlatforms(connected);
-    } catch (error) {}
+      setShowLoading(false);
+    } catch (error) {
+      console.log(error);
+      setShowLoading(false);
+    }
   };
 
   const [request, response, promptAsync] = useAuthRequest(
@@ -144,14 +152,17 @@ const HomeScreen = () => {
       const connected = [...connectedPlatforms];
       connected.push('dropbox');
       setConnectedPlatforms(connected);
+      setShowLoading(false);
     } catch (error) {
       console.log(error.message);
+      setShowLoading(false);
     }
   };
 
   // Handle Authorization Response
   useEffect(() => {
     if (response?.type === 'success') {
+      setShowLoading(true);
       const { code } = response.params;
       const codeVerifier = request?.codeVerifier;
       console.log('Authorization Code:', response?.params?.code);
@@ -439,6 +450,7 @@ const HomeScreen = () => {
       {showNotification && (
         <NotificationOverlay notifications={notifications} onClose={() => setShowNotification(false)} />
       )}
+      <Loading show={showLoading} />
     </>
   );
 };

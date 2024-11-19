@@ -25,17 +25,20 @@ import * as Sharing from 'expo-sharing';
 import { formatPolicy } from '../../utils/policyFormator';
 
 const storageOptionDescription = {
-  'Will Server Only': 'Data will be kept on the Will server only, which is a secure server that hosting by us.',
-  'Private Server Only':
-    "Data will be split across your configured storage locations, if you haven't set them up, they will be stored on our server (save as above)",
-  'X Server Only': 'Data will be kept on the X server only. We are not going to keep any data on our server.',
-  Both: 'Data will be kept on both servers.',
-  'None (Delete All)': 'Delete all data.',
+  beyondLifeServer:
+    'Data will be securely stored on the BeyondLife server, which is managed and maintained by our trusted infrastructure.',
+  personalCloudServer:
+    'Data will be distributed across your configured personal cloud storage locations. If no configuration is provided, the data will default to being stored on the BeyondLife server.',
+  xServer:
+    'Data will remain intact and exclusively stored on the X server, with no alterations or backups retained on the BeyondLife server.',
+  personalAndXServers:
+    'Data will be redundantly stored on both your personal cloud server and the X server, providing enhanced availability and reliability.',
+  deleteAll: 'All data will be permanently deleted from our systems and associated servers. (Including the X server)',
 };
 
 const TwitterConfigureWill = () => {
   const [showLoading, setShowLoading] = useState(false);
-  const [storageOption, setStorageOption] = useState('Will Server Only');
+  const [storageOption, setStorageOption] = useState('beyondLifeServer');
   // const [offensiveTweets, setOffensiveTweets] = useState('Will Server Only');
   // const [tweetsWithImages, setTweetsWithImages] = useState('Will Server Only');
   // const [deleteBeforeDate, setDeleteBeforeDate] = useState(new Date());
@@ -94,9 +97,9 @@ const TwitterConfigureWill = () => {
   const [inputedPolicy, setInputedPolicy] = useState('');
 
   const [tweetsList, setTweetsList] = useState([
-    { id: 1, text: 'First tweet', attributes: [], policy: '' },
-    { id: 2, text: 'Second tweet', attributes: [], policy: '' },
-    { id: 3, text: 'Third tweet', attributes: [], policy: '' },
+    { id: 1, text: 'First tweet, welcome to Sydney', attributes: [], policy: '' },
+    { id: 2, text: 'Second tweet, ', attributes: [], policy: '' },
+    { id: 3, text: 'Third tweet, ', attributes: [], policy: '' },
   ]);
 
   const hideModal = () => {
@@ -276,13 +279,13 @@ const TwitterConfigureWill = () => {
           {/* Step 1 */}
           {currentStep === 1 && (
             <View>
-              <Text className="text-xl font-semibold mt-8 mx-3">🌍 Step 1: Pick Your Tweets’ Forever Home</Text>
+              <Text className="text-xl font-semibold mt-8 mx-3">🌍 Step 1: Pick Your Tweets' Forever Home</Text>
               <Picker selectedValue={storageOption} onValueChange={(itemValue) => setStorageOption(itemValue)}>
-                <Picker.Item label="Will Server Only" value="Will Server Only" />
-                <Picker.Item label="Private Server Only" value="Private Server Only" />
-                <Picker.Item label="X Server Only" value="X Server Only" />
-                <Picker.Item label="Both" value="Both" />
-                <Picker.Item label="None (Delete All)" value="None (Delete All)" />
+                <Picker.Item label="BeyondLife Server" value="beyondLifeServer" />
+                <Picker.Item label="Personal Cloud Server" value="personalCloudServer" />
+                <Picker.Item label="X Server" value="xServer" />
+                <Picker.Item label="Personal and X Servers" value="personalAndXServers" />
+                <Picker.Item label="None (Delete All)" value="deleteAll" />
               </Picker>
               <View className="flex-row items-center ml-6 pr-3">
                 <Icon name="info-circle" size={20} color="#036635" />
@@ -449,18 +452,29 @@ const TwitterConfigureWill = () => {
                     animation="fadeInDown"
                     duration={800}
                     onAnimationEnd={() => !showDatePicker && setShowDatePicker(false)}
-                    style={{
-                      margin: 10,
-                      padding: 10,
-                      borderWidth: 1,
-                      borderColor: '#036635',
-                      borderRadius: 10,
-                      alignItems: 'center',
-                      gap: 5,
-                    }}
                   >
-                    <Text className="text-lg font-semibold ">Delete all tweets before the the date:</Text>
-                    <DateTimePicker value={deleteBeforeDate} mode={'date'} is24Hour={true} onChange={onDateChange} />
+                    <View
+                      style={{
+                        margin: 10,
+                        padding: 10,
+                        borderWidth: 1,
+                        borderColor: '#036635',
+                        borderRadius: 10,
+                        alignItems: 'center',
+                        gap: 5,
+                      }}
+                    >
+                      <Text className="text-lg font-semibold ">Delete all tweets before the the date:</Text>
+                      <DateTimePicker value={deleteBeforeDate} mode={'date'} is24Hour={true} onChange={onDateChange} />
+                    </View>
+
+                    <View className="flex-row items-center ml-6 pr-3">
+                      <Icon name="info-circle" size={20} color="#036635" />
+                      <HelperText type="info" className="text-base ml-2 font-bold">
+                        This will delete all tweets before the selected date. Be careful, this action is irreversible!
+                        If you are not sure about what will be deleted, please disable it and use the later options.
+                      </HelperText>
+                    </View>
                   </Animatable.View>
                 )}
               </View>
