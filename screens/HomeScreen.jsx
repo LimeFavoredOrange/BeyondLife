@@ -1,7 +1,7 @@
 import { StyleSheet, SafeAreaView, Text, View, TouchableOpacity, Dimensions } from 'react-native';
 import React, { useRef, useState, useEffect } from 'react';
 import Tabs from '../components/Tabs/Tabs';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectSelectedTab } from '../redux/slices/homeSlice';
 import { useNavigation } from '@react-navigation/native';
 import * as DocumentPicker from 'expo-document-picker';
