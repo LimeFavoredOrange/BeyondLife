@@ -8,6 +8,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import * as Animatable from 'react-native-animatable';
 import { useNavigation } from '@react-navigation/native';
+import Modal from 'react-native-modal';
 
 import axiosInstance from '../api';
 
@@ -22,6 +23,14 @@ const WillTriggerSettingScreen = () => {
   const [days, setDays] = useState(0);
   const [hours, setHours] = useState(10);
   const [numberOfHeirs, setNumberOfHeirs] = useState(0);
+
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState('');
+
+  const toggleModal = (content) => {
+    setModalContent(content);
+    setModalVisible(!isModalVisible);
+  };
 
   const handleThresholdChange = (value) => {
     const num = Math.min(numberOfHeirs, Math.max(0, parseInt(value) || 0));
@@ -114,7 +123,18 @@ const WillTriggerSettingScreen = () => {
       <AccountHeader setShowLoading={setShowLoading} title={'Trigger Condition Setting'} />
 
       <View style={{ padding: 20 }}>
-        <Text style={styles.title}>Set the threshold for will activation:</Text>
+        <View className="flex-row items-center mb-2">
+          <TouchableOpacity>
+            <Icon
+              name="information-outline"
+              size={25}
+              color="#4CAF50"
+              onPress={() => toggleModal('Threshold is the minimum number of heirs required to activate the will.')}
+            />
+          </TouchableOpacity>
+          <Text className="ml-1 text-lg leading-[25px] font-semibold">Set the threshold for will activation:</Text>
+        </View>
+
         <TextInput
           style={styles.input}
           keyboardType="number-pad"
@@ -158,7 +178,18 @@ const WillTriggerSettingScreen = () => {
         </Text>
 
         <View style={styles.switchContainer}>
-          <Text style={styles.title}>Enable Freezing Period</Text>
+          <View className="flex flex-row gap-1 items-center">
+            <TouchableOpacity>
+              <Icon
+                name="information-outline"
+                size={25}
+                color="#4CAF50"
+                onPress={() => toggleModal('Threshold is the minimum number of heirs required to activate the will.')}
+              />
+            </TouchableOpacity>
+            <Text style={styles.title}>Enable Freezing Period</Text>
+          </View>
+
           <Switch
             value={freezingEnabled}
             onValueChange={() => setFreezingEnabled(!freezingEnabled)}
@@ -261,6 +292,16 @@ const WillTriggerSettingScreen = () => {
           <Text style={{ color: 'white', fontWeight: 'bold' }}>Save</Text>
         </View>
       </TouchableOpacity>
+
+      {/* Modal for Information */}
+      <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)}>
+        <View className="bg-white p-5 rounded-lg items-center">
+          <Text className="text-base text-center mb-5 text-left">{modalContent}</Text>
+          <TouchableOpacity onPress={() => setModalVisible(false)} className="bg-green-500 px-4 py-2 rounded-lg">
+            <Text className="text-white font-bold">Close</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -270,7 +311,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 10,
   },
   input: {
     borderColor: '#ccc',
@@ -295,6 +335,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 20,
   },
   inputContainer: {
