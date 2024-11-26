@@ -6,7 +6,7 @@ import { BACKEND_URL } from '@env';
 console.log(BACKEND_URL);
 const axiosInstance = axios.create({
   baseURL: BACKEND_URL,
-  timeout: 10000,
+  timeout: 100000,
   headers: {
     'Content-Type': 'application/json',
   },

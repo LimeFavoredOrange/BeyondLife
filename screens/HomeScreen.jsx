@@ -61,12 +61,31 @@ const HomeScreen = () => {
     },
   };
 
-  const notifications = [
-    'Your account has been successfully linked to Twitter',
-    'Your account has been successfully linked to Google Drive',
-    'Your account has been successfully linked to Gmail',
-    'Your account has been successfully linked to Facebook',
-  ];
+  const [notifications, setNotifications] = React.useState([]);
+
+  React.useEffect(() => {
+    const getNotifications = async () => {
+      try {
+        if (!token) {
+          return; // Exit early if token is not set
+        }
+
+        const response = await axiosInstance.get('notifications/notifications', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const notifications = response.data;
+        console.log(notifications);
+        setNotifications(notifications);
+      } catch (error) {
+        console.error(error.message);
+      }
+    };
+
+    getNotifications();
+  }, [token]); // Depend on token to re-run when it's available
 
   const configureGoogleSignIn = () => {
     GoogleSignin.configure({
@@ -300,7 +319,10 @@ const HomeScreen = () => {
       <SafeAreaView className="bg-white w-screen h-screen">
         {selectedTab === 'Home' && (
           <>
-            <HomeHeader setShowNotification={setShowNotification} />
+            <HomeHeader
+              setShowNotification={setShowNotification}
+              notificationCount={notifications.filter((item) => item.read_status == 0).length}
+            />
             <HomeDashboard setShowStorageOptionScreen={setShowStorageOptionScreen} />
           </>
         )}

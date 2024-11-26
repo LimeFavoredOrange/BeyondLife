@@ -31,6 +31,8 @@ const storageOptionDescription = {
     'Data will be distributed across your configured personal cloud storage locations. If no configuration is provided, the data will default to being stored on the BeyondLife server.',
   xServer:
     'Data will remain intact and exclusively stored on the X server, with no alterations or backups retained on the BeyondLife server.',
+  beyondLifeAndPersonalServers:
+    'Data will be redundantly stored on both the BeyondLife server and your personal cloud server, providing enhanced availability and reliability.',
   beyondLifeAndXServer:
     'Data will be stored on both the BeyondLife server and the X server. This setup combines the security of BeyondLife infrastructure with the accessibility of the X platform.',
   personalAndXServers:
@@ -291,6 +293,7 @@ const TwitterConfigureWill = () => {
                 <Picker.Item label="BeyondLife Server" value="beyondLifeServer" />
                 <Picker.Item label="Personal Cloud Server" value="personalCloudServer" />
                 <Picker.Item label="X Server" value="xServer" />
+                <Picker.Item label="BeyondLife and Personal Servers" value="beyondLifeAndPersonalServers" />
                 <Picker.Item label="BeyondLife and X Servers" value="beyondLifeAndXServer" />
                 <Picker.Item label="Personal and X Servers" value="personalAndXServers" />
                 <Picker.Item label="None (Delete All)" value="deleteAll" />
