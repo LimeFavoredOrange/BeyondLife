@@ -22,6 +22,8 @@ import axiosInstance from '../../api';
 
 import { getFromSecureStore } from '../../utils/storage';
 
+import { generateKeyPairFromPassword } from '../../utils/pki';
+
 const Login = ({
   setAnimating,
   setCurrentMode,
@@ -59,6 +61,10 @@ const Login = ({
       } = response.data;
 
       // Sand an api call to update the notification token
+
+      // const { publicKey, privateKey } = await generateKeyPairFromPassword(password);
+      // console.log('publicKey', publicKey);
+      // console.log('privateKey', privateKey);
 
       console.log(response.data);
       dispatch(setAccountNumber(account_number));

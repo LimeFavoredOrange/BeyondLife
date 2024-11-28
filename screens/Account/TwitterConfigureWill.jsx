@@ -23,6 +23,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as Sharing from 'expo-sharing';
 
 import { formatPolicy } from '../../utils/policyFormator';
+import { set } from 'ramda';
 
 const storageOptionDescription = {
   beyondLifeServer:
@@ -48,7 +49,7 @@ const TwitterConfigureWill = () => {
   // const [deleteBeforeDate, setDeleteBeforeDate] = useState(new Date());
   const [offensiveTweets, setOffensiveTweets] = useState('Disable');
   const [tweetsWithImages, setTweetsWithImages] = useState('Disable');
-  const [deleteBeforeDate, setDeleteBeforeDate] = useState(new Date());
+  const [deleteBeforeDate, setDeleteBeforeDate] = useState('Disable');
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [progressStatus, setProgressStatus] = useState(0.16);
@@ -198,9 +199,12 @@ const TwitterConfigureWill = () => {
         tweetsWithImages,
         deleteBeforeDate,
         keywordsList,
+        attributesList,
         policyMatch,
         tweetsListWithoutText,
       };
+
+      console.log('Request Data:', requestData);
 
       try {
         setShowLoading(true);
@@ -426,7 +430,6 @@ const TwitterConfigureWill = () => {
               </Text>
               <View>
                 <View
-                  onPress={() => setShowDatePicker(true)}
                   style={{
                     margin: 10,
                     padding: 10,
@@ -440,7 +443,10 @@ const TwitterConfigureWill = () => {
                       style={{
                         backgroundColor: `${showDatePicker === true ? '#036635' : '#ccc'}`,
                       }}
-                      onPress={() => setShowDatePicker(true)}
+                      onPress={() => {
+                        setDeleteBeforeDate(new Date());
+                        setShowDatePicker(true);
+                      }}
                       className="flex-1 h-8 bg-gray-400 rounded-lg justify-center items-center font-bold"
                     >
                       <Text className="text-white font-bold">Enable</Text>
@@ -450,7 +456,10 @@ const TwitterConfigureWill = () => {
                       style={{
                         backgroundColor: `${showDatePicker === false ? '#036635' : '#ccc'}`,
                       }}
-                      onPress={() => setShowDatePicker(false)}
+                      onPress={() => {
+                        setShowDatePicker(false);
+                        setDeleteBeforeDate('Disable');
+                      }}
                       className="flex-1 h-8 rounded-lg justify-center items-center"
                     >
                       <Text className="text-white font-bold">Disable</Text>
