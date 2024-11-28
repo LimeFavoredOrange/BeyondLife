@@ -62,9 +62,9 @@ const Login = ({
 
       // Sand an api call to update the notification token
 
-      // const { publicKey, privateKey } = await generateKeyPairFromPassword(password);
-      // console.log('publicKey', publicKey);
-      // console.log('privateKey', privateKey);
+      const { publicKey, privateKey } = await generateKeyPairFromPassword(password);
+      console.log('publicKey', publicKey);
+      console.log('privateKey', privateKey);
 
       console.log(response.data);
       dispatch(setAccountNumber(account_number));

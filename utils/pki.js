@@ -1,52 +1,74 @@
-import crypto from 'react-native-crypto';
-import { encode as base64Encode, decode as base64Decode } from 'base64-arraybuffer';
+import crypto from 'react-native-quick-crypto';
 import { Buffer } from 'buffer';
 
 global.Buffer = Buffer;
 
-// 派生密钥
-async function deriveKeyFromPassword(password) {
+// 使用密码派生种子
+async function deriveSeed(password) {
+  const salt = Buffer.from('fixed_salt_value'); // 固定盐值
+  const iterations = 100000; // 推荐至少 100,000 次迭代
+  const keyLength = 32;
+
   return new Promise((resolve, reject) => {
-    crypto.pbkdf2(password, 'some_fixed_salt', 100000, 32, 'sha256', (err, derivedKey) => {
+    crypto.pbkdf2(password, salt, iterations, keyLength, 'sha256', (err, derivedKey) => {
       if (err) reject(err);
-      else resolve(derivedKey);
+      else resolve(Buffer.from(derivedKey));
     });
   });
 }
 
-// 基于密码生成公私钥对
+// 去掉 PEM 格式中的头尾标识和换行符
+function extractKeyContent(pem) {
+  return pem
+    .replace(/-----BEGIN [^-]+-----/g, '') // 去掉头部标识
+    .replace(/-----END [^-]+-----/g, '') // 去掉尾部标识
+    .replace(/\n/g, ''); // 去掉换行符
+}
+
+// 基于密码生成密钥对
 export async function generateKeyPairFromPassword(password) {
-  const seed = await deriveKeyFromPassword(password);
+  const seed = await deriveSeed(password);
 
-  // 使用种子生成密钥对
-  const keyPair = crypto.createECDH('prime256v1');
-  keyPair.setPrivateKey(seed);
+  console.log('Derived Seed:', seed.toString('hex'));
 
-  const publicKey = keyPair.getPublicKey();
-  const privateKey = keyPair.getPrivateKey();
-
-  return { publicKey, privateKey };
+  return new Promise((resolve, reject) => {
+    crypto.generateKeyPair(
+      'ec', // 使用椭圆曲线算法
+      {
+        namedCurve: 'prime256v1',
+        publicKeyEncoding: { type: 'spki', format: 'pem' },
+        privateKeyEncoding: {
+          type: 'pkcs8',
+          format: 'pem',
+          cipher: 'aes-256-cbc',
+          passphrase: seed.toString('hex'),
+        },
+      },
+      (err, publicKey, privateKey) => {
+        if (err) {
+          console.error('Error generating key pair:', err);
+          reject(err);
+        } else {
+          console.log('Key pair generated successfully!');
+          // 提取纯内容
+          const publicKeyContent = extractKeyContent(publicKey);
+          const privateKeyContent = extractKeyContent(privateKey);
+          resolve({ publicKey: publicKeyContent, privateKey: privateKeyContent });
+        }
+      }
+    );
+  });
 }
 
-// 解密数据
-export async function decryptData(privateKey, encryptedData) {
-  const { ephemeralPublicKey, ciphertext, iv, tag } = encryptedData;
+// 示例调用
+(async () => {
+  const password = 'secure_password';
 
-  // 导入后端返回的临时公钥
-  const ecdh = crypto.createECDH('prime256v1');
-  ecdh.setPrivateKey(privateKey);
-
-  // 计算共享密钥
-  const sharedSecret = ecdh.computeSecret(base64Decode(ephemeralPublicKey));
-
-  // 派生 AES 密钥
-  const aesKey = crypto.createHash('sha256').update(sharedSecret).digest();
-
-  // 使用 AES-GCM 解密
-  const decipher = crypto.createDecipheriv('aes-256-gcm', aesKey, base64Decode(iv));
-  decipher.setAuthTag(base64Decode(tag));
-
-  const plaintext = decipher.update(base64Decode(ciphertext), 'binary', 'utf8') + decipher.final('utf8');
-
-  return plaintext;
-}
+  try {
+    const { publicKey, privateKey } = await generateKeyPairFromPassword(password);
+    console.log('Public Key Content:', publicKey); // 纯内容
+    console.log('Private Key Content:', privateKey); // 纯内容
+  } catch (err) {
+    console.error('Error:', err);
+  }
+})();
