@@ -8,6 +8,8 @@ import showToast from '../../utils/showToast';
 
 import axiosInstance from '../../api';
 
+import { generateKeyPairFromPassword } from '../../utils/pki';
+
 const Register = ({ setAnimating, setCurrentMode, setCurrentHeight, loginAnimation, loginHeight, setShowLoading }) => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -25,15 +27,19 @@ const Register = ({ setAnimating, setCurrentMode, setCurrentHeight, loginAnimati
     if (password === confirmPassword) {
       setShowLoading(true);
       try {
+        // Generate the key pair from the email and password
+        const { publicKey, privateKey } = await generateKeyPairFromPassword(email, password);
+
         await axiosInstance.post('auth/register', {
           email,
           password,
+          publicKey,
         });
 
-        setShowLoading(false);
         setAnimating(loginAnimation);
         setCurrentHeight(loginHeight);
         setCurrentMode('Login');
+        setShowLoading(false);
 
         // Notify the user that the registration is successful
         showToast('Registration successful ✅', 'success');
