@@ -16,6 +16,7 @@ import storageConfiguration from '../../assets/storage.png';
 import heirConfiguration from '../../assets/heir.png';
 import willTriggerSetting from '../../assets/willTriggerSetting.png';
 import willActivation from '../../assets/willActivation.png';
+import accessWillData from '../../assets/accessWillData.png';
 
 // Dashboard screen component
 const Dashboard = ({ setShowStorageOptionScreen }) => {
@@ -81,7 +82,13 @@ const Dashboard = ({ setShowStorageOptionScreen }) => {
       id: 'Will Trigger Activation',
       title: 'Will Trigger Activation',
       image: willActivation,
-      action: () => navigation.navigate('Will Trigger Setting'),
+      action: () => navigation.navigate('Will Trigger Activation'),
+    },
+    {
+      id: 'Access Will Data',
+      title: 'Access Will Data',
+      image: accessWillData,
+      action: () => navigation.navigate('Access Will Data'),
     },
   ];
 

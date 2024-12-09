@@ -38,6 +38,8 @@ import GmailScreenHome from '../screens/Account/Gmail/GmailScreenHome';
 import GmailConfigureWill from '../screens/Account/Gmail/GmailConfigureWill';
 
 import WillTriggerSettingScreen from '../screens/WillTriggerSettingScreen';
+import WillTriggerActivationScreen from '../screens/WillTriggerActivationScreen';
+import AccessWillDataScreen from '../screens/AccessWillDataScreen';
 
 import ViewBackupScreen from '../screens/ViewBackupScreen';
 
@@ -101,6 +103,12 @@ const Navigation = () => {
 
       <Stack.Screen name="Heir Management" component={HeirManagementScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Will Trigger Setting" component={WillTriggerSettingScreen} options={{ headerShown: false }} />
+      <Stack.Screen
+        name="Will Trigger Activation"
+        component={WillTriggerActivationScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name="Access Will Data" component={AccessWillDataScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 };
