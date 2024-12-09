@@ -73,11 +73,11 @@ export async function decryptData(backendData, privateKeyHex) {
   // 计算共享密钥 (sharedSecret)
   const sharedSecret = privateKey.derive(serverPublicKey.getPublic()).toString('hex');
 
-  console.log('Shared Secret:', sharedSecret);
+  // console.log('Shared Secret:', sharedSecret);
 
   // 使用 HKDF 派生对称密钥
   const derivedKey = hkdf(sharedSecret, 32, null, 'handshake data'); // 与后端一致的 info 字段
-  console.log('Derived Key:', derivedKey.toString('hex'));
+  // console.log('Derived Key:', derivedKey.toString('hex'));
 
   // 解密密文
   const ciphertext = Buffer.from(backendData.ciphertext, 'hex');
@@ -87,7 +87,7 @@ export async function decryptData(backendData, privateKeyHex) {
   let decrypted = decipher.update(ciphertext);
   decrypted = Buffer.concat([decrypted, decipher.final()]);
 
-  console.log('Decrypted Message:', decrypted.toString('utf-8'));
+  // console.log('Decrypted Message:', decrypted.toString('utf-8'));
 
   return decrypted.toString('utf-8');
 }

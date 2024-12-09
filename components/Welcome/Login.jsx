@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setIsLogin, setToken, selectNotificationToken } from '../../redux/slices/auth';
 import {
   setAccountNumber,
+  setContractAddress,
+  setName,
   setHeirNumber,
   setNoteNumber,
   setWillsNumber,
@@ -45,7 +47,7 @@ export async function savePrivateKeyToSecureStore(key, value) {
   }
 }
 
-async function getPrivateKeyFromSecureStore(key) {
+export async function getPrivateKeyFromSecureStore(key) {
   try {
     const privateKey = await SecureStore.getItemAsync(key);
     if (privateKey) {
@@ -86,6 +88,8 @@ const Login = ({
       });
       const {
         account_number,
+        contract_address,
+        name,
         heir_number,
         note_number,
         wills_number,
@@ -100,10 +104,13 @@ const Login = ({
       // Sand an api call to update the notification token
 
       // const { publicKey, privateKey } = await generateKeyPairFromPassword(email, password);
-      // const { publicKey, privateKey } = await generateECCKeyPair(email, password);
+      const { publicKey, privateKey } = await generateECCKeyPair(email, password);
 
-      // console.log('publicKey\n', publicKey);
-      // console.log('privateKey\n', privateKey);
+      console.log('publicKey\n', publicKey);
+      console.log('privateKey\n', privateKey);
+
+      // 保存到 SecureStore
+      await savePrivateKeyToSecureStore('private_key', privateKey);
 
       // const dummyData = [
       //   {
@@ -132,11 +139,11 @@ const Login = ({
       //   const check = await decryptData(dummyData[i], privateKey);
       //   console.log('check', check, '\n\n');
       // }
-      // // 保存到 SecureStore
-      // await savePrivateKeyToSecureStore('private_key', privateKey);
 
       console.log(response.data);
       dispatch(setAccountNumber(account_number));
+      dispatch(setContractAddress(contract_address));
+      dispatch(setName(name));
       dispatch(setHeirNumber(heir_number));
       dispatch(setNoteNumber(note_number));
       dispatch(setWillsNumber(wills_number));

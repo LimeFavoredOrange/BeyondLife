@@ -14,6 +14,8 @@ const initialState = {
   greeting: greeting,
   selectedTab: 'Home',
   account_number: 0,
+  contract_address: '',
+  name: '',
   heir_number: 0,
   note_number: 0,
   wills_number: 0,
@@ -37,6 +39,12 @@ export const navSlice = createSlice({
     },
     setAccountNumber: (state, action) => {
       state.account_number = action.payload;
+    },
+    setContractAddress: (state, action) => {
+      state.contract_address = action.payload;
+    },
+    setName: (state, action) => {
+      state.name = action.payload;
     },
     setHeirNumber: (state, action) => {
       state.heir_number = action.payload;
@@ -72,6 +80,8 @@ export const {
   setGreeting,
   setSelectedTab,
   setAccountNumber,
+  setContractAddress,
+  setName,
   setHeirNumber,
   setNoteNumber,
   setWillsNumber,
@@ -86,6 +96,8 @@ export const {
 export const selectGreeting = (state) => state.home.greeting;
 export const selectSelectedTab = (state) => state.home.selectedTab;
 export const selectAccountNumber = (state) => state.home.account_number;
+export const selectContractAddress = (state) => state.home.contract_address;
+export const selectName = (state) => state.home.name;
 export const selectHeirNumber = (state) => state.home.heir_number;
 export const selectNoteNumber = (state) => state.home.note_number;
 export const selectWillsNumber = (state) => state.home.wills_number;

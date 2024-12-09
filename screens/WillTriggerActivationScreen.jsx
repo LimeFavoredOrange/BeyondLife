@@ -1,59 +1,44 @@
 import { SafeAreaView, View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AccountHeader from '../components/Account/AutomaticWillHeader';
 import Loading from '../components/Loading';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import * as Animatable from 'react-native-animatable';
 import Modal from 'react-native-modal';
+import { selectToken } from '../redux/slices/auth';
+import { useSelector } from 'react-redux';
 
-const dummyWills = [
-  {
-    id: '1',
-    title: "John Doe's Digital Will #1",
-    ownerName: 'John Doe',
-    createdAt: '2024-01-01',
-    status: 'not_started',
-    totalInheritors: 5,
-    votedCount: 0,
-    freezeTimeLeft: null,
-  },
-  {
-    id: '2',
-    title: "Alice Smith's Digital Will #2",
-    ownerName: 'Alice Smith',
-    createdAt: '2024-02-10',
-    status: 'voting',
-    totalInheritors: 4,
-    votedCount: 3,
-    freezeTimeLeft: null,
-  },
-  {
-    id: '3',
-    title: "Michael Brown's Digital Will #3",
-    ownerName: 'Michael Brown',
-    createdAt: '2024-03-15',
-    status: 'freezing',
-    totalInheritors: 6,
-    votedCount: 6,
-    freezeTimeLeft: '10 hours',
-  },
-  {
-    id: '4',
-    title: "Sarah Johnson's Digital Will #4",
-    ownerName: 'Sarah Johnson',
-    createdAt: '2024-04-20',
-    status: 'activated',
-    totalInheritors: 3,
-    votedCount: 3,
-    freezeTimeLeft: null,
-  },
-];
+import axiosInstance from '../api';
 
 const WillTriggerActivationScreen = () => {
   const [showLoading, setShowLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedWill, setSelectedWill] = useState(null);
+  const [trigger, setTrigger] = useState(false);
+  const [wills, setWills] = useState([]);
+  const token = useSelector(selectToken);
+
+  useEffect(() => {
+    const fetchWills = async () => {
+      setShowLoading(true);
+      try {
+        const response = await axiosInstance.get('/twitter/willList', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log('Live Data:', response.data);
+        setWills(response.data.wills || []);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setShowLoading(false);
+      }
+    };
+
+    fetchWills();
+  }, [token, trigger]);
 
   const openWillDetails = (will) => {
     setSelectedWill(will);
@@ -61,15 +46,19 @@ const WillTriggerActivationScreen = () => {
   };
 
   const renderStatusInfo = (status, will) => {
+    const totalInheritors = will.heirs ? will.heirs.length : 0;
+    const votedCount = will.voteCount || 0;
+    const remainingFreezingTime = will.remainingFreezingTime || 0;
+
     switch (status) {
-      case 'not_started':
+      case 'Pending Activation':
         return (
           <View>
             <Text className="text-sm text-gray-700">Status: Pending Activation</Text>
-            <Text className="text-xs text-gray-500">Total Inheritors: {will.totalInheritors}</Text>
+            <Text className="text-xs text-gray-500">Total Inheritors: {totalInheritors}</Text>
           </View>
         );
-      case 'voting':
+      case 'Voting in Progress':
         return (
           <View>
             <Text className="text-sm text-gray-700 mb-1">Status: Voting in Progress</Text>
@@ -77,13 +66,13 @@ const WillTriggerActivationScreen = () => {
               <AnimatedCircularProgress
                 size={50}
                 width={5}
-                fill={(will.votedCount / will.totalInheritors) * 100}
+                fill={totalInheritors > 0 ? (votedCount / totalInheritors) * 100 : 0}
                 tintColor="#036635"
                 backgroundColor="#e5e7eb"
               >
                 {() => (
                   <Text className="text-xs text-gray-700">
-                    {will.votedCount}/{will.totalInheritors}
+                    {votedCount}/{totalInheritors}
                   </Text>
                 )}
               </AnimatedCircularProgress>
@@ -91,17 +80,19 @@ const WillTriggerActivationScreen = () => {
             </View>
           </View>
         );
-      case 'freezing':
+      case 'Activated - In Freezing Period':
         return (
           <View>
             <Text className="text-sm text-gray-700">Status: Activated - In Freezing Period</Text>
-            <Text className="text-xs text-gray-500">Remaining Freezing Time: {will.freezeTimeLeft}</Text>
+            <Text className="text-xs text-gray-500">
+              Remaining Freezing Time: {remainingFreezingTime > 0 ? `${remainingFreezingTime} s` : 'N/A'}
+            </Text>
           </View>
         );
-      case 'activated':
+      case 'Activated - Ready to View':
         return (
           <View>
-            <Text className="text-sm text-green-600">Status: Activated - Ready to Claim</Text>
+            <Text className="text-sm text-green-600">Status: Activated - Ready to View</Text>
           </View>
         );
       default:
@@ -109,12 +100,30 @@ const WillTriggerActivationScreen = () => {
     }
   };
 
-  const triggerActivation = (will) => {
-    alert(`Activating Will: ${will.title}`);
+  const triggerActivation = async (will) => {
+    try {
+      await axiosInstance.post(
+        '/twitter/voteToTrigger',
+        { will_address: will.address },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setTrigger((prev) => !prev);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleVote = (will) => {
-    alert(`Voting for Will: ${will.title}`);
+  const handleVote = async (will, hasVoted) => {
+    if (hasVoted) {
+      await axiosInstance.post(
+        '/twitter/withdrawVote',
+        { will_address: will.address },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setTrigger((prev) => !prev);
+    } else {
+      triggerActivation(will);
+    }
   };
 
   return (
@@ -122,62 +131,82 @@ const WillTriggerActivationScreen = () => {
       <Loading showLoading={showLoading} />
       <AccountHeader setShowLoading={setShowLoading} title={'Will Trigger Activation'} />
       <ScrollView className="p-4">
-        {dummyWills.map((will, index) => (
-          <Animatable.View
-            key={will.id || index}
-            animation="fadeInUp"
-            duration={700}
-            delay={index * 100}
-            className="bg-white rounded-xl shadow-md p-4 mb-4 border border-gray-200"
-          >
-            <View className="flex-row items-center mb-3">
-              <View className="mr-3">
-                <Icon name="account-circle" size={40} color="#036635" />
-              </View>
-              <View>
-                <Text className="text-lg font-semibold">{will.title}</Text>
-                <Text className="text-sm text-gray-500">Owner: {will.ownerName}</Text>
-                <Text className="text-xs text-gray-400">Created At: {will.createdAt}</Text>
-              </View>
-            </View>
+        {wills.map((will, index) => {
+          const totalInheritors = will.heirs ? will.heirs.length : 0;
+          const freezeTimeLeft = will.remainingFreezingTime > 0 ? `${will.remainingFreezingTime} s` : null;
+          const title = `${will.ownerName}'s Digital Will`;
 
-            <View className="mb-4">{renderStatusInfo(will.status, will)}</View>
-
-            <View className="flex-row justify-between items-center">
-              <TouchableOpacity onPress={() => openWillDetails(will)}>
-                <Icon name="information-outline" size={24} color="#374151" />
+          let actionButton = null;
+          if (will.status === 'Pending Activation') {
+            actionButton = (
+              <TouchableOpacity className="bg-green-500 px-4 py-2 rounded-full" onPress={() => triggerActivation(will)}>
+                <Text className="text-white text-sm">Activate</Text>
               </TouchableOpacity>
-              <View className="flex-row space-x-2">
-                {will.status === 'not_started' && (
-                  <TouchableOpacity
-                    className="bg-green-500 px-4 py-2 rounded-full"
-                    onPress={() => triggerActivation(will)}
-                  >
-                    <Text className="text-white text-sm">Activate</Text>
-                  </TouchableOpacity>
-                )}
-                {will.status === 'voting' && (
-                  <TouchableOpacity className="bg-blue-500 px-4 py-2 rounded-full" onPress={() => handleVote(will)}>
-                    <Text className="text-white text-sm">Vote</Text>
-                  </TouchableOpacity>
-                )}
-                {will.status === 'freezing' && (
-                  <TouchableOpacity className="border border-red-300 px-4 py-2 rounded-full" disabled>
-                    <Text className="text-red-600 text-sm">Freezing</Text>
-                  </TouchableOpacity>
-                )}
-                {will.status === 'activated' && (
-                  <TouchableOpacity
-                    className="border border-gray-300 px-4 py-2 rounded-full"
-                    onPress={() => alert('View Activation Details')}
-                  >
-                    <Text className="text-gray-700 text-sm">View</Text>
-                  </TouchableOpacity>
-                )}
+            );
+          } else if (will.status === 'Voting in Progress') {
+            actionButton = (
+              <TouchableOpacity
+                className={`${will.hasVoted ? 'bg-red-500' : 'bg-blue-500'} px-4 py-2 rounded-full`}
+                onPress={() => handleVote(will, will.hasVoted)}
+              >
+                <Text className="text-white text-sm">{will.hasVoted ? 'Withdraw' : 'Vote'}</Text>
+              </TouchableOpacity>
+            );
+          } else if (will.status === 'Activated - In Freezing Period') {
+            actionButton = (
+              <TouchableOpacity className="border border-red-300 px-4 py-2 rounded-full" disabled>
+                <Text className="text-red-600 text-sm">Freezing</Text>
+              </TouchableOpacity>
+            );
+          } else if (will.status === 'Activated - Ready to View') {
+            actionButton = (
+              <TouchableOpacity
+                className="border border-gray-300 px-4 py-2 rounded-full"
+                onPress={() => alert('View Activation Details')}
+              >
+                <Text className="text-gray-700 text-sm">View</Text>
+              </TouchableOpacity>
+            );
+          }
+
+          return (
+            <Animatable.View
+              key={will.address || index}
+              animation="fadeInUp"
+              duration={700}
+              delay={index * 100}
+              className="bg-white rounded-xl shadow-md p-4 mb-4 border border-gray-200"
+            >
+              <View className="flex-row items-center mb-3">
+                <View className="mr-3">
+                  <Icon name="account-circle" size={40} color="#036635" />
+                </View>
+                <View>
+                  <Text className="text-lg font-semibold">{title}</Text>
+                  <Text className="text-sm text-gray-500">Owner: {will.ownerName}</Text>
+                  {will.type && (
+                    <Text className="text-sm text-gray-500">
+                      Type:{' '}
+                      <Text className="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-lg dark:bg-green-900 dark:text-green-300">
+                        {will.type}
+                      </Text>
+                    </Text>
+                  )}
+                  <Text className="text-xs text-gray-400">Created At: {will.createdAt}</Text>
+                </View>
               </View>
-            </View>
-          </Animatable.View>
-        ))}
+
+              <View className="mb-4">{renderStatusInfo(will.status, will)}</View>
+
+              <View className="flex-row justify-between items-center">
+                <TouchableOpacity onPress={() => openWillDetails(will)}>
+                  <Icon name="information-outline" size={24} color="#374151" />
+                </TouchableOpacity>
+                <View className="flex-row space-x-2">{actionButton}</View>
+              </View>
+            </Animatable.View>
+          );
+        })}
       </ScrollView>
 
       <Modal
@@ -190,8 +219,9 @@ const WillTriggerActivationScreen = () => {
         <View className="bg-white p-4 rounded-xl">
           {selectedWill && (
             <>
-              <Text className="text-lg font-semibold mb-2">{selectedWill.title}</Text>
+              <Text className="text-lg font-semibold mb-2">{`${selectedWill.ownerName}'s Digital Will`}</Text>
               <Text className="text-sm text-gray-700 mb-1">Owner: {selectedWill.ownerName}</Text>
+              {selectedWill.type && <Text className="text-sm text-gray-700 mb-1">Type: {selectedWill.type}</Text>}
               <Text className="text-sm text-gray-700 mb-1">Created At: {selectedWill.createdAt}</Text>
               <Text className="text-sm text-gray-700 mb-3">Status: {selectedWill.status}</Text>
               <Text className="text-sm text-gray-500 mb-3">

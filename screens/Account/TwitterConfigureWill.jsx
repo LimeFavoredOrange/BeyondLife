@@ -23,7 +23,8 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as Sharing from 'expo-sharing';
 
 import { formatPolicy } from '../../utils/policyFormator';
-import { set } from 'ramda';
+
+import { selectContractAddress, selectName } from '../../redux/slices/homeSlice';
 
 const storageOptionDescription = {
   beyondLifeServer:
@@ -56,6 +57,9 @@ const TwitterConfigureWill = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [animation, setAnimation] = useState('fadeInRight');
   const [currentPolicy, setCurrentPolicy] = useState('');
+
+  const contractAddress = useSelector(selectContractAddress);
+  const name = useSelector(selectName);
 
   // TODO: Remove if for now
   const [showOption, setShowOption] = useState(false);
@@ -202,6 +206,8 @@ const TwitterConfigureWill = () => {
         attributesList,
         policyMatch,
         tweetsListWithoutText,
+        contractAddress,
+        name,
       };
 
       console.log('Request Data:', requestData);

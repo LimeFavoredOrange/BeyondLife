@@ -41,6 +41,8 @@ import WillTriggerSettingScreen from '../screens/WillTriggerSettingScreen';
 import WillTriggerActivationScreen from '../screens/WillTriggerActivationScreen';
 import AccessWillDataScreen from '../screens/AccessWillDataScreen';
 
+import ViewDataScreen from '../screens/ViewDataScreen';
+
 import ViewBackupScreen from '../screens/ViewBackupScreen';
 
 // Heir Management Screen
@@ -109,6 +111,7 @@ const Navigation = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="Access Will Data" component={AccessWillDataScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="View Data" component={ViewDataScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 };
