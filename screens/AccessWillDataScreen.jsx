@@ -37,7 +37,11 @@ const AccessWillDataScreen = () => {
 
         // Filter all the wills that are ready to access
         const readyWills = response.data.wills.filter((will) => will.status === 'Activated - Ready to View');
-        setWills(readyWills || []);
+
+        // Only get the first 1 will
+        const temp = readyWills.slice(0, 1);
+        // setWills(readyWills || []);
+        setWills(temp || []);
       } catch (error) {
         console.error(error);
       } finally {
