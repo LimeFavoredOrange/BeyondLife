@@ -8,6 +8,7 @@ import * as Animatable from 'react-native-animatable';
 import Modal from 'react-native-modal';
 import { selectToken } from '../redux/slices/auth';
 import { useSelector } from 'react-redux';
+
 import axiosInstance from '../api';
 
 const WillTriggerActivationScreen = () => {
@@ -15,77 +16,16 @@ const WillTriggerActivationScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedWill, setSelectedWill] = useState(null);
   const [trigger, setTrigger] = useState(false);
-
-  // 假数据：涵盖各种状态和类型
-  const dummyWills = [
-    {
-      address: '0xWillVoting456',
-      ownerName: 'Alice Smith',
-      createdAt: '2024-03-15',
-      type: 'X',
-      status: 'Voting in Progress',
-      heirs: ['0xHeirA', '0xHeirB', '0xHeirC'],
-      voteCount: 1,
-      remainingFreezingTime: 0,
-      hasVoted: false, // 此用户还未投票
-    },
-    {
-      address: '0xWillFreezingABC',
-      ownerName: 'Catherine Liu',
-      createdAt: '2024-05-20',
-      // 没有type字段，以展示无type情况
-      type: 'Gmail',
-      status: 'Activated - In Freezing Period',
-      heirs: ['0xHeirQ', '0xHeirW', '0xHeirE', '0xHeirR'],
-      voteCount: 4,
-      remainingFreezingTime: 3600, // 还有1小时冻结期
-      hasVoted: false,
-    },
-    {
-      address: '0xWillVoting789',
-      ownerName: 'Bob Johnson',
-      createdAt: '2024-04-01',
-      type: 'Google Drive',
-      status: 'Voting in Progress',
-      heirs: ['0xHeirX', '0xHeirY'],
-      voteCount: 1,
-      remainingFreezingTime: 0,
-      hasVoted: true, // 当前用户已经投票过，显示Withdraw按钮
-    },
-    {
-      address: '0xWillPending123',
-      ownerName: 'John Doe',
-      createdAt: '2024-02-10',
-      type: 'Twitter',
-      status: 'Pending Activation',
-      heirs: ['0xHeir1', '0xHeir2'],
-      voteCount: 0,
-      remainingFreezingTime: 0,
-      hasVoted: false,
-    },
-    {
-      address: '0xWillReadyXYZ',
-      ownerName: 'David Kim',
-      createdAt: '2024-06-30',
-      type: 'Twitter',
-      status: 'Activated - Ready to View',
-      heirs: ['0xHeirM'],
-      voteCount: 1,
-      remainingFreezingTime: 0,
-      hasVoted: false,
-    },
-  ];
-
   const [wills, setWills] = useState([]);
-
   const token = useSelector(selectToken);
+
   useEffect(() => {
     const fetchWills = async () => {
       setShowLoading(true);
       try {
         const response = await axiosInstance.get('/twitter/willList', {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`, // 使用反引号
           },
         });
         console.log('Live Data:', response.data);
@@ -96,6 +36,7 @@ const WillTriggerActivationScreen = () => {
         setShowLoading(false);
       }
     };
+
     fetchWills();
   }, [token, trigger]);
 
@@ -159,16 +100,29 @@ const WillTriggerActivationScreen = () => {
     }
   };
 
-  // 原本triggerActivation/handleVote逻辑调用后端请求已不需要真实操作，仅供截图使用，可简化为alert
-  const triggerActivation = (will) => {
-    alert(`Activating Will: ${will.address}`);
+  const triggerActivation = async (will) => {
+    try {
+      await axiosInstance.post(
+        '/twitter/voteToTrigger',
+        { will_address: will.address },
+        { headers: { Authorization: `Bearer ${token}` } } // 使用反引号
+      );
+      setTrigger((prev) => !prev);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleVote = (will, hasVoted) => {
+  const handleVote = async (will, hasVoted) => {
     if (hasVoted) {
-      alert(`Withdrawing vote for Will: ${will.address}`);
+      await axiosInstance.post(
+        '/twitter/withdrawVote',
+        { will_address: will.address },
+        { headers: { Authorization: `Bearer ${token}` } } // 使用反引号
+      );
+      setTrigger((prev) => !prev);
     } else {
-      alert(`Voting for Will: ${will.address}`);
+      triggerActivation(will);
     }
   };
 
@@ -178,6 +132,7 @@ const WillTriggerActivationScreen = () => {
       <AccountHeader setShowLoading={setShowLoading} title={'Will Trigger Activation'} />
       <ScrollView className="p-4">
         {wills.map((will, index) => {
+          const freezeTimeLeft = will.remainingFreezingTime > 0 ? `${will.remainingFreezingTime} s` : null;
           const title = `${will.ownerName}'s Digital Will`;
 
           let actionButton = null;
@@ -188,11 +143,10 @@ const WillTriggerActivationScreen = () => {
               </TouchableOpacity>
             );
           } else if (will.status === 'Voting in Progress') {
+            // 使用模板字符串包裹类名
+            const buttonClass = `${will.hasVoted ? 'bg-red-500' : 'bg-blue-500'} px-4 py-2 rounded-full`;
             actionButton = (
-              <TouchableOpacity
-                className={`${will.hasVoted ? 'bg-red-500' : 'bg-blue-500'} px-4 py-2 rounded-full`}
-                onPress={() => handleVote(will, will.hasVoted)}
-              >
+              <TouchableOpacity className={buttonClass} onPress={() => handleVote(will, will.hasVoted)}>
                 <Text className="text-white text-sm">{will.hasVoted ? 'Withdraw' : 'Vote'}</Text>
               </TouchableOpacity>
             );

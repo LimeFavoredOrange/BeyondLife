@@ -10,12 +10,15 @@ import { Icon } from '@rneui/base';
 
 import axiosInstance from '../../api';
 
+import Loading from '../Loading';
+
 const AccountDashboard = () => {
   const navigation = useNavigation();
   const token = useSelector(selectToken);
   const [xStatus, setXStatus] = React.useState(false);
   const [googleDriveStatus, setGoogleDriveStatus] = React.useState(false);
   const [gmailStatus, setGmailStatus] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
 
   const platforms = [
     {
@@ -40,42 +43,52 @@ const AccountDashboard = () => {
 
   React.useEffect(() => {
     const fetchStatus = async () => {
-      const response = await axiosInstance.get('/digitalWill/list', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setXStatus(response.data.twitterWillContractAddress !== 'None' ? true : false);
-      setGoogleDriveStatus(response.data.googleDriveWillContractAddress !== 'None' ? true : false);
-      setGmailStatus(response.data.GmailWillContractAddress !== 'None' ? true : false);
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get('/digitalWill/list', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setXStatus(response.data.twitterWillContractAddress !== 'None' ? true : false);
+        setGoogleDriveStatus(response.data.googleDriveWillContractAddress !== 'None' ? true : false);
+        setGmailStatus(response.data.GmailWillContractAddress !== 'None' ? true : false);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
     };
 
     fetchStatus();
   }, []);
 
   return (
-    <FlatList
-      data={platforms}
-      renderItem={({ item }) => {
-        return (
-          <TouchableOpacity
-            className={`flex-row items-center ${
-              item.status ? 'bg-gray-300' : 'bg-gray-100'
-            } border-b px-2 space-x-2 pr-3`}
-            style={{ height: 50 }}
-            onPress={() => {
-              navigation.navigate(item.id);
-            }}
-          >
-            <Image source={item.logo} style={{ width: 30, height: 30, resizeMode: 'contain' }} />
-            <Text className="text-lg font-semibold">{item.title}</Text>
-            <View className="flex-grow"></View>
-            {/* Use a tick icon */}
-            {item.status ? <Icon name="check-circle" type="feather" size={20} color="green" /> : null}
-          </TouchableOpacity>
-        );
-      }}
-    />
+    <>
+      <Loading showLoading={loading} />
+      <FlatList
+        data={platforms}
+        renderItem={({ item }) => {
+          return (
+            <TouchableOpacity
+              className={`flex-row items-center ${
+                item.status ? 'bg-gray-300' : 'bg-gray-100'
+              } border-b px-2 space-x-2 pr-3`}
+              style={{ height: 50 }}
+              onPress={() => {
+                navigation.navigate(item.id);
+              }}
+            >
+              <Image source={item.logo} style={{ width: 30, height: 30, resizeMode: 'contain' }} />
+              <Text className="text-lg font-semibold">{item.title}</Text>
+              <View className="flex-grow"></View>
+              {/* Use a tick icon */}
+              {item.status ? <Icon name="check-circle" type="feather" size={20} color="green" /> : null}
+            </TouchableOpacity>
+          );
+        }}
+      />
+    </>
   );
 };
 
