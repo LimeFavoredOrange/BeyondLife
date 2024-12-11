@@ -6,9 +6,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import * as Animatable from 'react-native-animatable';
 import Modal from 'react-native-modal';
-// import { selectToken } from '../redux/slices/auth';
-// import { useSelector } from 'react-redux';
-// import axiosInstance from '../api';
+import { selectToken } from '../redux/slices/auth';
+import { useSelector } from 'react-redux';
+import axiosInstance from '../api';
 
 const WillTriggerActivationScreen = () => {
   const [showLoading, setShowLoading] = useState(false);
@@ -76,29 +76,28 @@ const WillTriggerActivationScreen = () => {
     },
   ];
 
-  const [wills, setWills] = useState(dummyWills);
+  const [wills, setWills] = useState([]);
 
-  // 原有真实数据请求已注释掉，仅供截图使用
-  // const token = useSelector(selectToken);
-  // useEffect(() => {
-  //   const fetchWills = async () => {
-  //     setShowLoading(true);
-  //     try {
-  //       const response = await axiosInstance.get('/twitter/willList', {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       });
-  //       console.log('Live Data:', response.data);
-  //       setWills(response.data.wills || []);
-  //     } catch (error) {
-  //       console.error(error);
-  //     } finally {
-  //       setShowLoading(false);
-  //     }
-  //   };
-  //   fetchWills();
-  // }, [token, trigger]);
+  const token = useSelector(selectToken);
+  useEffect(() => {
+    const fetchWills = async () => {
+      setShowLoading(true);
+      try {
+        const response = await axiosInstance.get('/twitter/willList', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log('Live Data:', response.data);
+        setWills(response.data.wills || []);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setShowLoading(false);
+      }
+    };
+    fetchWills();
+  }, [token, trigger]);
 
   const openWillDetails = (will) => {
     setSelectedWill(will);
