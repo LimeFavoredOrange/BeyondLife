@@ -112,34 +112,6 @@ const Login = ({
       // 保存到 SecureStore
       await savePrivateKeyToSecureStore('private_key', privateKey);
 
-      // const dummyData = [
-      //   {
-      //     ciphertext: 'd043a49670b60444ff1626a5ab434678ca4a4e9123b06c76c9d5876856a7',
-      //     iv: 'dfc841bacfcf8b6b83f0330bdc48ea36',
-      //     serverPublicKey:
-      //       '04958c538b56fbc6f0c9e8abc31a68d682453e494d103c80f6f9bebe93aba95d122ce4910dd9738fb9e2d157710d599e6e86a6a3ec524352e28b8ebd423983aaae',
-      //   },
-      //   {
-      //     ciphertext:
-      //       '03765fb8b2bb6dfb73861b01c80e54c80d7d9309794344d719f51006245b0998d8c9e2f154d36e3e27353798acbbe9cb6a3f8b6bcd42361c07fe72084ebbb400828c10b5dd767715542ec183fe0c4aba107f322530a73354b4ed2a1c62cec8ed568cab25049819bc75c0ca985098a0fa7e5865f05cf93522320df4',
-      //     iv: 'ddd5061b6b2a6df6e7d5525e51a4b482',
-      //     serverPublicKey:
-      //       '04839edbee7d0cd6412a9f333c526d7a03b430394f60817d66b674f5cde54021e45b09010314b3cc99c7bbef3b9933ca3dbf80dabfefcf3212f32b4287226e2a76',
-      //   },
-      //   {
-      //     ciphertext:
-      //       '9f02d1e198869c5a7eac8b357da66ad0031aeb0a24a6ad89b957db4fb7ae42915f2b75c84d3acad4848f79866de13d96e5cced061338c3f6be7e66be77c21a3b',
-      //     iv: '44a51f4583aa884f803f3076425d21ea',
-      //     serverPublicKey:
-      //       '04290e676d0c209ca0ce9263d4be8644b9bde8a4966db897d3c0c9a47e06e3415f79ef474d3ab8de0023f668f204a4df27ae73d3cb45e447cf54fa24b3a01e0eca',
-      //   },
-      // ];
-
-      // for (let i = 0; i < dummyData.length; i++) {
-      //   const check = await decryptData(dummyData[i], privateKey);
-      //   console.log('check', check, '\n\n');
-      // }
-
       console.log(response.data);
       dispatch(setAccountNumber(account_number));
       dispatch(setContractAddress(contract_address));
