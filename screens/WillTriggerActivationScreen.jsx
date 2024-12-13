@@ -1,4 +1,4 @@
-import { SafeAreaView, View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { SafeAreaView, View, Text, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import AccountHeader from '../components/Account/AutomaticWillHeader';
 import Loading from '../components/Loading';
@@ -88,6 +88,14 @@ const WillTriggerActivationScreen = () => {
             <Text className="text-xs text-gray-500">
               Remaining Freezing Time: {remainingFreezingTime > 0 ? `${remainingFreezingTime} s` : 'N/A'}
             </Text>
+          </View>
+        );
+      case 'Activated - Execution in Progress':
+        // Return the string with a loading spinner
+        return (
+          <View className="flex flex-row gap-1">
+            <Text className="text-sm text-gray-700">Execution in Progress</Text>
+            <ActivityIndicator size="small" color="#036635" />
           </View>
         );
       case 'Activated - Ready to View':

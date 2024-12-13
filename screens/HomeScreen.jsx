@@ -212,6 +212,79 @@ const HomeScreen = () => {
     );
   };
 
+  const connectToBeyondLife = async () => {
+    try {
+      setShowLoading(true);
+      const response = await axiosInstance.post(
+        'upload/beyondLife/connect',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Update the connected platforms
+      const connected = [...connectedPlatforms];
+      connected.push('beyondLife');
+      setConnectedPlatforms(connected);
+
+      const disconnect = unconnectedPlatforms.filter((platform) => platform !== 'beyondLife');
+      setUnconnectedPlatforms(disconnect);
+      setShowLoading(false);
+    } catch (error) {
+      console.error(error.message);
+      setShowLoading(false);
+    }
+  };
+
+  const disconnectFromBeyondLife = async () => {
+    try {
+      setShowLoading(true);
+      const response = await axiosInstance.post(
+        'upload/beyondLife/disconnect',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log(response.data);
+      // Update the connected platforms
+      const connected = connectedPlatforms.filter((platform) => platform !== 'beyondLife');
+      setConnectedPlatforms(connected);
+
+      const disconnect = [...unconnectedPlatforms];
+      disconnect.push('beyondLife');
+      setUnconnectedPlatforms(disconnect);
+
+      setShowLoading(false);
+    } catch (error) {
+      console.error(error.message);
+      setShowLoading(false);
+    }
+  };
+
+  const BeyondLifeButton = ({ connected }) => {
+    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#428588]'; // 已连接用浅绿色，未连接用Google蓝
+    const textColor = connected ? 'text-[#1E7D32]' : 'text-white'; // 已连接文字深绿色
+    const iconColor = connected ? '#1E7D32' : '#FFFFFF'; // 已连接图标深绿色
+
+    return (
+      <TouchableOpacity
+        className={`p-4 ${bgColor} rounded-lg flex-row items-center space-x-2 mt-2 shadow-md`}
+        onPress={connected ? () => disconnectFromBeyondLife() : () => connectToBeyondLife()}
+      >
+        <Icon name="database" size={24} color={iconColor} />
+        <Text className={`font-bold ${textColor}`}>{connected ? 'Unlink ' : 'Connect to '}BeyondLife</Text>
+        {connected && <Icon name="check-circle" size={20} color="#1E7D32" className="ml-2" />}
+      </TouchableOpacity>
+    );
+  };
+
   const DropboxButton = ({ connected }) => {
     const color = connected ? 'bg-[#DFF7E1]' : 'bg-[#0061FF]'; // 已连接使用浅绿色，未连接为蓝色
     const textColor = connected ? 'text-[#1E7D32]' : 'text-white'; // 已连接文字为深绿色，未连接为白色
@@ -273,6 +346,8 @@ const HomeScreen = () => {
         return <OneDriveButton key={platform} connected={connected} />;
       case 'iCloud':
         return <ICloudButton key={platform} connected={connected} />;
+      case 'beyondLife':
+        return <BeyondLifeButton key={platform} connected={connected} />;
       default:
         return null;
     }
@@ -293,6 +368,7 @@ const HomeScreen = () => {
 
         // Set the connected and unconnected platforms
         const setupStatus = response.data;
+        console.log('Setup Status:', setupStatus);
         const connected = [];
         const unconnected = [];
 
@@ -398,19 +474,20 @@ const HomeScreen = () => {
                   <View className="flex-col space-y-4">
                     {/* Option 1: Our Cloud */}
                     <TouchableOpacity
-                      style={{ backgroundColor: '#036635' }}
+                      style={{ backgroundColor: '#4682B4' }}
                       className="p-4 bg-blue-500 rounded-lg"
                       onPress={() => {
                         setShowStorageOptionScreen(false);
                         setFirstTimeDelay(1200);
                       }}
                     >
-                      <Text className="text-white font-bold text-center">Use BeyondLife Cloud Storage</Text>
+                      {/* <Text className="text-white font-bold text-center">Use BeyondLife Cloud Storage</Text> */}
+                      <Text className="text-white font-bold text-center">Do This Later</Text>
                     </TouchableOpacity>
 
                     {/* Option 2: Connect External Cloud Platforms */}
                     <TouchableOpacity
-                      style={{ backgroundColor: '#4682B4' }}
+                      style={{ backgroundColor: '#036635' }}
                       className="p-4 bg-blue-500 rounded-lg"
                       onPress={() => {
                         setShowCloudPlatforms(true); // 展示外部云平台按钮
