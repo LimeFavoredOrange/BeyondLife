@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, SafeAreaView, TouchableOpacity, Text, TextInput, FlatList, ScrollView } from 'react-native';
 
 import * as Animatable from 'react-native-animatable';
@@ -99,6 +99,46 @@ const TwitterConfigureWill = () => {
       }
     }
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    // Send a request to see if the use has already set up a will and get the settings
+    const fetchWillSettings = async () => {
+      try {
+        setShowLoading(true);
+        const response = await axiosInstance.get('/twitter/willSettings', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log('Will Settings:', response.data);
+        if (response.data.message !== 'No settings found') {
+          const { settings, tweetsList } = response.data;
+          setStorageOption(settings.storage_option);
+          setOffensiveTweets(settings.offensive_tweets);
+          setTweetsWithImages(settings.tweets_with_images);
+          setDeleteBeforeDate(settings.delete_before_date);
+          setKeywordsList(JSON.parse(settings.keywords_list));
+          setPolicyMatch(settings.policy_match);
+
+          // // Set the attributes and policy for each tweet
+          const updatedTweetsList = tweetsList.map((tweet) => {
+            return {
+              ...tweet,
+              attributes: JSON.parse(tweet.attributes),
+            };
+          });
+          setTweetsList(updatedTweetsList);
+        }
+      } catch (error) {
+        console.error('Error fetching will settings:', error);
+      } finally {
+        setShowLoading(false);
+      }
+    };
+
+    fetchWillSettings();
   }, []);
 
   const [policyMatch, setPolicyMatch] = useState('subset');

@@ -482,7 +482,7 @@ const HomeScreen = () => {
                       }}
                     >
                       {/* <Text className="text-white font-bold text-center">Use BeyondLife Cloud Storage</Text> */}
-                      <Text className="text-white font-bold text-center">Do This Later</Text>
+                      <Text className="text-white font-bold text-center">Skip For Now</Text>
                     </TouchableOpacity>
 
                     {/* Option 2: Connect External Cloud Platforms */}
