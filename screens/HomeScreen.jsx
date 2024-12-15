@@ -124,7 +124,11 @@ const HomeScreen = () => {
       // Update the connected platforms
       const connected = [...connectedPlatforms];
       connected.push('googleDrive');
-      setConnectedPlatforms(connected);
+      setConnectedPlatforms(sortByOrder(connected));
+
+      const disconnect = unconnectedPlatforms.filter((platform) => platform !== 'googleDrive');
+      setUnconnectedPlatforms(sortByOrder(disconnect));
+
       setShowLoading(false);
     } catch (error) {
       console.log(error);
@@ -170,7 +174,10 @@ const HomeScreen = () => {
       // Update the connected platforms
       const connected = [...connectedPlatforms];
       connected.push('dropbox');
-      setConnectedPlatforms(connected);
+      setConnectedPlatforms(sortByOrder(connected));
+
+      const disconnect = unconnectedPlatforms.filter((platform) => platform !== 'dropbox');
+      setUnconnectedPlatforms(sortByOrder(disconnect));
       setShowLoading(false);
     } catch (error) {
       console.log(error.message);
@@ -195,6 +202,34 @@ const HomeScreen = () => {
   const [connectedPlatforms, setConnectedPlatforms] = React.useState([]);
   const [unconnectedPlatforms, setUnconnectedPlatforms] = React.useState([]);
 
+  const disconnectFromGoogleDrive = async () => {
+    try {
+      setShowLoading(true);
+      const response = await axiosInstance.post(
+        'upload/googleDrive/unlink',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Update the connected platforms
+      const connected = connectedPlatforms.filter((platform) => platform !== 'googleDrive');
+      setConnectedPlatforms(sortByOrder(connected));
+
+      const disconnect = [...unconnectedPlatforms];
+      disconnect.push('googleDrive');
+      setUnconnectedPlatforms(sortByOrder(disconnect));
+
+      setShowLoading(false);
+    } catch (error) {
+      console.error(error.message);
+      setShowLoading(false);
+    }
+  };
+
   const GoogleDriveButton = ({ connected }) => {
     const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#4285F4]'; // 已连接用浅绿色，未连接用Google蓝
     const textColor = connected ? 'text-[#1E7D32]' : 'text-white'; // 已连接文字深绿色
@@ -203,7 +238,7 @@ const HomeScreen = () => {
     return (
       <TouchableOpacity
         className={`p-4 ${bgColor} rounded-lg flex-row items-center space-x-2 mt-2 shadow-md`}
-        onPress={connected ? () => alert('Are you sure you want to unlink Google Drive?') : () => googleSignIn()}
+        onPress={connected ? () => disconnectFromGoogleDrive() : () => googleSignIn()}
       >
         <Icon name="google-drive" size={24} color={iconColor} />
         <Text className={`font-bold ${textColor}`}>{connected ? 'Unlink ' : 'Connect to '}Google Drive</Text>
@@ -228,10 +263,10 @@ const HomeScreen = () => {
       // Update the connected platforms
       const connected = [...connectedPlatforms];
       connected.push('beyondLife');
-      setConnectedPlatforms(connected);
+      setConnectedPlatforms(sortByOrder(connected));
 
       const disconnect = unconnectedPlatforms.filter((platform) => platform !== 'beyondLife');
-      setUnconnectedPlatforms(disconnect);
+      setUnconnectedPlatforms(sortByOrder(disconnect));
       setShowLoading(false);
     } catch (error) {
       console.error(error.message);
@@ -255,11 +290,11 @@ const HomeScreen = () => {
       console.log(response.data);
       // Update the connected platforms
       const connected = connectedPlatforms.filter((platform) => platform !== 'beyondLife');
-      setConnectedPlatforms(connected);
+      setConnectedPlatforms(sortByOrder(connected));
 
       const disconnect = [...unconnectedPlatforms];
       disconnect.push('beyondLife');
-      setUnconnectedPlatforms(disconnect);
+      setUnconnectedPlatforms(sortByOrder(disconnect));
 
       setShowLoading(false);
     } catch (error) {
@@ -285,6 +320,34 @@ const HomeScreen = () => {
     );
   };
 
+  const disconnectFromDropbox = async () => {
+    try {
+      setShowLoading(true);
+      const response = await axiosInstance.post(
+        'upload/dropbox/unlink',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Update the connected platforms
+      const connected = connectedPlatforms.filter((platform) => platform !== 'dropbox');
+      setConnectedPlatforms(sortByOrder(connected));
+
+      const disconnect = [...unconnectedPlatforms];
+      disconnect.push('dropbox');
+      setUnconnectedPlatforms(sortByOrder(disconnect));
+
+      setShowLoading(false);
+    } catch (error) {
+      console.error(error.message);
+      setShowLoading(false);
+    }
+  };
+
   const DropboxButton = ({ connected }) => {
     const color = connected ? 'bg-[#DFF7E1]' : 'bg-[#0061FF]'; // 已连接使用浅绿色，未连接为蓝色
     const textColor = connected ? 'text-[#1E7D32]' : 'text-white'; // 已连接文字为深绿色，未连接为白色
@@ -293,7 +356,7 @@ const HomeScreen = () => {
     return (
       <TouchableOpacity
         className={`p-4 ${color} rounded-lg flex-row items-center space-x-2 mt-2 shadow-md`}
-        onPress={connected ? () => alert('Are you sure you want to unlink Dropbox?') : () => promptAsync()}
+        onPress={connected ? () => disconnectFromDropbox() : () => promptAsync()}
       >
         <Icon name="dropbox" size={24} color={iconColor} />
         <Text className={`font-bold ${textColor}`}>{connected ? 'Unlink ' : 'Connect to '}Dropbox</Text>
@@ -353,6 +416,11 @@ const HomeScreen = () => {
     }
   };
 
+  const sortByOrder = (arr) => {
+    const order = ['beyondLife', 'googleDrive', 'dropbox', 'oneDrive', 'iCloud'];
+    return arr.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  };
+
   useEffect(() => {
     // Get the upload platform setup status for the current user
     const getUploadPlatformSetup = async () => {
@@ -380,8 +448,8 @@ const HomeScreen = () => {
           }
         }
 
-        setConnectedPlatforms(connected);
-        setUnconnectedPlatforms(unconnected);
+        setConnectedPlatforms(sortByOrder(connected));
+        setUnconnectedPlatforms(sortByOrder(unconnected));
       } catch (error) {
         console.error(error.message);
       }
