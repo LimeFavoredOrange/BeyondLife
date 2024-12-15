@@ -5,10 +5,12 @@ import { Divider } from '@rneui/themed';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectGreeting } from '../../redux/slices/homeSlice';
 import { setIsLogin, setToken } from '../../redux/slices/auth';
+import { useNavigation } from '@react-navigation/native';
 
 const Header = ({ setShowNotification, notificationCount }) => {
   const dispatch = useDispatch();
   const greeting = useSelector(selectGreeting);
+  const navigation = useNavigation();
 
   return (
     <View>
@@ -26,7 +28,13 @@ const Header = ({ setShowNotification, notificationCount }) => {
           <View className="flex-1"></View>
 
           {/* Notification Bell Icon */}
-          <TouchableOpacity onPress={() => setShowNotification(true)} className="relative">
+          <TouchableOpacity
+            onPress={() => {
+              // setShowNotification(true);
+              navigation.navigate('NotificationListScreen');
+            }}
+            className="relative"
+          >
             <Icon name="notifications" type="ionicon" color={'#036635'} />
             {/* Badge for Notification Count */}
             {notificationCount > 0 && (

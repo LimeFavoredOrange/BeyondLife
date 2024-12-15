@@ -617,6 +617,7 @@ const HomeScreen = () => {
       {showNotification && (
         <NotificationOverlay notifications={notifications} onClose={() => setShowNotification(false)} />
       )}
+
       <Loading show={showLoading} />
     </>
   );

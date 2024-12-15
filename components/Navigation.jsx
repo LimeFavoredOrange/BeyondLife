@@ -48,6 +48,9 @@ import ViewBackupScreen from '../screens/ViewBackupScreen';
 // Heir Management Screen
 import HeirManagementScreen from '../screens/HeirManagementScreen';
 
+import NotificationListScreen from '../screens/NotificationListScreen';
+import NotificationDetailScreen from '../screens/NotificationDetailScreen';
+
 const Navigation = () => {
   // const [isSplashVisible, setIsSplashVisible] = React.useState(true);
 
@@ -112,6 +115,13 @@ const Navigation = () => {
       />
       <Stack.Screen name="Access Will Data" component={AccessWillDataScreen} options={{ headerShown: false }} />
       <Stack.Screen name="View Data" component={ViewDataScreen} options={{ headerShown: false }} />
+
+      <Stack.Screen name="NotificationListScreen" component={NotificationListScreen} options={{ headerShown: false }} />
+      <Stack.Screen
+        name="NotificationDetailScreen"
+        component={NotificationDetailScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };
