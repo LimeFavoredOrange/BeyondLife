@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, SafeAreaView, TouchableOpacity, Text, TextInput, FlatList, ScrollView } from 'react-native';
+import { View, SafeAreaView, TouchableOpacity, Text, TextInput, FlatList, ScrollView, Image } from 'react-native';
 
 import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
@@ -25,6 +25,7 @@ import * as Sharing from 'expo-sharing';
 import { formatPolicy } from '../../utils/policyFormator';
 
 import { selectContractAddress, selectName } from '../../redux/slices/homeSlice';
+import { set } from 'ramda';
 
 const storageOptionDescription = {
   beyondLifeServer:
@@ -115,6 +116,7 @@ const TwitterConfigureWill = () => {
         console.log('Will Settings:', response.data);
         if (response.data.message !== 'No settings found') {
           const { settings, tweetsList } = response.data;
+          console.log('tweetsList', tweetsList);
           setStorageOption(settings.storage_option);
           setOffensiveTweets(settings.offensive_tweets);
           setTweetsWithImages(settings.tweets_with_images);
@@ -122,13 +124,23 @@ const TwitterConfigureWill = () => {
           setKeywordsList(JSON.parse(settings.keywords_list));
           setPolicyMatch(settings.policy_match);
 
-          // // Set the attributes and policy for each tweet
-          const updatedTweetsList = tweetsList.map((tweet) => {
-            return {
-              ...tweet,
-              attributes: JSON.parse(tweet.attributes),
-            };
+          // For the dummy tweets list, change the corresponding attributes and policies
+          const updatedTweetsList = dummy_tweets_list.map((tweet) => {
+            // Find the matching id in the tweetsList
+            const matchingTweet = tweetsList.find((dummyTweet) => dummyTweet.id === tweet.id);
+            if (matchingTweet) {
+              return {
+                ...tweet,
+                attributes: JSON.parse(matchingTweet.attributes),
+                policy: matchingTweet.policy,
+              };
+            } else {
+              return tweet;
+            }
           });
+
+          console.log('Updated Tweets List:', updatedTweetsList);
+
           setTweetsList(updatedTweetsList);
         }
       } catch (error) {
@@ -145,16 +157,43 @@ const TwitterConfigureWill = () => {
 
   const [inputedPolicy, setInputedPolicy] = useState('');
 
-  const [tweetsList, setTweetsList] = useState([
-    { id: 1, text: 'First tweet, welcome to Sydney', attributes: [], policy: '' },
+  const dummy_tweets_list = [
+    {
+      id: 1,
+      text: 'First tweet, welcome to Sydney',
+      images: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-JI9zihxNGOqiYdiX2OuqegWCEiev0eAPAw&s'],
+      attributes: [],
+      policy: '',
+      timestamp: '2024-11-26 06:40:57',
+    },
     {
       id: 2,
       text: 'Second tweet, Call for Papers: Exploring the History of the Web, from Inception to Present @TheWebConf 2025 @TheOfficialACM',
       attributes: [],
+      images: [''],
       policy: '',
+      timestamp: '2024-11-28 21:40:57',
     },
-    { id: 3, text: 'Third tweet, #TheWebConf24 Cheers, beers, volunteers! Thank you!', attributes: [], policy: '' },
-  ]);
+    {
+      id: 3,
+      text: 'Third tweet, #TheWebConf24 Cheers, beers, volunteers! Thank you!',
+      images: [''],
+      attributes: [],
+      policy: '',
+      timestamp: '2024-12-05 08:40:57',
+    },
+    // Offensive tweet example
+    {
+      id: 4,
+      text: 'This is for testing purpose only: what the fuck!',
+      images: [''],
+      attributes: [],
+      policy: '',
+      timestamp: '2024-12-07 09:40:57',
+    },
+  ];
+
+  const [tweetsList, setTweetsList] = useState([]);
 
   const hideModal = () => {
     // Set the current selected attributes to the selected tweet
@@ -644,6 +683,22 @@ const TwitterConfigureWill = () => {
                     style={{ marginBottom: 15, padding: 15, borderWidth: 1, borderColor: '#ccc', borderRadius: 10 }}
                   >
                     <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{item.text}</Text>
+                    <Text style={{ fontSize: 14, color: '#666' }}>{item.timestamp}</Text>
+                    {item.images.length > 0 && (
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 10 }}>
+                        {item.images.map((image, index) => {
+                          if (image !== '') {
+                            return (
+                              <Image
+                                key={index}
+                                source={{ uri: image }}
+                                style={{ width: '90%', height: 150, borderRadius: 10, margin: 5 }}
+                              />
+                            );
+                          }
+                        })}
+                      </View>
+                    )}
 
                     <TouchableOpacity
                       style={{
