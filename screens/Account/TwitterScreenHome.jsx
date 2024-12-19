@@ -34,6 +34,18 @@ const TwitterScreenHome = () => {
         >
           <Text className="text-white text-center text-lg font-semibold tracking-wider">Configure Will</Text>
         </TouchableOpacity>
+
+        {/* Spacing between buttons */}
+        <View className="h-5" />
+
+        {/* Remove Configured Will Button */}
+        <TouchableOpacity
+          className="py-4 rounded-lg shadow-xl w-3/4"
+          onPress={() => console.log('Remove Configured Will')}
+          style={{ backgroundColor: '#D14343' }}
+        >
+          <Text className="text-white text-center text-lg font-semibold tracking-wider">Remove Configured Will</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

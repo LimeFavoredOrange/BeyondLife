@@ -27,6 +27,8 @@ import { formatPolicy } from '../../utils/policyFormator';
 import { selectContractAddress, selectName } from '../../redux/slices/homeSlice';
 import { set } from 'ramda';
 
+import ProgressLoading from '../../components/ProgressLoading/ProgressLoading';
+
 const storageOptionDescription = {
   beyondLifeServer:
     'Data will be securely stored on the BeyondLife server, which is managed and maintained by our trusted infrastructure.',
@@ -45,10 +47,11 @@ const storageOptionDescription = {
 
 const TwitterConfigureWill = () => {
   const [showLoading, setShowLoading] = useState(false);
+
+  const [showProgressLoading, setShowProgressLoading] = useState(false);
+  const [progressTaskID, setProgressTaskID] = useState('');
+
   const [storageOption, setStorageOption] = useState('beyondLifeServer');
-  // const [offensiveTweets, setOffensiveTweets] = useState('Will Server Only');
-  // const [tweetsWithImages, setTweetsWithImages] = useState('Will Server Only');
-  // const [deleteBeforeDate, setDeleteBeforeDate] = useState(new Date());
   const [offensiveTweets, setOffensiveTweets] = useState('Disable');
   const [tweetsWithImages, setTweetsWithImages] = useState('Disable');
   const [deleteBeforeDate, setDeleteBeforeDate] = useState('Disable');
@@ -113,14 +116,22 @@ const TwitterConfigureWill = () => {
           },
         });
 
-        console.log('Will Settings:', response.data);
+        console.log('Will Settings:', response.data.settings);
         if (response.data.message !== 'No settings found') {
           const { settings, tweetsList } = response.data;
-          console.log('tweetsList', tweetsList);
           setStorageOption(settings.storage_option);
           setOffensiveTweets(settings.offensive_tweets);
+          setOffensiveTweetsEnabled(settings.offensive_tweets === 'Enable');
+
           setTweetsWithImages(settings.tweets_with_images);
-          setDeleteBeforeDate(settings.delete_before_date);
+          setTweetsWithImagesEnabled(settings.tweets_with_images === 'Enable');
+
+          if (settings.delete_before_date !== 'Disable') {
+            setDeleteBeforeDate(new Date(settings.delete_before_date));
+            setShowDatePicker(true);
+          } else {
+            setDeleteBeforeDate('Disable');
+          }
           setKeywordsList(JSON.parse(settings.keywords_list));
           setPolicyMatch(settings.policy_match);
 
@@ -139,7 +150,7 @@ const TwitterConfigureWill = () => {
             }
           });
 
-          console.log('Updated Tweets List:', updatedTweetsList);
+          // console.log('Updated Tweets List:', updatedTweetsList);
 
           setTweetsList(updatedTweetsList);
         }
@@ -276,11 +287,11 @@ const TwitterConfigureWill = () => {
   const handleNext = async () => {
     if (currentStep === 7) {
       const tweetsListWithoutText = tweetsList.map(({ text, ...rest }) => rest);
+
       const requestData = {
         storageOption,
         offensiveTweets,
         tweetsWithImages,
-        deleteBeforeDate,
         keywordsList,
         attributesList,
         policyMatch,
@@ -289,7 +300,13 @@ const TwitterConfigureWill = () => {
         name,
       };
 
-      console.log('Request Data:', requestData);
+      if (showDatePicker === true) {
+        requestData.deleteBeforeDate = deleteBeforeDate;
+      } else {
+        requestData.deleteBeforeDate = 'Disable';
+      }
+
+      console.log('Request Data:', JSON.stringify(requestData));
 
       try {
         setShowLoading(true);
@@ -297,36 +314,40 @@ const TwitterConfigureWill = () => {
         const response = await axiosInstance.post('/twitter/setup', requestData, {
           headers: {
             Authorization: `Bearer ${token}`,
-            Accept: 'application/xml',
+            // Accept: 'application/xml',
+            'Content-Type': 'application/json',
           },
           responseType: 'text',
         });
-
-        if (response.data) {
-          const xmlContent = response.data;
-
-          const fileUri = `${FileSystem.cacheDirectory}DigitalWill.xml`;
-          await FileSystem.writeAsStringAsync(fileUri, xmlContent, {
-            encoding: FileSystem.EncodingType.UTF8,
-          });
-
-          if (await Sharing.isAvailableAsync()) {
-            await Sharing.shareAsync(fileUri);
-            showToast('✅ Your will has been successfully set and shared!', 'success');
-          } else {
-            showToast('⚠️ Sharing is not available on this device.', 'error');
-          }
-        } else {
-          showToast('⚠️ Failed to retrieve XML data from server response.', 'error');
-        }
-
+        const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
         setShowLoading(false);
+        setShowProgressLoading(true);
+        setProgressTaskID(data.task_id);
 
-        navigation.navigate('Home');
+        // if (response.data) {
+        //   const xmlContent = response.data;
+
+        //   const fileUri = `${FileSystem.cacheDirectory}DigitalWill.xml`;
+        //   await FileSystem.writeAsStringAsync(fileUri, xmlContent, {
+        //     encoding: FileSystem.EncodingType.UTF8,
+        //   });
+
+        //   if (await Sharing.isAvailableAsync()) {
+        //     await Sharing.shareAsync(fileUri);
+        //     showToast('✅ Your will has been successfully set and shared!', 'success');
+        //   } else {
+        //     showToast('⚠️ Sharing is not available on this device.', 'error');
+        //   }
+        // } else {
+        //   showToast('⚠️ Failed to retrieve XML data from server response.', 'error');
+        // }
+
+        // navigation.navigate('Home');
       } catch (error) {
-        setShowLoading(false);
         console.error('Error setting up Twitter will:', error);
         showToast('❌ Error setting up your will. Please try again.', 'error');
+      } finally {
+        setShowLoading(false);
       }
     } else {
       setAnimation('fadeInRight');
@@ -370,6 +391,11 @@ const TwitterConfigureWill = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Loading showLoading={showLoading} />
+      <ProgressLoading
+        showLoading={showProgressLoading}
+        taskID={progressTaskID}
+        setShowLoading={setShowProgressLoading}
+      />
       <AccountHeader setShowLoading={setShowLoading} title={'Configure Will📝'} />
       <ProgressBar progress={progressStatus} color={'#036635'} />
       <View className="h-full">
@@ -406,14 +432,20 @@ const TwitterConfigureWill = () => {
                 <View className="flex-row gap-2 px-6">
                   <TouchableOpacity
                     style={{ backgroundColor: offensiveTweetsEnabled ? '#036635' : '#ccc' }}
-                    onPress={() => setOffensiveTweetsEnabled(true)}
+                    onPress={() => {
+                      setOffensiveTweetsEnabled(true);
+                      setOffensiveTweets('Enable');
+                    }}
                     className="flex-1 h-8 rounded-lg justify-center items-center"
                   >
                     <Text className="text-white font-bold">Enable</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={{ backgroundColor: !offensiveTweetsEnabled ? '#036635' : '#ccc' }}
-                    onPress={() => setOffensiveTweetsEnabled(false)}
+                    onPress={() => {
+                      setOffensiveTweetsEnabled(false);
+                      setOffensiveTweets('Disable');
+                    }}
                     className="flex-1 h-8 rounded-lg justify-center items-center"
                   >
                     <Text className="text-white font-bold">Disable</Text>
@@ -459,14 +491,20 @@ const TwitterConfigureWill = () => {
                 <View className="flex-row gap-2 px-6">
                   <TouchableOpacity
                     style={{ backgroundColor: tweetsWithImagesEnabled ? '#036635' : '#ccc' }}
-                    onPress={() => setTweetsWithImagesEnabled(true)}
+                    onPress={() => {
+                      setTweetsWithImagesEnabled(true);
+                      setTweetsWithImages('Enable');
+                    }}
                     className="flex-1 h-8 rounded-lg justify-center items-center"
                   >
                     <Text className="text-white font-bold">Enable</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={{ backgroundColor: !tweetsWithImagesEnabled ? '#036635' : '#ccc' }}
-                    onPress={() => setTweetsWithImagesEnabled(false)}
+                    onPress={() => {
+                      setTweetsWithImagesEnabled(false);
+                      setTweetsWithImages('Disable');
+                    }}
                     className="flex-1 h-8 rounded-lg justify-center items-center"
                   >
                     <Text className="text-white font-bold">Disable</Text>

@@ -15,6 +15,8 @@ import { setNotificationToken } from './redux/slices/auth';
 
 import { saveToSecureStore } from './utils/storage';
 
+import { PaperProvider } from 'react-native-paper';
+
 // Setting up navigator
 const Stack = createNativeStackNavigator();
 
@@ -64,8 +66,10 @@ export default function App() {
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <Navigation />
-        <Toast />
+        <PaperProvider>
+          <Navigation />
+          <Toast />
+        </PaperProvider>
       </NavigationContainer>
     </Provider>
   );
