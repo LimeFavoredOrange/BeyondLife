@@ -49,6 +49,10 @@ const WillTriggerActivationScreen = () => {
     fetchWills();
   }, [token, trigger]);
 
+  useEffect(() => {
+    // If there is any unfinished will, show a notification, for each of the unfinished will
+  }, [unFinishedWill]);
+
   const openWillDetails = (will) => {
     setSelectedWill(will);
     setModalVisible(true);
