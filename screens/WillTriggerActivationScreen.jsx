@@ -20,6 +20,8 @@ const WillTriggerActivationScreen = () => {
   const [wills, setWills] = useState([]);
   const token = useSelector(selectToken);
 
+  const [unFinishedWill, setUnFinishedWill] = useState([]);
+
   useEffect(() => {
     const fetchWills = async () => {
       setShowLoading(true);
@@ -31,6 +33,12 @@ const WillTriggerActivationScreen = () => {
         });
         console.log('Live Data:', response.data);
         setWills(response.data.wills || []);
+
+        // For each of the wills, check if there is any unfinished will
+        // If the status is not 'Activated - Ready to View', then it is an unfinished will
+        const unfinishedWill = response.data.wills.filter((will) => will.status !== 'Activated - Ready to View');
+        console.log('Unfinished Will:', unfinishedWill);
+        setUnFinishedWill(unfinishedWill);
       } catch (error) {
         console.error(error);
       } finally {
@@ -40,6 +48,10 @@ const WillTriggerActivationScreen = () => {
 
     fetchWills();
   }, [token, trigger]);
+
+  useEffect(() => {
+    // If there is any unfinished will, show a notification, for each of the unfinished will
+  }, [unFinishedWill]);
 
   const openWillDetails = (will) => {
     setSelectedWill(will);
@@ -51,15 +63,15 @@ const WillTriggerActivationScreen = () => {
     const votedCount = will.voteCount || 0;
     const remainingFreezingTime = will.remainingFreezingTime || 0;
 
-    switch (status) {
-      case 'Pending Activation':
+    switch (true) {
+      case status.includes('Pending Activation'):
         return (
           <View>
             <Text className="text-sm text-gray-700">Status: Pending Activation</Text>
             <Text className="text-xs text-gray-500">Total Inheritors: {totalInheritors}</Text>
           </View>
         );
-      case 'Voting in Progress':
+      case status.includes('Voting in Progress'):
         return (
           <View>
             <Text className="text-sm text-gray-700 mb-1">Status: Voting in Progress</Text>
@@ -81,7 +93,7 @@ const WillTriggerActivationScreen = () => {
             </View>
           </View>
         );
-      case 'Activated - In Freezing Period':
+      case status.includes('Activated - In Freezing Period'):
         return (
           <View>
             <Text className="text-sm text-gray-700">Status: Activated - In Freezing Period</Text>
@@ -90,22 +102,26 @@ const WillTriggerActivationScreen = () => {
             </Text>
           </View>
         );
-      case 'Activated - Execution in Progress':
-        // Return the string with a loading spinner
+      case status.includes('Activated - Execution in Progress'):
         return (
           <View className="flex flex-row gap-1">
             <Text className="text-sm text-gray-700">Execution in Progress</Text>
             <ActivityIndicator size="small" color="#036635" />
           </View>
         );
-      case 'Activated - Ready to View':
+      case status.includes('Activated - Ready to View'):
         return (
           <View>
             <Text className="text-sm text-green-600">Status: Activated - Ready to View</Text>
           </View>
         );
       default:
-        return <Text className="text-sm text-gray-500">Unknown Status</Text>;
+        return (
+          <View className="flex flex-row gap-1">
+            <Text className="text-sm text-gray-700">{status}</Text>
+            <ActivityIndicator size="small" color="#036635" />
+          </View>
+        );
     }
   };
 
@@ -163,6 +179,7 @@ const WillTriggerActivationScreen = () => {
               const title = `${will.ownerName}'s Digital Will`;
 
               let actionButton = null;
+
               if (will.status === 'Pending Activation') {
                 actionButton = (
                   <TouchableOpacity
@@ -173,7 +190,6 @@ const WillTriggerActivationScreen = () => {
                   </TouchableOpacity>
                 );
               } else if (will.status === 'Voting in Progress') {
-                // 使用模板字符串包裹类名
                 const buttonClass = `${will.hasVoted ? 'bg-red-500' : 'bg-blue-500'} px-4 py-2 rounded-full`;
                 actionButton = (
                   <TouchableOpacity className={buttonClass} onPress={() => handleVote(will, will.hasVoted)}>
