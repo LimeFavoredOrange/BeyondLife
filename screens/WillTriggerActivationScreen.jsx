@@ -20,6 +20,8 @@ const WillTriggerActivationScreen = () => {
   const [wills, setWills] = useState([]);
   const token = useSelector(selectToken);
 
+  const [unFinishedWill, setUnFinishedWill] = useState([]);
+
   useEffect(() => {
     const fetchWills = async () => {
       setShowLoading(true);
@@ -31,6 +33,12 @@ const WillTriggerActivationScreen = () => {
         });
         console.log('Live Data:', response.data);
         setWills(response.data.wills || []);
+
+        // For each of the wills, check if there is any unfinished will
+        // If the status is not 'Activated - Ready to View', then it is an unfinished will
+        const unfinishedWill = response.data.wills.filter((will) => will.status !== 'Activated - Ready to View');
+        console.log('Unfinished Will:', unfinishedWill);
+        setUnFinishedWill(unfinishedWill);
       } catch (error) {
         console.error(error);
       } finally {
@@ -167,6 +175,7 @@ const WillTriggerActivationScreen = () => {
               const title = `${will.ownerName}'s Digital Will`;
 
               let actionButton = null;
+
               if (will.status === 'Pending Activation') {
                 actionButton = (
                   <TouchableOpacity
@@ -177,7 +186,6 @@ const WillTriggerActivationScreen = () => {
                   </TouchableOpacity>
                 );
               } else if (will.status === 'Voting in Progress') {
-                // 使用模板字符串包裹类名
                 const buttonClass = `${will.hasVoted ? 'bg-red-500' : 'bg-blue-500'} px-4 py-2 rounded-full`;
                 actionButton = (
                   <TouchableOpacity className={buttonClass} onPress={() => handleVote(will, will.hasVoted)}>
