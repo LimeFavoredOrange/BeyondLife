@@ -39,42 +39,48 @@ const ViewDataScreen = ({ route }) => {
       ) : (
         <ScrollView className="px-4 pb-4">
           {data.map((item, index) => {
-            const element = JSON.parse(item);
-            const content = element.text;
-            const images = element.images;
-            const timestamp = element.timestamp;
-            console.log('content', content);
-            console.log('images', images);
-            console.log('timestamp', timestamp);
-            return (
-              <Animatable.View key={index} animation="fadeInUp" duration={500} delay={index * 100} className="mb-4">
-                <Card className="rounded-xl shadow-sm border border-gray-200">
-                  <Card.Content className="flex-row items-start">
-                    <Icon name="twitter" size={30} color="#036635" style={{ marginRight: 10 }} />
-                    <View className="flex-1">
-                      <Text className="text-base text-gray-800 font-medium mb-1">{`Tweet ${index + 1}`}</Text>
-                      <Text className="text-sm text-gray-700">{content}</Text>
-                      <Text className="text-xs text-gray-400">{timestamp}</Text>
-                      {images && (
-                        <View className="flex-row mt-2">
-                          {images.map((image, i) => {
-                            if (image !== '') {
-                              return (
-                                <Image
-                                  key={i}
-                                  source={{ uri: image }}
-                                  style={{ width: '80%', height: 150, marginRight: 5, borderRadius: 5 }}
-                                />
-                              );
-                            }
-                          })}
-                        </View>
-                      )}
-                    </View>
-                  </Card.Content>
-                </Card>
-              </Animatable.View>
-            );
+            console.log('item', item);
+            let element = item;
+
+            try {
+              element = JSON.parse(item);
+
+              const content = element.text;
+              const images = element.images;
+              const timestamp = element.timestamp;
+              console.log('content', content);
+              console.log('images', images);
+              console.log('timestamp', timestamp);
+              return (
+                <Animatable.View key={index} animation="fadeInUp" duration={500} delay={index * 100} className="mb-4">
+                  <Card className="rounded-xl shadow-sm border border-gray-200">
+                    <Card.Content className="flex-row items-start">
+                      <Icon name="twitter" size={30} color="#036635" style={{ marginRight: 10 }} />
+                      <View className="flex-1">
+                        <Text className="text-base text-gray-800 font-medium mb-1">{`Tweet ${index + 1}`}</Text>
+                        <Text className="text-sm text-gray-700">{content}</Text>
+                        <Text className="text-xs text-gray-400">{timestamp}</Text>
+                        {images && (
+                          <View className="flex-row mt-2">
+                            {images.map((image, i) => {
+                              if (image !== '') {
+                                return (
+                                  <Image
+                                    key={i}
+                                    source={{ uri: image }}
+                                    style={{ width: '80%', height: 150, marginRight: 5, borderRadius: 5 }}
+                                  />
+                                );
+                              }
+                            })}
+                          </View>
+                        )}
+                      </View>
+                    </Card.Content>
+                  </Card>
+                </Animatable.View>
+              );
+            } catch (error) {}
           })}
         </ScrollView>
       )}
