@@ -45,8 +45,8 @@ const Register = ({ setAnimating, setCurrentMode, setCurrentHeight, loginAnimati
         showToast('Registration successful ✅', 'success');
       } catch (error) {
         setShowLoading(false);
-        console.log(error);
-        showToast('Registration failed ❌', 'error');
+        console.log(error.response.data);
+        showToast(error.response.data.message, 'error');
       }
     }
   };

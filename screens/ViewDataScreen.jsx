@@ -80,7 +80,9 @@ const ViewDataScreen = ({ route }) => {
                   </Card>
                 </Animatable.View>
               );
-            } catch (error) {}
+            } catch (error) {
+              console.log('Error parsing JSON:', error);
+            }
           })}
         </ScrollView>
       )}
