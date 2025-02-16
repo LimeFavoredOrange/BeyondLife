@@ -18,6 +18,7 @@ import AccountManagerDashboard from '../components/Account/AccountManagerDashboa
 import LinkAccount from '../components/Link/LinkAccount';
 import AccountHeader from '../components/Account/AutomaticWillHeader';
 import AccountDashboard from '../components/Account/AutomaticWillDashboard';
+import SettingDashboard from '../components/Setting/SettingDashboard';
 import { set } from 'ramda';
 import NotificationOverlay from '../components/NotificationOverlay';
 import * as WebBrowser from 'expo-web-browser';
@@ -513,7 +514,12 @@ const HomeScreen = () => {
           </>
         )}
 
-        {selectedTab === 'Setting' && <AccountHeader title={'Settings'} />}
+        {selectedTab === 'Setting' && (
+          <>
+            <AccountHeader title={'Settings'} />
+            <SettingDashboard />
+          </>
+        )}
         <Tabs />
 
         {showStorageOptionScreen && (

@@ -65,6 +65,7 @@ const AccessWillDataScreen = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+
       console.log('Access Will Response:', response.data);
       const target = response.data.data;
       const privateKey = await getPrivateKeyFromSecureStore('private_key');
