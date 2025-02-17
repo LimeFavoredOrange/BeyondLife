@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import Tabs from '../components/Tabs/Tabs';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectSelectedTab } from '../redux/slices/homeSlice';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import * as DocumentPicker from 'expo-document-picker';
 
 import * as Animatable from 'react-native-animatable';
@@ -44,10 +44,18 @@ const HomeScreen = () => {
   const selectedTab = useSelector(selectSelectedTab);
   const token = useSelector(selectToken);
   const navigation = useNavigation();
+  const route = useRoute();
 
   const [showLoading, setShowLoading] = useState(false);
 
   const [showStorageOptionScreen, setShowStorageOptionScreen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (route.params?.showStorageOptionScreen === true) {
+      setShowStorageOptionScreen(true);
+    }
+  }, [route.params?.showStorageOptionScreen]);
+
   const [showCloudPlatforms, setShowCloudPlatforms] = React.useState(false);
   const [firstTimeDelay, setFirstTimeDelay] = React.useState(1200);
 

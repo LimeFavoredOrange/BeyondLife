@@ -9,6 +9,7 @@ import Modal from 'react-native-modal';
 import { selectToken } from '../redux/slices/auth';
 import { useSelector } from 'react-redux';
 import AccessDataNothing from '../assets/access_data_notiong.png';
+import { useNavigation } from '@react-navigation/native';
 
 import axiosInstance from '../api';
 
@@ -19,6 +20,8 @@ const WillTriggerActivationScreen = () => {
   const [trigger, setTrigger] = useState(false);
   const [wills, setWills] = useState([]);
   const token = useSelector(selectToken);
+
+  const navigation = useNavigation();
 
   const [unFinishedWill, setUnFinishedWill] = useState([]);
 
@@ -110,7 +113,7 @@ const WillTriggerActivationScreen = () => {
           <View>
             <Text className="text-sm text-gray-700">Status: Activated - In Freezing Period</Text>
             <Text className="text-xs text-gray-500">
-              Remaining Freezing Time: {remainingFreezingTime > 0 ? `${remainingFreezingTime} s` : 'N/A'}
+              Freezing Time: {remainingFreezingTime > 0 ? `${remainingFreezingTime} s` : 'N/A'}
             </Text>
           </View>
         );
@@ -218,7 +221,7 @@ const WillTriggerActivationScreen = () => {
                 actionButton = (
                   <TouchableOpacity
                     className="border border-gray-300 px-4 py-2 rounded-full"
-                    onPress={() => alert('View Activation Details')}
+                    onPress={() => navigation.navigate('Access Will Data')}
                   >
                     <Text className="text-gray-700 text-sm">View</Text>
                   </TouchableOpacity>

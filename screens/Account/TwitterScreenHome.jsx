@@ -9,11 +9,15 @@ import { useSelector } from 'react-redux';
 
 import axiosInstance from '../../api';
 
+import { setSelectedTab } from '../../redux/slices/homeSlice';
+import { useDispatch } from 'react-redux';
+
 const TwitterScreenHome = () => {
   const [showLoading, setShowLoading] = React.useState(false);
   const navigation = useNavigation();
   const token = useSelector(selectToken);
   const [alreadySetupWill, setAlreadySetupWill] = React.useState(false);
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
     // Check does the current user already setup a will or not
@@ -56,6 +60,68 @@ const TwitterScreenHome = () => {
     }
   };
 
+  const handleNavigateTOTwitterList = async () => {
+    // Check does the current user already link to the twitter account or not
+    // If not, navigate to the Home screen and set the selected tab to Link
+    const response = await axiosInstance.get('link/status', { headers: { Authorization: `Bearer ${token}` } });
+    if (response.data.twitter === 'None') {
+      dispatch(setSelectedTab('Link'));
+      navigation.navigate('Home');
+    } else {
+      navigation.navigate('TwitterList');
+    }
+  };
+
+  const handleSetupWillPreCheck = async () => {
+    // Check does the current user already link to the twitter account or not
+    // If not, navigate to the Home screen and set the selected tab to Link
+    let response = await axiosInstance.get('link/status', { headers: { Authorization: `Bearer ${token}` } });
+    if (response.data.twitter === 'None') {
+      dispatch(setSelectedTab('Link'));
+      navigation.navigate('Home');
+      return;
+    }
+
+    // Check does the current user already setup the storage location or not
+    // If not, navigate to the Home screen with pamameter showStorageOptionScreen=true
+    response = await axiosInstance.get('upload/setup_status', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    // Check if all the value in the returned object is false, then not setup yet
+    if (Object.values(response.data).every((val) => val === false)) {
+      dispatch(setSelectedTab('Home'));
+      navigation.navigate('Home', { showStorageOptionScreen: true });
+      return;
+    }
+
+    // Check does the current user already setup heirs or not
+    // If not, navigate to the Heir Management screen
+    response = await axiosInstance.get('heirs/list', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (response.data.length === 0) {
+      navigation.navigate('Heir Management');
+      return;
+    }
+
+    // Check does the current user already setup the will trigger condition or not
+    // If not, navigate to the Will Trigger Setting screen
+    response = await axiosInstance.get('auth/willtrigger', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (response.data.threshold === 0) {
+      navigation.navigate('Will Trigger Setting');
+      return;
+    }
+    navigation.navigate('Twitter Configure Will');
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F3F4F6' }}>
       <Loading showLoading={showLoading} />
@@ -65,7 +131,7 @@ const TwitterScreenHome = () => {
         {/* Retrieve Tweets Button */}
         <TouchableOpacity
           className="py-4 rounded-lg shadow-xl w-3/4"
-          onPress={() => navigation.navigate('TwitterList')}
+          onPress={() => handleNavigateTOTwitterList()}
           style={{ backgroundColor: '#036635' }}
         >
           <Text className="text-white text-center text-lg font-semibold tracking-wider">Retrieve Tweets</Text>
@@ -77,7 +143,7 @@ const TwitterScreenHome = () => {
         {/* Configure Will Button */}
         <TouchableOpacity
           className="py-4 rounded-lg shadow-xl w-3/4"
-          onPress={() => navigation.navigate('Twitter Configure Will')}
+          onPress={() => handleSetupWillPreCheck()}
           style={{ backgroundColor: '#028760' }}
         >
           <Text className="text-white text-center text-lg font-semibold tracking-wider">Configure Will</Text>
