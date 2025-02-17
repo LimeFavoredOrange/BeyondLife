@@ -8,7 +8,7 @@ import * as Animatable from 'react-native-animatable';
 import Modal from 'react-native-modal';
 import { selectToken } from '../redux/slices/auth';
 import { useSelector } from 'react-redux';
-import AccessDataNothing from '../assets/access_data_notiong.png'; // 确保路径正确
+import AccessDataNothing from '../assets/access_data_notiong.png';
 
 import axiosInstance from '../api';
 
@@ -130,7 +130,7 @@ const WillTriggerActivationScreen = () => {
       await axiosInstance.post(
         '/twitter/voteToTrigger',
         { will_address: will.address },
-        { headers: { Authorization: `Bearer ${token}` } } // 使用反引号
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setTrigger((prev) => !prev);
     } catch (error) {
