@@ -31,6 +31,8 @@ import { DROPBOX_KEY, GOOGLE_IOSCLIENT_ID, GOOGLE_WEB_ID } from '@env';
 import axiosInstance from '../api';
 import Loading from '../components/Loading';
 
+import OnboardingModal from '../components/Home/OnboardingModal';
+
 WebBrowser.maybeCompleteAuthSession();
 
 const discovery = {
@@ -45,7 +47,7 @@ const HomeScreen = () => {
 
   const [showLoading, setShowLoading] = useState(false);
 
-  const [showStorageOptionScreen, setShowStorageOptionScreen] = React.useState(true);
+  const [showStorageOptionScreen, setShowStorageOptionScreen] = React.useState(false);
   const [showCloudPlatforms, setShowCloudPlatforms] = React.useState(false);
   const [firstTimeDelay, setFirstTimeDelay] = React.useState(1200);
 
@@ -467,12 +469,15 @@ const HomeScreen = () => {
     getUploadPlatformSetup();
   }, [token]);
 
+  const [showOnBoarding, setShowOnBoarding] = React.useState(true);
   return (
     <>
       <SafeAreaView className="bg-white w-screen h-screen">
         {selectedTab === 'Home' && (
           <>
+            <OnboardingModal visible={showOnBoarding} onClose={() => setShowOnBoarding(false)} />
             <HomeHeader
+              setShowOnBoarding={setShowOnBoarding}
               setShowNotification={setShowNotification}
               notificationCount={notifications.filter((item) => item.read_status == 0).length}
             />
