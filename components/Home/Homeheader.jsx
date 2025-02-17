@@ -23,7 +23,8 @@ const Header = ({ setShowNotification, notificationCount }) => {
               dispatch(setToken(''));
             }}
           >
-            <Icon name="user-alt" type="font-awesome-5" />
+            {/* Info icon */}
+            <Icon name="info" type="feather" color={'black'} />
           </TouchableOpacity>
           <View className="flex-1"></View>
 

@@ -12,7 +12,7 @@ const OffensiveOption = ({ offensive, setOffensive }) => {
         onPress={() => setOffensive('noDetect')}
         checkedIcon="dot-circle-o"
         uncheckedIcon="circle-o"
-        title={'No detect offensive'}
+        title={'No offensive'}
       />
 
       {/* Option: Enable detection */}
@@ -21,7 +21,7 @@ const OffensiveOption = ({ offensive, setOffensive }) => {
         onPress={() => setOffensive('offensive')}
         checkedIcon="dot-circle-o"
         uncheckedIcon="circle-o"
-        title={'Detect offensive'}
+        title={'Contain offensive'}
       />
     </View>
   );

@@ -367,14 +367,18 @@ const HomeScreen = () => {
   };
 
   const OneDriveButton = ({ connected }) => {
-    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#0078D4]'; // 已连接用浅绿色，未连接用微软蓝
+    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#A9A9A9]'; // 已连接用浅绿色，未连接用微软蓝
     const textColor = connected ? 'text-[#1E7D32]' : 'text-white';
     const iconColor = connected ? '#1E7D32' : '#FFFFFF';
 
     return (
       <TouchableOpacity
         className={`p-4 ${bgColor} rounded-lg flex-row items-center space-x-2 mt-2 shadow-md`}
-        onPress={connected ? () => alert('Are you sure you want to unlink OneDrive?') : null}
+        onPress={
+          connected
+            ? () => alert('Are you sure you want to unlink OneDrive?')
+            : () => alert('OneDrive is not supported in demo version.')
+        }
       >
         <Icon name="microsoft-onedrive" size={24} color={iconColor} />
         <Text className={`font-bold ${textColor}`}>{connected ? 'Unlink ' : 'Connect to '}OneDrive</Text>
@@ -384,14 +388,18 @@ const HomeScreen = () => {
   };
 
   const ICloudButton = ({ connected }) => {
-    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#4A90E2]'; // 已连接用浅绿色，未连接用柔和的蓝
+    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#A9A9A9]'; // 已连接用浅绿色，未连接用柔和的蓝
     const textColor = connected ? 'text-[#1E7D32]' : 'text-white';
     const iconColor = connected ? '#1E7D32' : '#FFFFFF';
 
     return (
       <TouchableOpacity
         className={`p-4 ${bgColor} rounded-lg flex-row items-center space-x-2 mt-2 shadow-md`}
-        onPress={connected ? () => alert('Are you sure you want to unlink iCloud?') : null}
+        onPress={
+          connected
+            ? () => alert('Are you sure you want to unlink iCloud?')
+            : () => alert('iCloud is not supported in demo version.')
+        }
       >
         <Icon name="apple" size={24} color={iconColor} />
         <Text className={`font-bold ${textColor}`}>{connected ? 'Unlink ' : 'Connect to '}iCloud</Text>
@@ -493,7 +501,7 @@ const HomeScreen = () => {
 
         {selectedTab === 'Document' && (
           <>
-            <AccountHeader
+            {/* <AccountHeader
               title={'Automatic Will'}
               isTab={true}
               tabIcon={{ name: 'upload', type: 'entypo' }}
@@ -509,7 +517,8 @@ const HomeScreen = () => {
                   console.log(err);
                 }
               }}
-            />
+            /> */}
+            <AccountHeader title={'Automatic Will'} />
             <AccountDashboard />
           </>
         )}

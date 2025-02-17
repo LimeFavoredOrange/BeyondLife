@@ -23,30 +23,42 @@ const WillTriggerActivationScreen = () => {
   const [unFinishedWill, setUnFinishedWill] = useState([]);
 
   useEffect(() => {
+    let isInitialFetch = true; // 标记是否为首次加载
+
     const fetchWills = async () => {
-      setShowLoading(true);
+      if (isInitialFetch) setShowLoading(true);
+
       try {
         const response = await axiosInstance.get('/twitter/willList', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+
         console.log('Live Data:', response.data);
         setWills(response.data.wills || []);
 
-        // For each of the wills, check if there is any unfinished will
-        // If the status is not 'Activated - Ready to View', then it is an unfinished will
         const unfinishedWill = response.data.wills.filter((will) => will.status !== 'Activated - Ready to View');
         console.log('Unfinished Will:', unfinishedWill);
         setUnFinishedWill(unfinishedWill);
       } catch (error) {
         console.error(error);
       } finally {
-        setShowLoading(false);
+        if (isInitialFetch) {
+          setShowLoading(false);
+          isInitialFetch = false; // 仅首次加载后设置为 false
+        }
       }
     };
 
+    // 立即执行一次
     fetchWills();
+
+    // // 设置定时器，每 2 秒执行一次
+    // const intervalId = setInterval(fetchWills, 20000);
+
+    // // 组件卸载时清除定时器
+    // return () => clearInterval(intervalId);
   }, [token, trigger]);
 
   useEffect(() => {
@@ -268,9 +280,6 @@ const WillTriggerActivationScreen = () => {
                   {selectedWill.type && <Text className="text-sm text-gray-700 mb-1">Type: {selectedWill.type}</Text>}
                   <Text className="text-sm text-gray-700 mb-1">Created At: {selectedWill.createdAt}</Text>
                   <Text className="text-sm text-gray-700 mb-3">Status: {selectedWill.status}</Text>
-                  <Text className="text-sm text-gray-500 mb-3">
-                    More details can be shown here, such as inheritor list, conditions, and history.
-                  </Text>
                   <TouchableOpacity
                     className="bg-blue-500 px-4 py-2 rounded-full self-end"
                     onPress={() => setModalVisible(false)}

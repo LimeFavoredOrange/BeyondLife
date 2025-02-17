@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 
 import React from 'react';
 import AccountHeader from '../../components/Account/AutomaticWillHeader';
-import axios from 'axios';
+import axiosInstance from '../../api';
 import { Button, SearchBar, Badge, Divider } from '@rneui/themed';
 
 import Filter from '../../components/Account/Filter';
@@ -16,54 +16,77 @@ import { userData } from '../../Data/Twitter/twitterData';
 import twitterBackup from '../../Data/Twitter/twitterBackup';
 import { useNavigation } from '@react-navigation/native';
 
+const formatTimestamp = (timestamp) => {
+  if (!timestamp) return 'Unknown Date'; // 防止 undefined 报错
+  const date = new Date(timestamp.replace(' ', 'T'));
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(date);
+};
+
 const TwitterScreen = () => {
   // const mlURL = 'https://5331-110-150-115-26.au.ngrok.io';
   const [tweets, setTweets] = React.useState(userData.tweets.data);
-  const [targets, setTargets] = React.useState(userData.tweets.data);
-  const [imageData, setImageData] = React.useState([]);
-  const [offensiveData, setOffensiveData] = React.useState([]);
+  // const [targets, setTargets] = React.useState(userData.tweets.data);
+  const [dummyTweets, setDummyTweets] = React.useState([
+    {
+      id: 1,
+      text: 'First tweet, welcome to Sydney',
+      images: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-JI9zihxNGOqiYdiX2OuqegWCEiev0eAPAw&s'],
+      timestamp: '2024-11-26 06:40:57',
+    },
+    {
+      id: 2,
+      text: 'Second tweet, Call for Papers: Exploring the History of the Web, from Inception to Present @TheWebConf 2025 @TheOfficialACM',
+      images: [''],
+      timestamp: '2024-11-28 21:40:57',
+    },
+    {
+      id: 3,
+      text: 'Third tweet, #TheWebConf24 Cheers, beers, volunteers! Thank you!',
+      images: [''],
+      timestamp: '2024-12-05 08:40:57',
+    },
+    { id: 4, text: 'This is for testing purpose only: what the fuck!', images: [''], timestamp: '2024-12-07 09:40:57' },
+  ]);
+
+  const [targets, setTargets] = React.useState([]);
   const [showLoading, setShowLoading] = React.useState(false);
   let current_data = tweets;
-
-  const [medias, setMedias] = React.useState([]);
 
   const [tab, setTab] = React.useState('Tweets&replies');
   const [showOptions, setShowOptions] = React.useState(false);
 
-  const [selectImage, setSelectImage] = React.useState(0);
-  const [selectOffensive, setSelectOffensive] = React.useState(0);
-  const [enable, setEnable] = React.useState(0);
-
   const [searching, setSearching] = React.useState('');
 
-  const [showSetting, setShowSetting] = React.useState(false);
-
-  const navigation = useNavigation();
+  const detectOffensive = async (text) => {
+    try {
+      const response = await axiosInstance.post('/offensive/check', { text });
+      console.log('response', response.data);
+      return response.data.contains_offensive_language;
+    } catch (error) {
+      console.error('Error detecting offensive language:', error);
+      return false; // 发生错误时默认返回 false
+    }
+  };
 
   // Function to get all tweets
   const getTweets = async () => {
     setShowLoading(true);
-    // const response = await axios.get('https://tor2023-203l.onrender.com/twitter/getTweets');
-    // const response = await axios.get('https://1e86-110-150-54-105.ngrok-free.app/twitter/getTweets');
-    const response = userData;
-    // getUserSetting();
-    const tweetsData = response.tweets.data;
-
     // Check if tweet is offensive
-    // for (const tweet in tweetsData) {
-    //   const checkOffensive = await detectOffensive(removeLink(tweetsData[tweet].text));
-    //   if (checkOffensive === 'Toxicity: True') {
-    //     tweetsData[tweet].offensive = true;
-    //   } else {
-    //     tweetsData[tweet].offensive = false;
-    //   }
-    // }
+    for (const tweet of dummyTweets) {
+      const checkOffensive = await detectOffensive(tweet.text);
+      tweet.offensive = checkOffensive;
+    }
+    const temp = [...dummyTweets];
+    setTargets(temp);
+    setDummyTweets(temp);
 
-    setTweets(tweetsData);
-    setTargets(tweetsData);
-    setImageData(tweetsData.filter((item) => item.attachments).map((item) => item.id));
-    setOffensiveData(tweetsData.filter((item) => item.offensive).map((item) => item.id));
-    setMedias(response.tweets.includes.media);
     setShowLoading(false);
   };
 
@@ -71,96 +94,35 @@ const TwitterScreen = () => {
     getTweets();
   }, []);
 
-  // Function to check the input text is offensive or not
-  // const detectOffensive = async (text) => {
-  //   try {
-  //     const response = await axios.get(`${mlURL}/detectToxicity`, { params: { text } });
-  //     if (response.status === 200) {
-  //       return response.data;
-  //     }
-  //   } catch (error) {
-  //     console.log(error.message);
-  //   }
-  // };
-
-  const removeLink = (text) => {
-    const regex = /https?:\/\/[\w/:%#\$&\?\(\)~\.=\+\-]+/g;
-    return text.replace(regex, '');
-  };
-
-  const getImage = (key) => {
-    const media = medias.find((item) => item.media_key === key);
-    return media?.url;
-  };
-
-  // Function to delete tweet
-  const deleteTweet = async (id) => {
-    // const response = await axios.post(`https://1e86-110-150-54-105.ngrok-free.app/twitter/delete/${id}`);
-    // if (response.status === 200) {
-    //   setTargets((current) => current.filter((item) => item.id !== id));
-    // }
-    setTargets((current) => current.filter((item) => item.id !== id));
-  };
-
-  const checkAutomaticAction = (target) => {
-    if (selectImage === 1 && target.attachments) {
-      return true;
-    }
-    if (selectOffensive === 1 && target.offensive) {
-      return true;
-    }
-    return false;
-  };
-
   React.useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      const tar = tweets.filter((item) => item.text.toUpperCase().includes(searching.toUpperCase()));
+      const tar = dummyTweets.filter((item) => item.text.toUpperCase().includes(searching.toUpperCase()));
       setTargets(tar);
     }, 300);
     return () => clearTimeout(delayDebounceFn);
   }, [searching]);
 
   // Function to apply filter
-  const applyFunction = async (option, offensive, tab, current_data) => {
-    let tar = current_data.filter((item) => item.text.toUpperCase().includes(searching.toUpperCase()));
+  const applyFunction = (option, offensive, tab, current_data) => {
+    let tar = dummyTweets.filter((item) => item.text.toUpperCase().includes(searching.toUpperCase()));
+
+    console.log('option', option);
 
     if (option === 'containMedia') {
-      tar = tar.filter((item) => item.attachments);
+      console.log('containMedia');
+      tar = tar.filter((item) => item.images && item.images[0]);
     } else if (option === 'noMedia') {
-      tar = tar.filter((item) => !item.attachments);
+      console.log('noMedia');
+      tar = tar.filter((tweet) => !tweet.images || tweet.images.length === 0 || tweet.images.every((img) => !img));
     }
 
     if (offensive === 'offensive') {
+      console.log('offensive');
       tar = tar.filter((item) => item.offensive);
     }
-
-    if (tab === 'Replies') {
-      tar = tar.filter((item) => item.in_reply_to_user_id);
-    }
+    console.log('tar', tar);
     return tar;
   };
-
-  // Function to get the current user setting
-  // const getUserSetting = async () => {
-  //   try {
-  //     const res = await axios.get('https://tor2023-203l.onrender.com/twitter/autoSetting?userId=1');
-  //     const { deleteimage, deleteoffensive } = res.data;
-  //     console.log(deleteimage, deleteoffensive);
-  //     if (deleteimage === true) {
-  //       setSelectImage(1);
-  //     } else {
-  //       setSelectImage(0);
-  //     }
-
-  //     if (deleteoffensive === true) {
-  //       setSelectOffensive(1);
-  //     } else {
-  //       setSelectOffensive(0);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -170,43 +132,43 @@ const TwitterScreen = () => {
         title={'Twitter'}
         icon={[
           { name: 'options', type: 'ionicon' },
-          { name: 'refresh-auto', type: 'material-community' },
-          { name: 'clouddownload', type: 'antdesign' },
-          { name: 'upload-cloud', type: 'feather' },
-          { name: 'unlock', type: 'feather' },
+          // { name: 'refresh-auto', type: 'material-community' },
+          // { name: 'clouddownload', type: 'antdesign' },
+          // { name: 'upload-cloud', type: 'feather' },
+          // { name: 'unlock', type: 'feather' },
         ]}
         iconFunction={[
           () => {
             setShowOptions(true);
           },
-          () => {
-            setShowSetting(true);
-          },
-          async () => {
-            // Send the local backup file to the user (twitterBackup.txt)
-            // ../../Data/twitterData/tweetsData.txt
-            const fileUri = FileSystem.documentDirectory + 'twitterBackup.txt';
-            await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(twitterBackup));
-            const downloadedFile = await FileSystem.getInfoAsync(fileUri);
+          // () => {
+          //   setShowSetting(true);
+          // },
+          // async () => {
+          //   // Send the local backup file to the user (twitterBackup.txt)
+          //   // ../../Data/twitterData/tweetsData.txt
+          //   const fileUri = FileSystem.documentDirectory + 'twitterBackup.txt';
+          //   await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(twitterBackup));
+          //   const downloadedFile = await FileSystem.getInfoAsync(fileUri);
 
-            const imageFileExts = ['jpg', 'png', 'gif', 'heic', 'webp', 'bmp'];
-            const isIos = Platform.OS === 'ios';
+          //   const imageFileExts = ['jpg', 'png', 'gif', 'heic', 'webp', 'bmp'];
+          //   const isIos = Platform.OS === 'ios';
 
-            if (isIos && imageFileExts.every((x) => !downloadedFile.uri.endsWith(x))) {
-              const UTI = 'twitter.item';
-              await Sharing.shareAsync(downloadedFile.uri, { UTI });
-            } else {
-              await Sharing.shareAsync(downloadedFile.uri);
-            }
-          },
-          () => {
-            // Navigate to the twitter setting screen
-            navigation.navigate('Twitter Setting');
-          },
-          () => {
-            // Navigate to the twitter decryption screen
-            navigation.navigate('Twitter Decryption');
-          },
+          //   if (isIos && imageFileExts.every((x) => !downloadedFile.uri.endsWith(x))) {
+          //     const UTI = 'twitter.item';
+          //     await Sharing.shareAsync(downloadedFile.uri, { UTI });
+          //   } else {
+          //     await Sharing.shareAsync(downloadedFile.uri);
+          //   }
+          // },
+          // () => {
+          //   // Navigate to the twitter setting screen
+          //   navigation.navigate('Twitter Setting');
+          // },
+          // () => {
+          //   // Navigate to the twitter decryption screen
+          //   navigation.navigate('Twitter Decryption');
+          // },
         ]}
       />
 
@@ -219,81 +181,39 @@ const TwitterScreen = () => {
         clearIcon={Platform.OS === 'ios' ? { name: 'close-circle' } : null}
       />
 
-      <View className="flex-row justify-center space-x-4 my-2">
-        {/* Download all button */}
-        <TouchableOpacity
-          style={{ backgroundColor: '#036635' }}
-          className=" px-4 py-2 rounded-lg"
-          onPress={async () => {
-            // Send the local backup file to the user (twitterBackup.txt)
-            // ../../Data/twitterData/tweetsData.txt
-            const fileUri = FileSystem.documentDirectory + 'twitterBackup.txt';
-            await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(twitterBackup));
-            const downloadedFile = await FileSystem.getInfoAsync(fileUri);
-
-            const imageFileExts = ['jpg', 'png', 'gif', 'heic', 'webp', 'bmp'];
-            const isIos = Platform.OS === 'ios';
-
-            if (isIos && imageFileExts.every((x) => !downloadedFile.uri.endsWith(x))) {
-              const UTI = 'twitter.item';
-              await Sharing.shareAsync(downloadedFile.uri, { UTI });
-            } else {
-              await Sharing.shareAsync(downloadedFile.uri);
-            }
-          }}
-        >
-          <Text className="text-white text-center font-bold">Download all</Text>
-        </TouchableOpacity>
-
-        {/* Download all & delete from X button */}
-        <TouchableOpacity className="bg-red-500 px-4 py-2 rounded-lg">
-          <Text className="text-white text-center font-bold">Download all & delete from X</Text>
-        </TouchableOpacity>
-      </View>
-
       <Divider />
 
       <FlatList
         data={targets}
+        keyExtractor={(item, index) => `${item.id}-${index}`}
+        removeClippedSubviews={false} // 确保列表项不会因优化而被隐藏
+        extraData={targets} // 确保状态更新时触发重新渲染
         renderItem={({ item }) => {
+          console.log('item', item);
           return (
-            <View className="flex-row border-b">
-              <View style={{ height: 230, width: '80%' }} className="bg-gray-100 p-2 ">
-                <Text className="mb-2">id: {item.id}</Text>
-                <Text className="mb-2">author_id: {item.author_id}</Text>
-                <Text className="mb-2">created_at: {item.created_at}</Text>
-                {checkAutomaticAction(item) && (
-                  <Text>
-                    <Badge className="mb-2" value="will be automatically delete" status="primary" />
-                  </Text>
-                )}
-                {/* If the tweet doesn't contain image */}
-                {item.attachments === undefined && <Text className="mb-2">text: {item.text}</Text>}
+            <TouchableOpacity
+              className="border-b border-gray-300 p-4 bg-white hover:bg-gray-100 active:bg-gray-200 transition"
+              activeOpacity={0.6}
+            >
+              <View className="flex-row items-start">
+                {/* 图片（如果有才显示） */}
+                {item.images && item.images[0] && item.images[0].trim() ? (
+                  <Image source={{ uri: item.images[0] }} className="w-36 h-20 rounded-lg mr-3" resizeMode="cover" />
+                ) : null}
 
-                {/* If the tweet contain image */}
-                {item.attachments && (
-                  <>
-                    <Text className="mb-2">text: {removeLink(item.text)}</Text>
-                    <Image
-                      height={300}
-                      width={300}
-                      source={{ uri: `${getImage(item.attachments.media_keys[0])}`, width: 200, height: 110 }}
-                    />
-                  </>
-                )}
+                {/* 文字部分，确保 Text 可正常换行，不被 Image 挤压 */}
+                <View className="flex-1">
+                  <Text className="text-md font-semibold text-gray-900 flex-shrink">{item.text}</Text>
+                  <Text className="text-sm text-gray-500 mt-1">{formatTimestamp(item.timestamp)}</Text>
+                </View>
               </View>
-              <View className="justify-center items-center bg-gray-100 ">
-                <Button color="#FF2E2E" buttonStyle={{ borderRadius: 15 }} onPress={() => deleteTweet(item.id)}>
-                  <Text className="font-bold text-white">Delete</Text>
-                </Button>
-              </View>
-            </View>
+            </TouchableOpacity>
           );
         }}
       />
 
       {/* Filter popup */}
-      {/* <Filter
+      <Filter
         applyFunction={applyFunction}
         setTargets={setTargets}
         setShowOptions={setShowOptions}
@@ -301,24 +221,7 @@ const TwitterScreen = () => {
         tab={tab}
         setTab={setTab}
         current_data={current_data}
-      /> */}
-
-      {/* Setting popup */}
-      {/* <AutoSetting
-        showSetting={showSetting}
-        setShowSetting={setShowSetting}
-        setTargets={setTargets}
-        tab={tab}
-        current_data={current_data}
-        setSelectImage={setSelectImage}
-        setSelectOffensive={setSelectOffensive}
-        setEnable={setEnable}
-        enable={enable}
-        selectImage={selectImage}
-        selectOffensive={selectOffensive}
-        imageData={imageData}
-        offensiveData={offensiveData}
-      /> */}
+      />
     </SafeAreaView>
   );
 };
