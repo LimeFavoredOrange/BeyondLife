@@ -89,6 +89,13 @@ const TwitterScreenHome = () => {
         Authorization: `Bearer ${token}`,
       },
     });
+    // 检查有没有至少 2 个true
+    if (Object.values(response.data).filter((val) => val === true).length < 2) {
+      dispatch(setSelectedTab('Home'));
+      navigation.navigate('Home', { showStorageOptionScreen: true });
+      return;
+    }
+
     // Check if all the value in the returned object is false, then not setup yet
     if (Object.values(response.data).every((val) => val === false)) {
       dispatch(setSelectedTab('Home'));

@@ -634,6 +634,9 @@ const HomeScreen = () => {
                       Select the platform where you want to store your data. Connecting multiple platforms will enhance
                       data redundancy and security, though it may impact performance.
                     </Text>
+                    <Text className="text-center font-semibold text-sm text-red-500">
+                      For the demo purpose, you must select at least two platforms to get started.
+                    </Text>
                   </View>
                 </Animatable.View>
               )}

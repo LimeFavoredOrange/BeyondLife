@@ -30,8 +30,7 @@ const OnboardingModal = ({ visible, onClose }) => {
     },
     {
       title: '3. Configure Will Triggers',
-      description:
-        'BeyondLife offers multiple triggers, including time-based activation, biometric verification, or third-party confirmation.',
+      description: 'BeyondLife offers multiple triggers, including time-based activation, or threshold activation.',
       image: willTriggerSetting,
     },
     {

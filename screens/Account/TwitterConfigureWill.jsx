@@ -427,6 +427,11 @@ const TwitterConfigureWill = () => {
                   {storageOptionDescription[storageOption]}
                 </HelperText>
               </View>
+              <HelperText type="info" className="text-base ml-2 text-red-500 font-bold">
+                For demo purposes, this option will only be valid if at least two storage locations are involved. This
+                ensures the demonstration of the file distribution process. (You may choose multiple personal cloud
+                options or a combination of BeyondLife and a personal cloud.)
+              </HelperText>
             </View>
           )}
 
