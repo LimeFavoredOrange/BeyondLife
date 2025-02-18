@@ -204,7 +204,7 @@ const TwitterConfigureWill = () => {
     },
   ];
 
-  const [tweetsList, setTweetsList] = useState([]);
+  const [tweetsList, setTweetsList] = useState(dummy_tweets_list);
 
   const hideModal = () => {
     // Set the current selected attributes to the selected tweet
