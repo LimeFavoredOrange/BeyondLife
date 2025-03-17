@@ -34,7 +34,7 @@ const Dashboard = ({ setShowStorageOptionScreen }) => {
       title: '#Accounts',
       backgroundColor: '#056A47',
       num: accountNumber,
-      linkTo: () => dispatch(setSelectedTab('Link')),
+      linkTo: () => dispatch(setSelectedTab('Key')),
     },
     {
       id: 'Executor number',

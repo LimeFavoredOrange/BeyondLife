@@ -8,7 +8,8 @@ import * as Animatable from 'react-native-animatable';
 import Modal from 'react-native-modal';
 import { selectToken } from '../redux/slices/auth';
 import { useSelector } from 'react-redux';
-import AccessDataNothing from '../assets/access_data_notiong.png'; // 确保路径正确
+import AccessDataNothing from '../assets/access_data_notiong.png';
+import { useNavigation } from '@react-navigation/native';
 
 import axiosInstance from '../api';
 
@@ -20,33 +21,47 @@ const WillTriggerActivationScreen = () => {
   const [wills, setWills] = useState([]);
   const token = useSelector(selectToken);
 
+  const navigation = useNavigation();
+
   const [unFinishedWill, setUnFinishedWill] = useState([]);
 
   useEffect(() => {
+    let isInitialFetch = true; // 标记是否为首次加载
+
     const fetchWills = async () => {
-      setShowLoading(true);
+      if (isInitialFetch) setShowLoading(true);
+
       try {
         const response = await axiosInstance.get('/twitter/willList', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+
         console.log('Live Data:', response.data);
         setWills(response.data.wills || []);
 
-        // For each of the wills, check if there is any unfinished will
-        // If the status is not 'Activated - Ready to View', then it is an unfinished will
         const unfinishedWill = response.data.wills.filter((will) => will.status !== 'Activated - Ready to View');
         console.log('Unfinished Will:', unfinishedWill);
         setUnFinishedWill(unfinishedWill);
       } catch (error) {
         console.error(error);
       } finally {
-        setShowLoading(false);
+        if (isInitialFetch) {
+          setShowLoading(false);
+          isInitialFetch = false; // 仅首次加载后设置为 false
+        }
       }
     };
 
+    // 立即执行一次
     fetchWills();
+
+    // // 设置定时器，每 2 秒执行一次
+    // const intervalId = setInterval(fetchWills, 20000);
+
+    // // 组件卸载时清除定时器
+    // return () => clearInterval(intervalId);
   }, [token, trigger]);
 
   useEffect(() => {
@@ -98,7 +113,7 @@ const WillTriggerActivationScreen = () => {
           <View>
             <Text className="text-sm text-gray-700">Status: Activated - In Freezing Period</Text>
             <Text className="text-xs text-gray-500">
-              Remaining Freezing Time: {remainingFreezingTime > 0 ? `${remainingFreezingTime} s` : 'N/A'}
+              Freezing Time: {remainingFreezingTime > 0 ? `${remainingFreezingTime} s` : 'N/A'}
             </Text>
           </View>
         );
@@ -130,7 +145,7 @@ const WillTriggerActivationScreen = () => {
       await axiosInstance.post(
         '/twitter/voteToTrigger',
         { will_address: will.address },
-        { headers: { Authorization: `Bearer ${token}` } } // 使用反引号
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setTrigger((prev) => !prev);
     } catch (error) {
@@ -206,7 +221,7 @@ const WillTriggerActivationScreen = () => {
                 actionButton = (
                   <TouchableOpacity
                     className="border border-gray-300 px-4 py-2 rounded-full"
-                    onPress={() => alert('View Activation Details')}
+                    onPress={() => navigation.navigate('Access Will Data')}
                   >
                     <Text className="text-gray-700 text-sm">View</Text>
                   </TouchableOpacity>
@@ -268,9 +283,6 @@ const WillTriggerActivationScreen = () => {
                   {selectedWill.type && <Text className="text-sm text-gray-700 mb-1">Type: {selectedWill.type}</Text>}
                   <Text className="text-sm text-gray-700 mb-1">Created At: {selectedWill.createdAt}</Text>
                   <Text className="text-sm text-gray-700 mb-3">Status: {selectedWill.status}</Text>
-                  <Text className="text-sm text-gray-500 mb-3">
-                    More details can be shown here, such as inheritor list, conditions, and history.
-                  </Text>
                   <TouchableOpacity
                     className="bg-blue-500 px-4 py-2 rounded-full self-end"
                     onPress={() => setModalVisible(false)}

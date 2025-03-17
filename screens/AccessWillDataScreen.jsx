@@ -65,6 +65,7 @@ const AccessWillDataScreen = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+
       console.log('Access Will Response:', response.data);
       const target = response.data.data;
       const privateKey = await getPrivateKeyFromSecureStore('private_key');
@@ -77,6 +78,7 @@ const AccessWillDataScreen = () => {
       console.log('Decrypted Data:', output);
 
       // Navigate to the next screen with the decrypted data
+      // 在这里导航到下一个屏幕，并传递解密后的数据
       navigation.navigate('View Data', { data: output });
 
       setShowLoading(false);

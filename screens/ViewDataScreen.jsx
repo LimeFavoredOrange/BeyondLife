@@ -48,9 +48,6 @@ const ViewDataScreen = ({ route }) => {
               const content = element.text;
               const images = element.images;
               const timestamp = element.timestamp;
-              console.log('content', content);
-              console.log('images', images);
-              console.log('timestamp', timestamp);
               return (
                 <Animatable.View key={index} animation="fadeInUp" duration={500} delay={index * 100} className="mb-4">
                   <Card className="rounded-xl shadow-sm border border-gray-200">

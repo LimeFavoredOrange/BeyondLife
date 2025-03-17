@@ -7,7 +7,7 @@ import { selectGreeting } from '../../redux/slices/homeSlice';
 import { setIsLogin, setToken } from '../../redux/slices/auth';
 import { useNavigation } from '@react-navigation/native';
 
-const Header = ({ setShowNotification, notificationCount }) => {
+const Header = ({ setShowNotification, notificationCount, setShowOnBoarding }) => {
   const dispatch = useDispatch();
   const greeting = useSelector(selectGreeting);
   const navigation = useNavigation();
@@ -19,11 +19,11 @@ const Header = ({ setShowNotification, notificationCount }) => {
           {/* User Icon */}
           <TouchableOpacity
             onPress={() => {
-              dispatch(setIsLogin(false));
-              dispatch(setToken(''));
+              setShowOnBoarding(true);
             }}
           >
-            <Icon name="user-alt" type="font-awesome-5" />
+            {/* Info icon */}
+            <Icon name="info" type="feather" color={'black'} />
           </TouchableOpacity>
           <View className="flex-1"></View>
 

@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import Tabs from '../components/Tabs/Tabs';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectSelectedTab } from '../redux/slices/homeSlice';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import * as DocumentPicker from 'expo-document-picker';
 
 import * as Animatable from 'react-native-animatable';
@@ -18,6 +18,7 @@ import AccountManagerDashboard from '../components/Account/AccountManagerDashboa
 import LinkAccount from '../components/Link/LinkAccount';
 import AccountHeader from '../components/Account/AutomaticWillHeader';
 import AccountDashboard from '../components/Account/AutomaticWillDashboard';
+import SettingDashboard from '../components/Setting/SettingDashboard';
 import { set } from 'ramda';
 import NotificationOverlay from '../components/NotificationOverlay';
 import * as WebBrowser from 'expo-web-browser';
@@ -30,6 +31,8 @@ import { DROPBOX_KEY, GOOGLE_IOSCLIENT_ID, GOOGLE_WEB_ID } from '@env';
 import axiosInstance from '../api';
 import Loading from '../components/Loading';
 
+import OnboardingModal from '../components/Home/OnboardingModal';
+
 WebBrowser.maybeCompleteAuthSession();
 
 const discovery = {
@@ -41,10 +44,18 @@ const HomeScreen = () => {
   const selectedTab = useSelector(selectSelectedTab);
   const token = useSelector(selectToken);
   const navigation = useNavigation();
+  const route = useRoute();
 
   const [showLoading, setShowLoading] = useState(false);
 
-  const [showStorageOptionScreen, setShowStorageOptionScreen] = React.useState(true);
+  const [showStorageOptionScreen, setShowStorageOptionScreen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (route.params?.showStorageOptionScreen === true) {
+      setShowStorageOptionScreen(true);
+    }
+  }, [route.params?.showStorageOptionScreen]);
+
   const [showCloudPlatforms, setShowCloudPlatforms] = React.useState(false);
   const [firstTimeDelay, setFirstTimeDelay] = React.useState(1200);
 
@@ -366,14 +377,18 @@ const HomeScreen = () => {
   };
 
   const OneDriveButton = ({ connected }) => {
-    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#0078D4]'; // 已连接用浅绿色，未连接用微软蓝
+    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#A9A9A9]'; // 已连接用浅绿色，未连接用微软蓝
     const textColor = connected ? 'text-[#1E7D32]' : 'text-white';
     const iconColor = connected ? '#1E7D32' : '#FFFFFF';
 
     return (
       <TouchableOpacity
         className={`p-4 ${bgColor} rounded-lg flex-row items-center space-x-2 mt-2 shadow-md`}
-        onPress={connected ? () => alert('Are you sure you want to unlink OneDrive?') : null}
+        onPress={
+          connected
+            ? () => alert('Are you sure you want to unlink OneDrive?')
+            : () => alert('OneDrive is not supported in demo version.')
+        }
       >
         <Icon name="microsoft-onedrive" size={24} color={iconColor} />
         <Text className={`font-bold ${textColor}`}>{connected ? 'Unlink ' : 'Connect to '}OneDrive</Text>
@@ -383,14 +398,18 @@ const HomeScreen = () => {
   };
 
   const ICloudButton = ({ connected }) => {
-    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#4A90E2]'; // 已连接用浅绿色，未连接用柔和的蓝
+    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#A9A9A9]'; // 已连接用浅绿色，未连接用柔和的蓝
     const textColor = connected ? 'text-[#1E7D32]' : 'text-white';
     const iconColor = connected ? '#1E7D32' : '#FFFFFF';
 
     return (
       <TouchableOpacity
         className={`p-4 ${bgColor} rounded-lg flex-row items-center space-x-2 mt-2 shadow-md`}
-        onPress={connected ? () => alert('Are you sure you want to unlink iCloud?') : null}
+        onPress={
+          connected
+            ? () => alert('Are you sure you want to unlink iCloud?')
+            : () => alert('iCloud is not supported in demo version.')
+        }
       >
         <Icon name="apple" size={24} color={iconColor} />
         <Text className={`font-bold ${textColor}`}>{connected ? 'Unlink ' : 'Connect to '}iCloud</Text>
@@ -458,12 +477,15 @@ const HomeScreen = () => {
     getUploadPlatformSetup();
   }, [token]);
 
+  const [showOnBoarding, setShowOnBoarding] = React.useState(true);
   return (
     <>
       <SafeAreaView className="bg-white w-screen h-screen">
         {selectedTab === 'Home' && (
           <>
+            <OnboardingModal visible={showOnBoarding} onClose={() => setShowOnBoarding(false)} />
             <HomeHeader
+              setShowOnBoarding={setShowOnBoarding}
               setShowNotification={setShowNotification}
               notificationCount={notifications.filter((item) => item.read_status == 0).length}
             />
@@ -492,7 +514,7 @@ const HomeScreen = () => {
 
         {selectedTab === 'Document' && (
           <>
-            <AccountHeader
+            {/* <AccountHeader
               title={'Automatic Will'}
               isTab={true}
               tabIcon={{ name: 'upload', type: 'entypo' }}
@@ -508,12 +530,18 @@ const HomeScreen = () => {
                   console.log(err);
                 }
               }}
-            />
+            /> */}
+            <AccountHeader title={'Automatic Will'} />
             <AccountDashboard />
           </>
         )}
 
-        {selectedTab === 'Setting' && <AccountHeader title={'Settings'} />}
+        {selectedTab === 'Setting' && (
+          <>
+            <AccountHeader title={'Settings'} />
+            <SettingDashboard />
+          </>
+        )}
         <Tabs />
 
         {showStorageOptionScreen && (
@@ -605,6 +633,9 @@ const HomeScreen = () => {
                     <Text className="text-center text-sm text-gray-600">
                       Select the platform where you want to store your data. Connecting multiple platforms will enhance
                       data redundancy and security, though it may impact performance.
+                    </Text>
+                    <Text className="text-center font-semibold text-sm text-red-500">
+                      For the demo purpose, you must select at least two platforms to get started.
                     </Text>
                   </View>
                 </Animatable.View>

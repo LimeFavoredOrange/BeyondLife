@@ -204,7 +204,7 @@ const TwitterConfigureWill = () => {
     },
   ];
 
-  const [tweetsList, setTweetsList] = useState([]);
+  const [tweetsList, setTweetsList] = useState(dummy_tweets_list);
 
   const hideModal = () => {
     // Set the current selected attributes to the selected tweet
@@ -351,7 +351,9 @@ const TwitterConfigureWill = () => {
       }
     } else {
       setAnimation('fadeInRight');
-      if (currentStep === 1 && storageOption === 'None (Delete All)') {
+      console.log('Current Step:', currentStep);
+      console.log('Storage Option:', storageOption);
+      if (currentStep === 1 && storageOption === 'deleteAll') {
         setCurrentStep(7);
         setProgressStatus(1);
         setSkippedSteps(true);
@@ -404,7 +406,13 @@ const TwitterConfigureWill = () => {
           {currentStep === 1 && (
             <View>
               <Text className="text-xl font-semibold mt-8 mx-3">🌍 Step 1: Pick Your Tweets' Forever Home</Text>
-              <Picker selectedValue={storageOption} onValueChange={(itemValue) => setStorageOption(itemValue)}>
+              <Picker
+                selectedValue={storageOption}
+                onValueChange={(itemValue) => {
+                  console.log('Storage Option:', itemValue);
+                  setStorageOption(itemValue);
+                }}
+              >
                 <Picker.Item label="BeyondLife Server" value="beyondLifeServer" />
                 <Picker.Item label="Personal Cloud Server" value="personalCloudServer" />
                 <Picker.Item label="X Server" value="xServer" />
@@ -419,6 +427,11 @@ const TwitterConfigureWill = () => {
                   {storageOptionDescription[storageOption]}
                 </HelperText>
               </View>
+              <HelperText type="info" className="text-base ml-2 text-red-500 font-bold">
+                For demo purposes, this option will only be valid if at least two storage locations are involved. This
+                ensures the demonstration of the file distribution process. (You may choose multiple personal cloud
+                options or a combination of BeyondLife and a personal cloud.)
+              </HelperText>
             </View>
           )}
 

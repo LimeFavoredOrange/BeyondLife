@@ -8,6 +8,7 @@ import OffensiveOption from './OffensiveOption';
 const Filter = ({ applyFunction, setTargets, showOptions, setShowOptions, tab, setTab, current_data }) => {
   const [option, setOption] = React.useState('Default');
   const [offensive, setOffensive] = React.useState('noDetect');
+
   return (
     <Modal
       animationType="slide"
@@ -27,7 +28,8 @@ const Filter = ({ applyFunction, setTargets, showOptions, setShowOptions, tab, s
             style={{ backgroundColor: '#036635', width: '50%' }}
             onPress={async () => {
               setShowOptions(!showOptions);
-              setTargets(await applyFunction(option, offensive, tab, current_data));
+              const temp = applyFunction(option, offensive, tab, current_data);
+              setTargets(temp);
             }}
           >
             <Text className="text-white text-base font-bold text-center">Set & close</Text>
