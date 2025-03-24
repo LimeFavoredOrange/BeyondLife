@@ -1,0 +1,65 @@
+{
+  "expo": {
+    "name": "BeyondLife",
+    "slug": "beyondlife",
+    "version": "1.0.0",
+    "icon": "./assets/icon6.png",
+    "plugins": [
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ],
+      "expo-secure-store",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.759598077912-b2sv2au01e7otsttmru0702p9k4ednfc"
+        }
+      ]
+    ],
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "permissions": ["CAMERA", "CAMERA_ROLL", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"],
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/b773ff8b-02ea-4b8e-831a-8cc85f0d6c89"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.xinzhang9091.BeyondLife",
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": ["com.googleusercontent.apps.759598077912-r27lg26pndr093siik6fd1ah3tf4ug1h"]
+          }
+        ]
+      }
+    },
+    "android": {
+      "package": "com.xinzhang9091.BeyondLife",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "95fc06c4-4f6d-4bec-97a5-3ec156194ff9"
+      }
+    },
+    "scheme": ["BeyondLife"],
+    "runtimeVersion": "1.0.0",
+    "owner": "xinzhang9091"
+  }
+}
