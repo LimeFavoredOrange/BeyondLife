@@ -4,7 +4,7 @@
 
 [![React Native](https://img.shields.io/badge/Framework-React%20Native-blue)](https://reactnative.dev/)
 [![Expo](https://img.shields.io/badge/Built%20with-Expo-purple)](https://expo.dev/)
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![AGPL License](https://img.shields.io/badge/license-AGPL--3.0-green.svg)](LICENSE)
 
 Welcome to the open-source demo source code for **BeyondLife** – a secure, interactive, and future-oriented digital will experience.  
 This repository contains the **core source code** for a lightweight demo version of the BeyondLife app, focusing on X(formerly Twitter) integration.
@@ -107,7 +107,8 @@ This project is intended solely for research and academic purposes. The implemen
 
 ## 📄 License
 
----
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).  
+See the [LICENSE](./LICENSE) file for details.
 
 
 
