@@ -43,8 +43,6 @@ import AccessWillDataScreen from '../screens/AccessWillDataScreen';
 
 import ViewDataScreen from '../screens/ViewDataScreen';
 
-import ViewBackupScreen from '../screens/ViewBackupScreen';
-
 // Heir Management Screen
 import HeirManagementScreen from '../screens/HeirManagementScreen';
 
@@ -97,7 +95,6 @@ const Navigation = () => {
 
       <Stack.Screen name="Add Account" component={AddAccountScreen} />
       <Stack.Screen name="View Account" component={ViewAccountScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="View Backup" component={ViewBackupScreen} />
 
       <Stack.Screen name="Heir Management" component={HeirManagementScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Will Trigger Setting" component={WillTriggerSettingScreen} options={{ headerShown: false }} />
