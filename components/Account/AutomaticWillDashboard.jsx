@@ -18,7 +18,7 @@ const AccountDashboard = () => {
   const [gmailStatus, setGmailStatus] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // 控制 Tooltip 的显示状态
+  // Control the display status of Tooltip
   const [showTooltip, setShowTooltip] = useState({
     googleDrive: false,
     gmail: false,
@@ -46,12 +46,12 @@ const AccountDashboard = () => {
     fetchStatus();
   }, []);
 
-  // 处理 Tooltip 交互
+  // Handle Tooltip Interaction
   const handleTooltipPress = (tooltipKey) => {
     setShowTooltip((prev) => ({ ...prev, [tooltipKey]: true }));
     setTimeout(() => {
       setShowTooltip((prev) => ({ ...prev, [tooltipKey]: false }));
-    }, 1000); // 1s 后自动关闭
+    }, 1000); // Hide the tooltip after 1 second
   };
 
   const platforms = [
