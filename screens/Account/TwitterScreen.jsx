@@ -9,11 +9,9 @@ import axiosInstance from '../../api';
 import { Button, SearchBar, Badge, Divider } from '@rneui/themed';
 
 import Filter from '../../components/Account/Filter';
-import AutoSetting from '../../components/Account/AutoSetting';
 
 import Loading from '../../components/Loading';
 import { userData } from '../../Data/Twitter/twitterData';
-import twitterBackup from '../../Data/Twitter/twitterBackup';
 import { useNavigation } from '@react-navigation/native';
 
 const formatTimestamp = (timestamp) => {
@@ -186,8 +184,8 @@ const TwitterScreen = () => {
       <FlatList
         data={targets}
         keyExtractor={(item, index) => `${item.id}-${index}`}
-        removeClippedSubviews={false} // 确保列表项不会因优化而被隐藏
-        extraData={targets} // 确保状态更新时触发重新渲染
+        removeClippedSubviews={false} // Make sure the list is not clipped
+        extraData={targets} // Re-render the list when targets change
         renderItem={({ item }) => {
           console.log('item', item);
           return (
@@ -196,12 +194,11 @@ const TwitterScreen = () => {
               activeOpacity={0.6}
             >
               <View className="flex-row items-start">
-                {/* 图片（如果有才显示） */}
+                {/* Show the images if present */}
                 {item.images && item.images[0] && item.images[0].trim() ? (
                   <Image source={{ uri: item.images[0] }} className="w-36 h-20 rounded-lg mr-3" resizeMode="cover" />
                 ) : null}
 
-                {/* 文字部分，确保 Text 可正常换行，不被 Image 挤压 */}
                 <View className="flex-1">
                   <Text className="text-md font-semibold text-gray-900 flex-shrink">{item.text}</Text>
                   <Text className="text-sm text-gray-500 mt-1">{formatTimestamp(item.timestamp)}</Text>

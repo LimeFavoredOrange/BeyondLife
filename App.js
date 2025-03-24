@@ -45,7 +45,7 @@ export default function App() {
     registerForPushNotificationsAsync();
 
     const notificationListener = Notifications.addNotificationReceivedListener((notification) => {
-      console.log('系统通知已收到:', notification);
+      console.log('System notification received:', notification);
       Toast.show({
         type: 'success',
         text1: notification.request.content.title,
@@ -54,7 +54,7 @@ export default function App() {
     });
 
     const responseListener = Notifications.addNotificationResponseReceivedListener((response) => {
-      console.log('用户点击了系统通知:', response);
+      console.log('User clicked on system notification:', response);
     });
 
     return () => {

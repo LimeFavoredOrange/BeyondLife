@@ -7,7 +7,6 @@ const ViewBackupScreen = ({ route }) => {
   const [data, setData] = React.useState(twitterRestore.data.data);
   const [medias, setMedias] = React.useState(twitterRestore.data.includes.media);
   console.log(medias);
-  // console.log(data);
 
   // React.useEffect(() => {
   //   const { data } = route.params;

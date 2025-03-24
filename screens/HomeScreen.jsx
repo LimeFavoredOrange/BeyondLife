@@ -7,7 +7,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import * as DocumentPicker from 'expo-document-picker';
 
 import * as Animatable from 'react-native-animatable';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // 图标库
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import * as ExpoFileSystem from 'expo-file-system';
 import twitterRestore from '../Data/Twitter/twitterRestore';
@@ -242,9 +242,9 @@ const HomeScreen = () => {
   };
 
   const GoogleDriveButton = ({ connected }) => {
-    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#4285F4]'; // 已连接用浅绿色，未连接用Google蓝
-    const textColor = connected ? 'text-[#1E7D32]' : 'text-white'; // 已连接文字深绿色
-    const iconColor = connected ? '#1E7D32' : '#FFFFFF'; // 已连接图标深绿色
+    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#4285F4]';
+    const textColor = connected ? 'text-[#1E7D32]' : 'text-white';
+    const iconColor = connected ? '#1E7D32' : '#FFFFFF';
 
     return (
       <TouchableOpacity
@@ -315,9 +315,9 @@ const HomeScreen = () => {
   };
 
   const BeyondLifeButton = ({ connected }) => {
-    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#428588]'; // 已连接用浅绿色，未连接用Google蓝
-    const textColor = connected ? 'text-[#1E7D32]' : 'text-white'; // 已连接文字深绿色
-    const iconColor = connected ? '#1E7D32' : '#FFFFFF'; // 已连接图标深绿色
+    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#428588]';
+    const textColor = connected ? 'text-[#1E7D32]' : 'text-white';
+    const iconColor = connected ? '#1E7D32' : '#FFFFFF';
 
     return (
       <TouchableOpacity
@@ -360,9 +360,9 @@ const HomeScreen = () => {
   };
 
   const DropboxButton = ({ connected }) => {
-    const color = connected ? 'bg-[#DFF7E1]' : 'bg-[#0061FF]'; // 已连接使用浅绿色，未连接为蓝色
-    const textColor = connected ? 'text-[#1E7D32]' : 'text-white'; // 已连接文字为深绿色，未连接为白色
-    const iconColor = connected ? '#1E7D32' : '#FFFFFF'; // 已连接图标深绿色，未连接图标为白色
+    const color = connected ? 'bg-[#DFF7E1]' : 'bg-[#0061FF]';
+    const textColor = connected ? 'text-[#1E7D32]' : 'text-white';
+    const iconColor = connected ? '#1E7D32' : '#FFFFFF';
 
     return (
       <TouchableOpacity
@@ -377,7 +377,7 @@ const HomeScreen = () => {
   };
 
   const OneDriveButton = ({ connected }) => {
-    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#A9A9A9]'; // 已连接用浅绿色，未连接用微软蓝
+    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#A9A9A9]';
     const textColor = connected ? 'text-[#1E7D32]' : 'text-white';
     const iconColor = connected ? '#1E7D32' : '#FFFFFF';
 
@@ -398,7 +398,7 @@ const HomeScreen = () => {
   };
 
   const ICloudButton = ({ connected }) => {
-    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#A9A9A9]'; // 已连接用浅绿色，未连接用柔和的蓝
+    const bgColor = connected ? 'bg-[#DFF7E1]' : 'bg-[#A9A9A9]';
     const textColor = connected ? 'text-[#1E7D32]' : 'text-white';
     const iconColor = connected ? '#1E7D32' : '#FFFFFF';
 
@@ -586,7 +586,7 @@ const HomeScreen = () => {
                       style={{ backgroundColor: '#036635' }}
                       className="p-4 bg-blue-500 rounded-lg"
                       onPress={() => {
-                        setShowCloudPlatforms(true); // 展示外部云平台按钮
+                        setShowCloudPlatforms(true);
                       }}
                     >
                       <Text className="text-white font-bold text-center">Connect External Cloud Platforms</Text>

@@ -27,10 +27,6 @@ const GmailForward = () => {
 
   const navigation = useNavigation();
 
-  // React.useEffect(() => {
-  //   alert('Forward function is not available for this static demo');
-  // }, []);
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <AccountHeader title={'Forward emails'} />
@@ -152,12 +148,12 @@ const GmailForward = () => {
           onPress={async () => {
             setShowLoading(true);
             // Send the request to the backend
-            await axios.put('https://tor2023-203l.onrender.com/gmail/forward', {
-              keywords: keywordList,
-              senders: addressList,
-              before: date,
-              targetEmail: targetEmail,
-            });
+            // await axios.put('https://tor2023-203l.onrender.com/gmail/forward', {
+            //   keywords: keywordList,
+            //   senders: addressList,
+            //   before: date,
+            //   targetEmail: targetEmail,
+            // });
             setShowLoading(false);
             navigation.goBack();
           }}

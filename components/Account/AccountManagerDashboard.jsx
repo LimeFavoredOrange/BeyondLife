@@ -39,6 +39,7 @@ const AccountManagerDashboard = () => {
     fetchData();
   }, [accountNumber]);
 
+  // Tag color
   const tagColor = {
     Work: 'red',
     Social: 'blue',

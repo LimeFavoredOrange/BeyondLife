@@ -1,6 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
 
-// 保存数据
+// Store data
 export const saveToSecureStore = async (key, value) => {
   try {
     await SecureStore.setItemAsync(key, value);
@@ -10,7 +10,7 @@ export const saveToSecureStore = async (key, value) => {
   }
 };
 
-// 读取数据
+// Read data
 export const getFromSecureStore = async (key) => {
   try {
     const value = await SecureStore.getItemAsync(key);
@@ -26,7 +26,7 @@ export const getFromSecureStore = async (key) => {
   }
 };
 
-// 删除数据
+// Delete data
 export const deleteFromSecureStore = async (key) => {
   try {
     await SecureStore.deleteItemAsync(key);

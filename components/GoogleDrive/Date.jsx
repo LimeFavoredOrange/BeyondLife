@@ -1,7 +1,6 @@
 import { View, Text, Modal, TouchableOpacity } from 'react-native';
 import { vw, vh } from 'react-native-expo-viewport-units';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import axios from 'axios';
 import React from 'react';
 
 // Component to pick the date
@@ -36,9 +35,6 @@ const Date1 = ({ showDate, setShowDate, setShowLoading }) => {
             style={{ backgroundColor: '#FF2E2E', width: '50%' }}
             onPress={async () => {
               setShowLoading(true);
-              // const response = await axios.put('http://localhost:8080/googleDrive/files/delete/before', {
-              //   date: date,
-              // });
               setShowLoading(false);
               setShowDate(!showDate);
             }}

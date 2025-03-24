@@ -35,7 +35,7 @@ import {
 
 import * as SecureStore from 'expo-secure-store';
 
-// 保存私钥到 SecureStore
+// Store the private key in SecureStore
 export async function savePrivateKeyToSecureStore(key, value) {
   try {
     await SecureStore.setItemAsync(key, value, {
@@ -101,15 +101,9 @@ const Login = ({
         link_to_google_drive,
       } = response.data;
 
-      // Sand an api call to update the notification token
-
-      // const { publicKey, privateKey } = await generateKeyPairFromPassword(email, password);
       const { publicKey, privateKey } = await generateECCKeyPair(email, password);
 
-      console.log('publicKey\n', publicKey);
-      console.log('privateKey\n', privateKey);
-
-      // 保存到 SecureStore
+      // Save the private key to SecureStore
       await savePrivateKeyToSecureStore('private_key', privateKey);
 
       console.log(response.data);

@@ -15,7 +15,7 @@ import { getPrivateKeyFromSecureStore } from '../components/Welcome/Login';
 import { decryptData } from '../utils/pki';
 import { useNavigation } from '@react-navigation/native';
 
-import AccessDataNothing from '../assets/access_data_notiong.png'; // 确保路径正确
+import AccessDataNothing from '../assets/access_data_notiong.png';
 
 const AccessWillDataScreen = () => {
   const [showLoading, setShowLoading] = useState(false);
@@ -35,7 +35,6 @@ const AccessWillDataScreen = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log('Live Data:', response.data);
 
         // Filter all the wills that are ready to access
         const readyWills = response.data.wills.filter((will) => will.status === 'Activated - Ready to View');
@@ -58,15 +57,12 @@ const AccessWillDataScreen = () => {
   const handleAccess = async (will) => {
     try {
       setShowLoading(true);
-      console.log('Accessing will:', will);
       const response = await axiosInstance.get('/twitter/accessWill', {
         params: { creator_id: will.creatorInfo },
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      console.log('Access Will Response:', response.data);
       const target = response.data.data;
       const privateKey = await getPrivateKeyFromSecureStore('private_key');
 
@@ -75,10 +71,8 @@ const AccessWillDataScreen = () => {
         const check = await decryptData(target[i], privateKey);
         output.push(check);
       }
-      console.log('Decrypted Data:', output);
 
       // Navigate to the next screen with the decrypted data
-      // 在这里导航到下一个屏幕，并传递解密后的数据
       navigation.navigate('View Data', { data: output });
 
       setShowLoading(false);
@@ -96,7 +90,7 @@ const AccessWillDataScreen = () => {
       <AccountHeader setShowLoading={setShowLoading} title={'Access Will Data'} />
 
       {isEmpty ? (
-        // 没有数据时显示占位图与提示文字
+        // Show placeholder image and text when there is no data
         <View className="flex-1 justify-center items-center px-4">
           <Animatable.View animation="fadeIn" duration={800} style={{ alignItems: 'center' }}>
             <Image

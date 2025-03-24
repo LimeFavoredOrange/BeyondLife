@@ -52,13 +52,6 @@ import NotificationListScreen from '../screens/NotificationListScreen';
 import NotificationDetailScreen from '../screens/NotificationDetailScreen';
 
 const Navigation = () => {
-  // const [isSplashVisible, setIsSplashVisible] = React.useState(true);
-
-  // if (isSplashVisible) {
-  //   console.log('Splash screen');
-  //   return <SplashScreen onFinish={() => setIsSplashVisible(false)} />;
-  // }
-
   // Haven't login yet.
   if (useSelector(selectIsLogin) === false) {
     return (

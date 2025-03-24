@@ -6,11 +6,11 @@ import { createCipheriv, createDecipheriv, createHmac } from 'react-native-quick
 
 import { Buffer } from 'buffer';
 
-const ec = new EC('p256'); // 使用 SECP256R1 椭圆曲线
+const ec = new EC('p256'); // Using the SECP256R1 elliptic curve
 
-// HKDF 密钥派生实现
+// HKDF key derivation implementation
 function hkdf(sharedSecret, length, salt = null, info = '') {
-  const hashLen = 32; // SHA-256 输出长度为 32 字节
+  const hashLen = 32; // The length of the hash output for SHA-256 is 32 bytes
   const pseudoRandomKey = createHmac('sha256', salt || Buffer.alloc(hashLen, 0))
     .update(Buffer.from(sharedSecret, 'hex'))
     .digest();
@@ -31,15 +31,15 @@ function hkdf(sharedSecret, length, salt = null, info = '') {
 
 // Generate a fixed seed based on email and password
 async function deriveSeed(email, password) {
-  const salt = FIX_SALT; // 固定盐值
+  const salt = FIX_SALT; // Use a fixed salt
   const hash = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, `${email}:${password}:${salt}`);
-  return hash; // 返回 SHA-256 哈希值作为种子
+  return hash; // Return the SHA-256 hash as the seed
 }
 
 export async function generateECCKeyPair(email, password) {
-  const ec = new EC('p256'); // 使用 SECP256R1 曲线
+  const ec = new EC('p256'); // Using the SECP256R1 elliptic curve
   const seed = await deriveSeed(email, password);
-  const keyPair = ec.keyFromPrivate(seed, 'hex'); // 使用种子生成私钥
+  const keyPair = ec.keyFromPrivate(seed, 'hex'); // Use the seed to generate the private key
 
   return {
     publicKey: keyPair.getPublic('hex'),
@@ -54,7 +54,7 @@ export async function generateRSAKeyPairFromSeed(email, password) {
     modulusLength: 2048,
     publicKeyEncoding: { type: 'spki', format: 'pem' },
     privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
-    randomBytes: () => Buffer.from(seed, 'hex'), // 确定性随机数
+    randomBytes: () => Buffer.from(seed, 'hex'), // Deterministic random number
   });
 
   return {
@@ -64,13 +64,13 @@ export async function generateRSAKeyPairFromSeed(email, password) {
 }
 
 export async function decryptData(backendData, privateKeyHex) {
-  // 解析前端私钥
+  // Parse the private key from the hex string
   const privateKey = ec.keyFromPrivate(privateKeyHex, 'hex');
 
-  // 解析后端公钥
+  // Parse the server public key from the hex string
   const serverPublicKey = ec.keyFromPublic(backendData.serverPublicKey, 'hex');
 
-  // 计算共享密钥 (sharedSecret)
+  // Calculate the shared secret
   let sharedSecret = privateKey.derive(serverPublicKey.getPublic()).toString('hex');
 
   // Check the shared secret, its length should be 64
@@ -83,12 +83,12 @@ export async function decryptData(backendData, privateKeyHex) {
 
   console.log('Shared Secret:', sharedSecret);
 
-  // 使用 HKDF 派生对称密钥
+  // Use HKDF to derive the symmetric key
   const derivedKey = hkdf(sharedSecret, 32, null, 'handshake data'); // 与后端一致的 info 字段
 
   console.log('Derived Key:', derivedKey.toString('hex'));
 
-  // 解密密文
+  // Convert the ciphertext and IV from hex to Buffer
   const ciphertext = Buffer.from(backendData.ciphertext, 'hex');
   const iv = Buffer.from(backendData.iv, 'hex');
 
@@ -101,13 +101,13 @@ export async function decryptData(backendData, privateKeyHex) {
   return decrypted.toString('utf-8');
 }
 
-// 基于密码生成确定性的公私钥对
+// Generate a deterministic key pair based on the password
 export async function generateKeyPairFromPassword(email, password) {
   const seed = await deriveSeed(email, password);
 
-  // 使用种子生成私钥
+  // Generate the private key using the seed
   const privateKey = ec.keyFromPrivate(seed, 'hex');
-  const publicKey = privateKey.getPublic('hex'); // 从私钥派生公钥
+  const publicKey = privateKey.getPublic('hex'); // Get the public key from the private key
 
   return { publicKey, privateKey: privateKey.getPrivate('hex') };
 }

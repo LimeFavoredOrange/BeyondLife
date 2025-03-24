@@ -10,7 +10,7 @@ const NotificationDetailScreen = ({ route }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F3F4F6' }}>
-      {/* 标题区域 */}
+      {/* Header Area */}
       <AccountHeader title="Notification Details" />
 
       <Animatable.View
@@ -18,7 +18,7 @@ const NotificationDetailScreen = ({ route }) => {
         duration={600}
         className="m-4 p-6 bg-white rounded-2xl shadow-md border border-gray-200"
       >
-        {/* 图标与标题 */}
+        {/* Icon and title */}
         <View className="flex-row items-center mb-4">
           <View className="p-3 bg-yellow-100 rounded-full">
             <Icon
@@ -30,17 +30,17 @@ const NotificationDetailScreen = ({ route }) => {
           <Text className="text-xl font-bold text-gray-800 ml-3">{notification.title || 'Notification'}</Text>
         </View>
 
-        {/* 通知正文 */}
+        {/* Notification info */}
         <View className="mb-4">
           <Text className="text-base text-gray-700 leading-6">{notification.message}</Text>
         </View>
 
-        {/* 时间戳 */}
+        {/* Timestamp */}
         <View className="mb-4">
           <Text className="text-sm text-gray-500">Date: {notification.timestamp}</Text>
         </View>
 
-        {/* 分类显示 */}
+        {/* Show current notification's category */}
         {notification.category && (
           <View className="mt-2">
             <Text className="text-xs text-blue-700 bg-blue-100 px-3 py-1 rounded-full self-start">
@@ -48,8 +48,6 @@ const NotificationDetailScreen = ({ route }) => {
             </Text>
           </View>
         )}
-
-        {/* 添加更多的交互按钮或信息 */}
       </Animatable.View>
     </SafeAreaView>
   );

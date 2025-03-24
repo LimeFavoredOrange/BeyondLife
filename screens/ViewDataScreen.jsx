@@ -4,7 +4,7 @@ import * as Animatable from 'react-native-animatable';
 import { Card } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import AccessDataNothing from '../assets/access_data_notiong.png'; // 确保路径正确
+import AccessDataNothing from '../assets/access_data_notiong.png';
 
 const ViewDataScreen = ({ route }) => {
   const { data } = route.params;
@@ -15,7 +15,7 @@ const ViewDataScreen = ({ route }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F3F4F6' }}>
-      {/* 标题区域 */}
+      {/* Title area */}
       <View className="px-4 pt-4 pb-2">
         <Text className="text-2xl font-bold text-gray-800 mb-2">Decrypted Content</Text>
         <Text className="text-sm text-gray-500">
@@ -24,7 +24,7 @@ const ViewDataScreen = ({ route }) => {
       </View>
 
       {isEmpty ? (
-        // 没有数据时显示占位图与提示文字
+        // Placeholder image and text when there's no data
         <View className="flex-1 justify-center items-center px-4">
           <Animatable.View animation="fadeIn" duration={800} style={{ alignItems: 'center' }}>
             <Image

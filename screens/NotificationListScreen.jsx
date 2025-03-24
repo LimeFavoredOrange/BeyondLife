@@ -99,7 +99,6 @@ const NotificationListScreen = () => {
           return (
             <Animatable.View key={item.id} animation="fadeInUp" duration={600} delay={index * 100} className="mb-4">
               <View className="relative">
-                {/* 红点 */}
                 {!isRead && (
                   <View
                     style={{
@@ -114,11 +113,9 @@ const NotificationListScreen = () => {
                     }}
                   />
                 )}
-                {/* 卡片 */}
                 <TouchableOpacity activeOpacity={0.9} onPress={() => handlePressNotification(item)}>
                   <Card className="rounded-xl shadow-md border border-gray-200" style={{ elevation: 5 }}>
                     <Card.Content className="flex-row items-start">
-                      {/* 中间：内容 */}
                       <View className="flex-1">
                         <View className="flex-row justify-between items-center mb-1">
                           <Text className="text-base font-semibold text-gray-800">{item.title}</Text>

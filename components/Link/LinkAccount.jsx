@@ -25,7 +25,7 @@ const AccountManagerDashboard = () => {
     googleDrive: false,
   });
 
-  // 获取当前绑定状态
+  // Get the current linked account status
   useEffect(() => {
     axiosInstance
       .get('link/status', { headers: { Authorization: `Bearer ${token}` } })
@@ -39,7 +39,7 @@ const AccountManagerDashboard = () => {
       });
   }, []);
 
-  // Twitter OAuth 配置
+  // Twitter OAuth Configuration
   const discovery = {
     authorizationEndpoint: 'https://twitter.com/i/oauth2/authorize',
     tokenEndpoint: 'https://api.x.com/2/oauth2/token',
@@ -62,13 +62,10 @@ const AccountManagerDashboard = () => {
     discovery
   );
 
-  // 处理 Twitter 认证回调
+  // Handle Twitter OAuth Callback
   useEffect(() => {
     if (response?.type === 'success') {
       const { code } = response.params;
-      console.log('Authorization Code:', code);
-      console.log('Client ID:', CLIENT_ID);
-      console.log('Client Secret:', CLIENT_SECRET);
 
       const tokenRequest = {
         code,
@@ -121,7 +118,7 @@ const AccountManagerDashboard = () => {
     }
   }, [response]);
 
-  // 处理 Tooltip
+  // Handle Tooltip Interaction
   const handleTooltipPress = (tooltipKey) => {
     setShowTooltip((prev) => ({ ...prev, [tooltipKey]: true }));
     setTimeout(() => {

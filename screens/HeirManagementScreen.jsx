@@ -191,7 +191,7 @@ const HeirManagementScreen = () => {
       {currentStep === 2 && (
         <View>
           <Text className="text-xl mb-4 text-center">
-            Let’s keep your chosen one in the loop! Please enter the email of an heir who’s already registered with
+            Let's keep your chosen one in the loop! Please enter the email of an heir who’s already registered with
             BeyondLife.
           </Text>
           <TextInput

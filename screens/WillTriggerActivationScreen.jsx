@@ -26,7 +26,7 @@ const WillTriggerActivationScreen = () => {
   const [unFinishedWill, setUnFinishedWill] = useState([]);
 
   useEffect(() => {
-    let isInitialFetch = true; // 标记是否为首次加载
+    let isInitialFetch = true;
 
     const fetchWills = async () => {
       if (isInitialFetch) setShowLoading(true);
@@ -49,19 +49,12 @@ const WillTriggerActivationScreen = () => {
       } finally {
         if (isInitialFetch) {
           setShowLoading(false);
-          isInitialFetch = false; // 仅首次加载后设置为 false
+          isInitialFetch = false;
         }
       }
     };
 
-    // 立即执行一次
     fetchWills();
-
-    // // 设置定时器，每 2 秒执行一次
-    // const intervalId = setInterval(fetchWills, 20000);
-
-    // // 组件卸载时清除定时器
-    // return () => clearInterval(intervalId);
   }, [token, trigger]);
 
   useEffect(() => {
@@ -158,7 +151,7 @@ const WillTriggerActivationScreen = () => {
       await axiosInstance.post(
         '/twitter/withdrawVote',
         { will_address: will.address },
-        { headers: { Authorization: `Bearer ${token}` } } // 使用反引号
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setTrigger((prev) => !prev);
     } else {
@@ -174,7 +167,7 @@ const WillTriggerActivationScreen = () => {
       <AccountHeader setShowLoading={setShowLoading} title={'Will Trigger Activation'} />
 
       {isEmpty ? (
-        // 没有数据时显示占位图与提示文字
+        // No data available
         <View className="flex-1 justify-center items-center px-4">
           <Animatable.View animation="fadeIn" duration={800} style={{ alignItems: 'center' }}>
             <Image

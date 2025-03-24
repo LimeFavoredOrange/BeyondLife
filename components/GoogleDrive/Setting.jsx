@@ -1,7 +1,6 @@
 import { View, Text, Modal, TouchableOpacity, TextInput, FlatList } from 'react-native';
 import { vw, vh } from 'react-native-expo-viewport-units';
 import { Icon } from '@rneui/base';
-import axios from 'axios';
 import React from 'react';
 
 const Setting = ({ showSetting, setShowSetting, setShowLoading }) => {
@@ -67,9 +66,6 @@ const Setting = ({ showSetting, setShowSetting, setShowLoading }) => {
             style={{ backgroundColor: '#FF2E2E', width: '50%' }}
             onPress={async () => {
               setShowLoading(true);
-              // const response = await axios.put('https://tor2023-203l.onrender.com/googleDrive/files/delete', {
-              //   keywords: keywordList,
-              // });
               setShowLoading(false);
               setShowSetting(!showSetting);
             }}

@@ -120,7 +120,6 @@ const HeirSettingScreen = () => {
 
       {/* Render the number of heirs, based on numberOfHeirs */}
 
-      {/* 根据数量生成对应数量的盒子 */}
       {Array.from({ length: numberOfHeirs }).map((_, index) => {
         return (
           <View key={index} className=" m-3 rounded-lg p-3" style={{ backgroundColor: '#1b7549' }}>
