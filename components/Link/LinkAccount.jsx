@@ -47,7 +47,7 @@ const AccountManagerDashboard = () => {
   };
 
   const redirectUri = makeRedirectUri({
-    scheme: 'digitalWill',
+    scheme: 'BeyondLife',
     useProxy: false,
   });
 
@@ -67,6 +67,8 @@ const AccountManagerDashboard = () => {
     if (response?.type === 'success') {
       const { code } = response.params;
       console.log('Authorization Code:', code);
+      console.log('Client ID:', CLIENT_ID);
+      console.log('Client Secret:', CLIENT_SECRET);
 
       const tokenRequest = {
         code,
@@ -77,6 +79,7 @@ const AccountManagerDashboard = () => {
       };
 
       const basicAuth = 'Basic ' + Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64');
+      console.log('Basic Auth:', basicAuth);
 
       fetch('https://api.x.com/2/oauth2/token', {
         method: 'POST',

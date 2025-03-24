@@ -152,7 +152,7 @@ const HomeScreen = () => {
       clientId: DROPBOX_KEY,
       scopes: [],
       redirectUri: makeRedirectUri({
-        scheme: 'digitalWill',
+        scheme: 'BeyondLife',
         path: 'oauth',
       }),
       extraParams: {

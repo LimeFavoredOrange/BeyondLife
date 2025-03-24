@@ -16,6 +16,14 @@ const SettingDashboard = () => {
     Alert.alert('Demo Version', 'This feature is disabled in the demo version.', [{ text: 'OK', style: 'cancel' }]);
   };
 
+  const showInfoPopup = () => {
+    Alert.alert(
+      'Info',
+      'This system forms part of an academic study focused on applying fine-grained cryptographic access control to posthumous data scenarios. The current design highlights considerations such as user privacy, portability, and controlled data delegation. This project is intended solely for research and academic purposes. The implementations provided here are proof-of-concept and have not been optimized or thoroughly tested for use in production environments. ',
+      [{ text: 'OK', style: 'cancel' }]
+    );
+  };
+
   return (
     <ScrollView className="flex-1 bg-gray-100 px-4" showsVerticalScrollIndicator={false}>
       {/* 账户管理 */}
@@ -54,10 +62,7 @@ const SettingDashboard = () => {
       {/* 关于 */}
       <View className="mt-4 bg-white rounded-2xl shadow-md p-4">
         <Text className="text-lg font-semibold text-gray-700 mb-2">About</Text>
-        <TouchableOpacity
-          className="flex-row items-center justify-between py-3"
-          onPress={showDemoAlert} // 替换实际导航
-        >
+        <TouchableOpacity className="flex-row items-center justify-between py-3" onPress={showInfoPopup}>
           <Text className="text-base text-gray-800">About This App</Text>
           <Icon name="chevron-right" type="feather" size={20} color="gray" />
         </TouchableOpacity>

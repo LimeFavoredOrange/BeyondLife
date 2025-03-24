@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, ScrollView } from 'react-native';
+import { View, Text, TextInput, ScrollView, Alert } from 'react-native';
 import { Input, Icon, Button } from '@rneui/themed';
 import { vw } from 'react-native-expo-viewport-units';
 import SelectDropdown from 'react-native-select-dropdown';
@@ -59,8 +59,6 @@ const AddAccountScreen = () => {
   const newAccountNumber = useSelector(selectAccountNumber) + 1;
 
   React.useEffect(() => {
-    console.log('加入新的账户');
-
     const getAccounts = async () => {
       try {
         const response = await axiosInstance.get(`heirs/list`, {
@@ -68,6 +66,12 @@ const AddAccountScreen = () => {
             Authorization: `Bearer ${token}`,
           },
         });
+        console.log('Executors:', response.data);
+        if (response.data.length === 0) {
+          Alert.alert('No executors found', 'Please add executors first.', [{ text: 'OK', style: 'cancel' }]);
+          navigation.replace('Heir Management');
+          return;
+        }
         setExecutors(response.data);
       } catch (error) {
         console.error('Get accounts error:', error);
